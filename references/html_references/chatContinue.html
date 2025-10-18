@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMA - 채팅</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .chat-message-user {
+            background: #f3f4f6;
+            border-radius: 18px;
+            padding: 12px 18px;
+            max-width: 70%;
+            margin-left: auto;
+        }
+        .thinking-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Left Sidebar -->
+    <div class="fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-50" style="width: 260px;">
+        <div class="flex flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">H</span>
+                    </div>
+                    <span class="font-semibold text-gray-900 tracking-tight">HAMA</span>
+                </div>
+                <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="panel-left" class="w-5 h-5 text-gray-600"></i>
+                </button>
+            </div>
+            
+            <div class="p-3">
+                <button class="w-full flex items-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium text-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    새 채팅
+                </button>
+            </div>
+            
+            <div class="px-3 space-y-1">
+                <button class="w-full flex items-center gap-3 px-3 py-2 bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="message-square" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">채팅</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">아티팩트</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="pie-chart" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">포트폴리오</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="user" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">마이페이지</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="compass" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">디스커버</span>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto px-3 mt-4">
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 mb-2">최근 채팅</div>
+                <div class="space-y-0.5">
+                    <button class="w-full text-left px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="text-sm text-gray-900 truncate font-medium">삼성전자 투자 분석 요청</div>
+                        <div class="text-xs text-gray-500 mt-0.5">방금</div>
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <div class="text-sm text-gray-900 truncate">포트폴리오 리밸런싱</div>
+                        <div class="text-xs text-gray-500 mt-0.5">5일 전</div>
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <div class="text-sm text-gray-900 truncate">미국 주식 시장 전망</div>
+                        <div class="text-xs text-gray-500 mt-0.5">1주 전</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 p-3">
+                <div class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
+                    <div class="w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-semibold">김</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-gray-900 truncate">김투자</div>
+                        <div class="text-xs text-gray-500">프리미엄 플랜</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Chat Area -->
+    <div style="margin-left: 260px;">
+        <div class="max-w-4xl mx-auto px-8 py-8 pb-32">
+            <!-- User Message 1 -->
+            <div class="flex justify-end mb-6">
+                <div class="chat-message-user">
+                    <p class="text-gray-900">삼성전자에 대한 투자 분석을 해주세요. 현재 주가와 향후 전망을 알고 싶어요.</p>
+                </div>
+            </div>
+            
+            <!-- AI Response 1 -->
+            <div class="mb-8">
+                <!-- Thinking Process -->
+                <div class="thinking-box mb-4">
+                    <button onclick="toggleThinking()" class="w-full flex items-center justify-between text-left">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="brain" class="w-4 h-4 text-gray-600"></i>
+                            <span class="text-sm font-medium text-gray-900">생각 중...</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-600"></i>
+                    </button>
+                    <div id="thinkingContent" class="mt-3 text-sm text-gray-600 space-y-2 hidden">
+                        <div class="flex items-start gap-2">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                            <div>실시간 주가 데이터 수집 중...</div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                            <div>최근 3개월 재무제표 분석</div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                            <div>반도체 업황 및 경쟁사 비교</div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                            <div>증권사 목표가 및 투자의견 취합</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Message Content (Full Width - Gemini Style) -->
+                <div class="prose max-w-none">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 tracking-tight">삼성전자 투자 분석</h2>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
+                            <span class="font-semibold text-gray-900">현재 주가 정보</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mt-3">
+                            <div>
+                                <div class="text-sm text-gray-600">현재가</div>
+                                <div class="text-xl font-semibold text-gray-900">₩72,500</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600">등락률</div>
+                                <div class="text-xl font-semibold text-green-600">+2.8%</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600">시가총액</div>
+                                <div class="text-xl font-semibold text-gray-900">432조원</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3 tracking-tight">투자 포인트</h3>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-white border border-gray-200 rounded-xl p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="trending-up" class="w-4 h-4 text-green-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">반도체 업황 회복</h4>
+                                    <p class="text-sm text-gray-600">메모리 반도체 가격이 상승세로 전환되면서 실적 개선이 예상됩니다. 특히 HBM(고대역폭 메모리) 수요 증가가 긍정적입니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white border border-gray-200 rounded-xl p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="cpu" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">AI 반도체 수혜</h4>
+                                    <p class="text-sm text-gray-600">생성형 AI 확산으로 데이터센터 향 고성능 메모리 수요가 급증하고 있으며, 삼성전자는 이 분야에서 강점을 보유하고 있습니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white border border-gray-200 rounded-xl p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="dollar-sign" class="w-4 h-4 text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-1">밸류에이션 매력</h4>
+                                    <p class="text-sm text-gray-600">현재 PER 11배 수준으로 과거 평균 대비 저평가 구간입니다. 실적 턴어라운드 시 주가 상승 여력이 큽니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3 tracking-tight">증권사 투자의견</h3>
+                    
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 mb-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">평균 목표가</div>
+                                <div class="text-2xl font-semibold text-gray-900">₩85,000</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">투자의견</div>
+                                <div class="text-2xl font-semibold text-green-600">매수 (85%)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-600 mt-0.5"></i>
+                            <div>
+                                <div class="font-semibold text-gray-900 mb-1">리스크 요인</div>
+                                <p class="text-sm text-gray-700">중국 경기 둔화, 반도체 가격 변동성, 파운드리 사업 경쟁 심화 등이 주요 리스크입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Save as Artifact Button -->
+                    <div class="flex items-center gap-3 mt-6 pt-6 border-t border-gray-200">
+                        <button class="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            아티팩트로 저장
+                        </button>
+                        <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium">
+                            <i data-lucide="share" class="w-4 h-4"></i>
+                            공유
+                        </button>
+                        <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            복사
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global Chat Prompt -->
+    <div class="fixed bottom-8" style="left: 50%; transform: translateX(-50%); width: calc(100% - 320px - 8rem); max-width: 900px;">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-lg">
+            <div class="flex items-end gap-3 p-4">
+                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="paperclip" class="w-5 h-5 text-gray-600"></i>
+                </button>
+                <textarea rows="1" placeholder="메시지를 입력하세요..." class="flex-1 resize-none border-none focus:outline-none text-gray-900 placeholder-gray-500"></textarea>
+                <button class="p-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
+                    <i data-lucide="arrow-up" class="w-5 h-5 text-white"></i>
+                </button>
+            </div>
+        </div>
+        <div class="text-center mt-2 text-xs text-gray-500">
+            AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        function toggleThinking() {
+            const content = document.getElementById('thinkingContent');
+            content.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

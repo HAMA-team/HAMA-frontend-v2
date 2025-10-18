@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMA - 채팅 기록</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Left Sidebar -->
+    <div class="fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-50" style="width: 260px;">
+        <div class="flex flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">H</span>
+                    </div>
+                    <span class="font-semibold text-gray-900 tracking-tight">HAMA</span>
+                </div>
+                <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="panel-left" class="w-5 h-5 text-gray-600"></i>
+                </button>
+            </div>
+            
+            <div class="p-3">
+                <button class="w-full flex items-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium text-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    새 채팅
+                </button>
+            </div>
+            
+            <div class="px-3 space-y-1">
+                <button class="w-full flex items-center gap-3 px-3 py-2 bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="message-square" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">채팅</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">아티팩트</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="pie-chart" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">포트폴리오</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="user" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">마이페이지</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="compass" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">디스커버</span>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto px-3 mt-4">
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 mb-2">최근 채팅</div>
+                <div class="space-y-0.5">
+                    <button class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <div class="text-sm text-gray-900 truncate">삼성전자 투자 분석 요청</div>
+                        <div class="text-xs text-gray-500 mt-0.5">2일 전</div>
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <div class="text-sm text-gray-900 truncate">포트폴리오 리밸런싱</div>
+                        <div class="text-xs text-gray-500 mt-0.5">5일 전</div>
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <div class="text-sm text-gray-900 truncate">미국 주식 시장 전망</div>
+                        <div class="text-xs text-gray-500 mt-0.5">1주 전</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 p-3">
+                <div class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
+                    <div class="w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-semibold">김</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-gray-900 truncate">김투자</div>
+                        <div class="text-xs text-gray-500">프리미엄 플랜</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div style="margin-left: 260px;">
+        <div class="max-w-4xl mx-auto px-8 py-8 pb-32">
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">채팅 기록</h1>
+                <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    새 채팅
+                </button>
+            </div>
+            
+            <div class="relative mb-6">
+                <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+                <input type="text" placeholder="채팅 검색..." class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div class="text-sm text-gray-600 mb-4">총 27개의 대화</div>
+            
+            <div class="space-y-2">
+                <button class="w-full bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all text-left">
+                    <h3 class="font-semibold text-gray-900 mb-2">삼성전자 투자 분석 요청</h3>
+                    <p class="text-sm text-gray-600 mb-3">삼성전자의 최근 실적과 향후 전망을 분석해주세요. 특히 반도체 부문...</p>
+                    <div class="text-xs text-gray-500">2일 전 · 금융 AI 에이전트</div>
+                </button>
+                
+                <button class="w-full bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all text-left">
+                    <h3 class="font-semibold text-gray-900 mb-2">포트폴리오 리밸런싱 제안</h3>
+                    <p class="text-sm text-gray-600 mb-3">현재 포트폴리오를 분석하고 최적의 자산 배분을 제안해드렸습니다...</p>
+                    <div class="text-xs text-gray-500">5일 전 · 금융 AI 에이전트</div>
+                </button>
+                
+                <button class="w-full bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all text-left">
+                    <h3 class="font-semibold text-gray-900 mb-2">미국 주식 시장 전망</h3>
+                    <p class="text-sm text-gray-600 mb-3">2025년 미국 주식 시장의 주요 트렌드와 투자 전략에 대해...</p>
+                    <div class="text-xs text-gray-500">1주 전 · 금융 AI 에이전트</div>
+                </button>
+                
+                <button class="w-full bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all text-left">
+                    <h3 class="font-semibold text-gray-900 mb-2">배당주 추천 요청</h3>
+                    <p class="text-sm text-gray-600 mb-3">안정적인 배당 수익을 제공하는 국내 우량주를 추천해드렸습니다...</p>
+                    <div class="text-xs text-gray-500">2주 전 · 금융 AI 에이전트</div>
+                </button>
+                
+                <button class="w-full bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all text-left">
+                    <h3 class="font-semibold text-gray-900 mb-2">2차전지 섹터 분석</h3>
+                    <p class="text-sm text-gray-600 mb-3">전기차 시장 성장에 따른 2차전지 업체들의 투자 가치를 분석...</p>
+                    <div class="text-xs text-gray-500">3주 전 · 금융 AI 에이전트</div>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global Chat Prompt -->
+    <div class="fixed bottom-8" style="left: 50%; transform: translateX(-50%); width: calc(100% - 320px - 8rem); max-width: 900px;">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-lg">
+            <div class="flex items-end gap-3 p-4">
+                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="paperclip" class="w-5 h-5 text-gray-600"></i>
+                </button>
+                <textarea rows="1" placeholder="메시지를 입력하세요..." class="flex-1 resize-none border-none focus:outline-none text-gray-900 placeholder-gray-500"></textarea>
+                <button class="p-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
+                    <i data-lucide="arrow-up" class="w-5 h-5 text-white"></i>
+                </button>
+            </div>
+        </div>
+        <div class="text-center mt-2 text-xs text-gray-500">
+            AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.
+        </div>
+    </div>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

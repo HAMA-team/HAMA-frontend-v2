@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAMA - 아티팩트 상세</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Left Sidebar -->
+    <div class="fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-50" style="width: 260px;">
+        <div class="flex flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">H</span>
+                    </div>
+                    <span class="font-semibold text-gray-900 tracking-tight">HAMA</span>
+                </div>
+                <button class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="panel-left" class="w-5 h-5 text-gray-600"></i>
+                </button>
+            </div>
+            
+            <div class="p-3">
+                <button class="w-full flex items-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium text-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    새 채팅
+                </button>
+            </div>
+            
+            <div class="px-3 space-y-1">
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="message-square" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">채팅</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">아티팩트</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="pie-chart" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">포트폴리오</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="user" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">마이페이지</span>
+                </button>
+                <button class="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-left text-sm">
+                    <i data-lucide="compass" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-gray-700 font-medium">디스커버</span>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto px-3 mt-4">
+                <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 mb-2">최근 채팅</div>
+                <div class="space-y-0.5">
+                    <button class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <div class="text-sm text-gray-900 truncate">삼성전자 투자 분석 요청</div>
+                        <div class="text-xs text-gray-500 mt-0.5">2일 전</div>
+                    </button>
+                    <button class="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <div class="text-sm text-gray-900 truncate">포트폴리오 리밸런싱</div>
+                        <div class="text-xs text-gray-500 mt-0.5">5일 전</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 p-3">
+                <div class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
+                    <div class="w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-semibold">김</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-gray-900 truncate">김투자</div>
+                        <div class="text-xs text-gray-500">프리미엄 플랜</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div style="margin-left: 260px;">
+        <div class="max-w-5xl mx-auto px-8 py-8 pb-32">
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i>
+                </button>
+                <div class="flex-1">
+                    <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">삼성전자 투자 분석 리포트</h1>
+                    <div class="flex items-center gap-3 mt-2 text-sm text-gray-600">
+                        <span>2025년 10월 16일</span>
+                        <span>·</span>
+                        <span>오후 3:42</span>
+                        <span>·</span>
+                        <span>기업 분석</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i data-lucide="share" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i data-lucide="download" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i data-lucide="more-vertical" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="bg-white border border-gray-200 rounded-xl p-8 mb-6">
+                <div class="prose max-w-none">
+                    <!-- Executive Summary -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-3 tracking-tight">요약</h2>
+                        <p class="text-gray-700 leading-relaxed">삼성전자는 메모리 반도체 업황 회복과 AI 반도체 수요 증가에 따라 실적 개선이 예상됩니다. 현재 주가는 PER 11배로 저평가 구간에 있으며, 증권사 평균 목표가 대비 약 17%의 상승 여력이 있습니다.</p>
+                    </div>
+                    
+                    <!-- Current Price Info -->
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 tracking-tight">현재 주가 정보</h2>
+                    <div class="grid grid-cols-3 gap-4 mb-8">
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <div class="text-sm text-gray-600 mb-1">현재가</div>
+                            <div class="text-2xl font-semibold text-gray-900">₩72,500</div>
+                            <div class="text-sm text-green-600 mt-1">+2.8% ↑</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <div class="text-sm text-gray-600 mb-1">시가총액</div>
+                            <div class="text-2xl font-semibold text-gray-900">432조원</div>
+                            <div class="text-sm text-gray-500 mt-1">코스피 1위</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <div class="text-sm text-gray-600 mb-1">52주 최고/최저</div>
+                            <div class="text-2xl font-semibold text-gray-900">85,000</div>
+                            <div class="text-sm text-gray-500 mt-1">/ 55,000</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Investment Points -->
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 tracking-tight">투자 포인트</h2>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="bg-white border-2 border-gray-200 rounded-xl p-5">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">반도체 업황 회복</h3>
+                                    <p class="text-gray-700 leading-relaxed">메모리 반도체 가격이 상승세로 전환되면서 실적 개선이 예상됩니다. 특히 HBM(고대역폭 메모리) 수요 증가가 긍정적이며, 데이터센터 향 고성능 메모리 출하량이 급증하고 있습니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white border-2 border-gray-200 rounded-xl p-5">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="cpu" class="w-5 h-5 text-blue-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">AI 반도체 수혜</h3>
+                                    <p class="text-gray-700 leading-relaxed">생성형 AI 확산으로 데이터센터 향 고성능 메모리 수요가 급증하고 있습니다. 삼성전자는 HBM3E 양산을 시작하며 시장 점유율 확대가 기대됩니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white border-2 border-gray-200 rounded-xl p-5">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="dollar-sign" class="w-5 h-5 text-purple-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">밸류에이션 매력</h3>
+                                    <p class="text-gray-700 leading-relaxed">현재 PER 11배 수준으로 과거 평균 대비 저평가 구간입니다. 실적 턴어라운드 시 주가 재평가 가능성이 높으며, 역사적 평균 PER 회복 시 30% 이상 상승 여력이 있습니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analyst Opinions -->
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 tracking-tight">증권사 투자의견</h2>
+                    <div class="bg-gray-50 rounded-xl p-6 mb-8">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2">평균 목표가</div>
+                                <div class="text-3xl font-semibold text-gray-900">₩85,000</div>
+                                <div class="text-sm text-green-600 mt-1">+17.2% 상승 여력</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-2">투자의견</div>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-2xl font-semibold text-green-600">매수</span>
+                                    <span class="text-lg text-gray-500">(85%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Risk Factors -->
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 tracking-tight">리스크 요인</h2>
+                    <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8">
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-orange-600 mt-0.5"></i>
+                                <span class="text-gray-700"><strong>중국 경기 둔화:</strong> 중국 스마트폰 및 PC 시장 부진이 메모리 수요에 부정적 영향</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-orange-600 mt-0.5"></i>
+                                <span class="text-gray-700"><strong>반도체 가격 변동성:</strong> 공급 과잉 우려 시 메모리 가격 급락 가능성</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-orange-600 mt-0.5"></i>
+                                <span class="text-gray-700"><strong>파운드리 경쟁:</strong> TSMC 대비 기술 격차로 파운드리 사업 수익성 저하</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Conclusion -->
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4 tracking-tight">결론</h2>
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                        <p class="text-gray-700 leading-relaxed mb-3">삼성전자는 메모리 반도체 업황 회복과 AI 수요 증가라는 두 가지 호재를 동시에 누릴 수 있는 위치에 있습니다. 현재 밸류에이션이 매력적인 수준이며, 중장기 투자 관점에서 긍정적입니다.</p>
+                        <div class="flex items-center gap-2 mt-4 pt-4 border-t border-blue-200">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">매수 추천</span>
+                            <span class="text-sm text-gray-600">목표가: ₩85,000 | 투자기간: 6-12개월</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tags -->
+            <div class="flex items-center gap-2 mb-8">
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">#삼성전자</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">#반도체</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">#AI</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">#기업분석</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global Chat Prompt -->
+    <div class="fixed bottom-8" style="left: 50%; transform: translateX(-50%); width: calc(100% - 320px - 8rem); max-width: 900px;">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-lg">
+            <div class="flex items-end gap-3 p-4">
+                <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i data-lucide="paperclip" class="w-5 h-5 text-gray-600"></i>
+                </button>
+                <textarea rows="1" placeholder="이 리포트에 대해 질문하기..." class="flex-1 resize-none border-none focus:outline-none text-gray-900 placeholder-gray-500"></textarea>
+                <button class="p-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
+                    <i data-lucide="arrow-up" class="w-5 h-5 text-white"></i>
+                </button>
+            </div>
+        </div>
+        <div class="text-center mt-2 text-xs text-gray-500">
+            현재 아티팩트 내용이 자동으로 컨텍스트에 포함됩니다
+        </div>
+    </div>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
