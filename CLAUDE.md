@@ -17,16 +17,18 @@ Chat 중심의 직관적인 UX를 통해 사용자가 AI와 협업하며 투자 
 ## Design Principles
 
 1. **Chat First**: 모든 주요 기능이 Chat 인터페이스를 통해 접근 가능
-2. **Persistent Chat Input**: 모든 페이지에서 Chat 입력창이 하단 중앙에 고정 (Perplexity 스타일)
+2. **Persistent Chat Input**: Chat, Artifact 상세, Portfolio 화면에서 Chat 입력창이 하단 중앙에 고정
 3. **HITL 필수 표시**: 승인이 필요한 경우 반드시 화면에 표시
-4. **선택적 가시성**: LangGraph 에이전트 활동은 토글 가능한 뷰로 제공
+4. **Agent Activity Integration**: LangGraph 에이전트 활동은 Chat 화면 내에 Claude처럼 시간 순서대로 자연스럽게 표시
 
 ## Design References
 
 - **Shell & LNB**: Claude 구조 (좌측 사이드바)
 - **Chat UI**: Gemini 레이아웃 (사용자 질문: 말풍선, AI 답변: 전체 너비)
+- **Agent Activity**: Claude의 Thinking 표시 방식
 - **Portfolio**: PilePeak.ai 레이아웃 및 톤
 - **전체 테마**: PilePeak.ai의 Light Mode
+- **참조 이미지**: `references/img_references/` 및 `references/mockup_references/`
 
 ## Project Structure
 
@@ -41,7 +43,7 @@ src/
 │   │   ├── ChatView.tsx           # 채팅 메인 뷰
 │   │   ├── MessageBubble.tsx      # 사용자 메시지 말풍선
 │   │   ├── AIResponse.tsx         # AI 답변 (전체 너비)
-│   │   ├── ThinkingToggle.tsx     # 추론 과정 토글
+│   │   ├── AgentActivity.tsx      # 에이전트 활동 표시 (Claude 스타일)
 │   │   └── SaveArtifactButton.tsx # Artifact 저장 버튼
 │   ├── HITL/
 │   │   ├── HITLPanel.tsx          # HITL 승인 패널
@@ -77,17 +79,19 @@ src/
     └── utils.ts                   # 유틸리티 함수
 ```
 
-## Key Features (MVP Phase 1)
+## Key Features (Phase 1: 시연 필수 코어)
 
 ### 1. Core Layout
 - Shell & LNB 구조 (Claude 스타일)
-- 하단 고정 Chat Input (모든 페이지)
+- 하단 고정 Chat Input (Chat, Artifact 상세, Portfolio에만)
 - LNB 토글 기능
+- 다크 모드 지원 (Tailwind dark mode class 방식)
 
 ### 2. Chat Interface
 - Markdown 렌더링 지원
-- Thinking 표시 (접었다 펼쳤다 가능)
+- Agent Activity 통합 표시 (Claude의 Thinking처럼)
 - Save as Artifact 기능
+- 빈 채팅 상태 UI (시작 제안 카드)
 
 ### 3. HITL (Human-in-the-Loop)
 - 우측 사이드 패널 표시 (Claude Artifacts 스타일)
@@ -101,18 +105,18 @@ src/
 
 ### 5. Portfolio
 - PilePeak.ai 스타일 레이아웃
-- 트리맵 시각화 (기본)
+- 다중 차트 시각화 (트리맵/원형/누적막대)
 - 포트폴리오 요약 정보
 
 ### 6. My Page
 - 사용자 정보
-- 자동화 레벨 설정 (파일럿/코파일럿/어드바이저)
-- 온보딩 체험하기 버튼
+- 자동화 레벨 설정 (프로그레스 바 형태 UI)
+- 초개인화된 투자 성향 프로필 (LLM 생성 서술형)
+- 온보딩 체험하기 버튼 (선택적)
 
-### 7. Onboarding Flow
-- Mock 데이터 기반 체험형 데모
-- 4단계 질문 플로우
-- 투자 성향 및 자동화 레벨 추천
+### 7. i18n 구조
+- react-i18next 기반 다국어 지원 구조
+- 한국어/영어 지원 (번역은 Phase 3)
 
 ## API Integration
 
@@ -150,7 +154,8 @@ src/
 
 ### State Management
 - React Context 또는 Zustand 사용 (TBD)
-- MVP에서는 LocalStorage 사용 (Artifacts 저장)
+- Phase 3까지는 Backend DB 없이 LocalStorage 사용 (Artifacts 저장)
+- Phase 3부터 Backend 연동 (Artifact 영구 저장)
 
 ### Code Style
 - TypeScript 사용 권장
@@ -158,27 +163,53 @@ src/
 
 ## Important Documents
 
-- `FrontEndPRD.md`: 전체 프로젝트 요구사항 문서
+- `docs/ProductRequirements.md`: 전체 프로젝트 요구사항 문서 (FR 중심)
+- `docs/TechnicalSpecification.md`: 개발 레벨 상세 구현 문서
+- `docs/BackendRequirements.md`: 백엔드 API 변경사항 문서
+- `docs/conventions/`: 컨벤션 문서 (commit, branch, code)
 - `references/`: 디자인 참조 자료
+  - `references/HAMA Front IA.png`: 정보 구조 다이어그램
+  - `references/html_references/`: HTML 프로토타입
+  - `references/mockup_references/`: Figma 목업 (PNG)
+  - `references/img_references/`: UI/UX 참조 이미지
 
-## Out of Scope (MVP)
+## Development Phases
+
+### Phase 1: 시연 필수 코어
+- Core Layout, Chat, HITL, Artifacts, Portfolio, Dark Mode, i18n 구조
+
+### Phase 2: 시각화 & 설정
+- Portfolio 차트 옵션, My Page, 자동화 레벨 설정
+
+### Phase 3: 콘텐츠 관리 & 온보딩
+- Artifact 영구 저장, Chat History, Onboarding, i18n 번역
+
+### Phase 4: UX 강화
+- Discover, 검색, 필터링, 정렬
+
+### Phase 5: 부가 기능
+- 내보내기, 알림 센터
+
+## Out of Scope
 
 - 모바일 앱
-- 다크 모드
 - 실시간 Push 알림
 - 소셜 기능
 - 음성 인터페이스
-- 다국어 지원
 
 ## Current Status
 
-- **Phase**: MVP Development
-- **Version**: 1.0
-- **Last Updated**: 2025-10-17
+- **Phase**: Phase 1 시작 전 (문서화 완료)
+- **Version**: 2.0 (PRD 개편 완료)
+- **Last Updated**: 2025-10-20
+- **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude
 
-- 이 프로젝트는 초기 단계이며 아직 package.json이 없습니다
+- 이 프로젝트는 **캡스톤 프로젝트 발표회 부스 시연용**입니다
+- 아직 package.json이 없으며 개발 시작 전 단계입니다
 - 디자인은 PilePeak.ai, Claude, Gemini 등의 레퍼런스를 참고합니다
 - HITL(Human-in-the-Loop)은 이 프로젝트의 핵심 기능입니다
 - Chat First 원칙을 항상 염두에 두세요
+- 모든 문서는 `docs/` 폴더에서 확인할 수 있습니다
+- IA 다이어그램과 목업을 반드시 참조하세요
