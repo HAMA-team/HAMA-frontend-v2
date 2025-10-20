@@ -1,0 +1,24 @@
+{
+  "app": {
+    "title": "HAMA",
+    "description": "Human-in-the-Loop AI 투자 시스템"
+  },
+  "nav": {
+    "chat": "챗",
+    "artifacts": "아티팩트",
+    "portfolio": "포트폴리오",
+    "mypage": "마이페이지",
+    "discover": "디스커버"
+  },
+  "chat": {
+    "placeholder": "메시지를 입력하세요...",
+    "thinking": "생각 중...",
+    "saveArtifact": "아티팩트로 저장"
+  },
+  "hitl": {
+    "title": "승인 필요",
+    "approve": "승인",
+    "reject": "거부",
+    "modify": "수정"
+  }
+}

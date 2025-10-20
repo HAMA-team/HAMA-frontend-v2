@@ -1,0 +1,56 @@
+{
+  "name": "hama-frontend-v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HAMA-team/HAMA-frontend-v2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HAMA-team/HAMA-frontend-v2/issues"
+  },
+  "homepage": "https://github.com/HAMA-team/HAMA-frontend-v2#readme",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "clsx": "^2.1.1",
+    "i18next": "^25.6.0",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "lucide-react": "^0.546.0",
+    "next": "^15.5.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-i18next": "^16.1.0",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.3.0",
+    "tailwind-merge": "^3.3.1",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.8.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.38.0",
+    "eslint-config-next": "^15.5.6",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.15",
+    "typescript": "^5.9.3"
+  }
+}

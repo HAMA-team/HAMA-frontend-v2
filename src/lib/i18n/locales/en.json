@@ -1,0 +1,24 @@
+{
+  "app": {
+    "title": "HAMA",
+    "description": "Human-in-the-Loop AI Investment System"
+  },
+  "nav": {
+    "chat": "Chat",
+    "artifacts": "Artifacts",
+    "portfolio": "Portfolio",
+    "mypage": "My Page",
+    "discover": "Discover"
+  },
+  "chat": {
+    "placeholder": "Type a message...",
+    "thinking": "Thinking...",
+    "saveArtifact": "Save as Artifact"
+  },
+  "hitl": {
+    "title": "Approval Required",
+    "approve": "Approve",
+    "reject": "Reject",
+    "modify": "Modify"
+  }
+}
