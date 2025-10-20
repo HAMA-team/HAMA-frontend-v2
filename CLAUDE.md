@@ -7,12 +7,15 @@ Chat 중심의 직관적인 UX를 통해 사용자가 AI와 협업하며 투자 
 
 ## Tech Stack
 
-- **Framework**: Next.js (React)
-- **Styling**: Tailwind CSS
+- **Framework**: Next.js 15.5.6 (React 19)
+- **Language**: TypeScript 5.9
+- **Styling**: Tailwind CSS 4.1
 - **Icons**: Lucide React (1.5 strokewidth)
-- **상태관리**: React Context / Zustand (TBD)
-- **HTTP Client**: Axios / Fetch
+- **상태관리**: Zustand
+- **HTTP Client**: Axios
 - **Markdown**: react-markdown
+- **Charts**: Recharts
+- **i18n**: react-i18next
 
 ## Design Principles
 
@@ -153,9 +156,9 @@ src/
 - kebab-case for pages: `index.tsx`
 
 ### State Management
-- React Context 또는 Zustand 사용 (TBD)
-- Phase 3까지는 Backend DB 없이 LocalStorage 사용 (Artifacts 저장)
-- Phase 3부터 Backend 연동 (Artifact 영구 저장)
+- Zustand 사용 (전역 상태 관리)
+- Phase 1-2: LocalStorage 사용 (Artifacts, Chat History 임시 저장)
+- Phase 3부터: Backend DB 연동 (영구 저장)
 
 ### Code Style
 - TypeScript 사용 권장
@@ -163,15 +166,26 @@ src/
 
 ## Important Documents
 
-- `docs/ProductRequirements.md`: 전체 프로젝트 요구사항 문서 (FR 중심)
-- `docs/TechnicalSpecification.md`: 개발 레벨 상세 구현 문서
-- `docs/BackendRequirements.md`: 백엔드 API 변경사항 문서
+### Core Documents
+- `docs/ProductRequirements.md`: PRD v3.0 (User Stories, Acceptance Criteria)
+- `docs/TechnicalSpecification.md`: 컴포넌트 구조, API 연동, 성능 최적화
+- `docs/DesignSystem.md`: 디자인 토큰, 타이포그래피, 색상, 애니메이션
+- `docs/ErrorHandling.md`: 에러 시나리오 및 복구 전략
+- `docs/InformationArchitecture.md`: IA 다이어그램 및 페이지 구조
+- `docs/Userflow.md`: 사용자 플로우 다이어그램
+
+### Reference Documents
+- `references/BackendPRD.md`: 백엔드 기능 요구사항
+- `references/backendAPI.md`: 백엔드 API 명세
+- `references/design지시.md`: UI/UX 디자인 지시사항
+- `references/초기스크리닝.md`: 온보딩 질문 시나리오
+- `references/HAMA Front IA.png`: IA 다이어그램 (이미지)
+- `references/html_references/`: HTML 프로토타입
+- `references/mockup_references/`: Figma 목업 (PNG)
+- `references/img_references/`: UI/UX 참조 이미지 (Claude, Gemini, PilePeak)
+
+### Conventions
 - `docs/conventions/`: 컨벤션 문서 (commit, branch, code)
-- `references/`: 디자인 참조 자료
-  - `references/HAMA Front IA.png`: 정보 구조 다이어그램
-  - `references/html_references/`: HTML 프로토타입
-  - `references/mockup_references/`: Figma 목업 (PNG)
-  - `references/img_references/`: UI/UX 참조 이미지
 
 ## Development Phases
 
@@ -199,17 +213,19 @@ src/
 
 ## Current Status
 
-- **Phase**: Phase 1 시작 전 (문서화 완료)
-- **Version**: 2.0 (PRD 개편 완료)
-- **Last Updated**: 2025-10-20
+- **Phase**: Phase 1 개발 시작 가능 (프로젝트 셋업 완료)
+- **Version**: 3.0 (PRD 개편 완료, 문서 체계화)
+- **Last Updated**: 2025-10-21
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude
 
 - 이 프로젝트는 **캡스톤 프로젝트 발표회 부스 시연용**입니다
-- 아직 package.json이 없으며 개발 시작 전 단계입니다
+- 프로젝트 셋업 완료 (Next.js, TypeScript, Tailwind CSS, Zustand 등 설치됨)
 - 디자인은 PilePeak.ai, Claude, Gemini 등의 레퍼런스를 참고합니다
 - HITL(Human-in-the-Loop)은 이 프로젝트의 핵심 기능입니다
 - Chat First 원칙을 항상 염두에 두세요
 - 모든 문서는 `docs/` 폴더에서 확인할 수 있습니다
 - IA 다이어그램과 목업을 반드시 참조하세요
+- **다크 모드 & 다국어**: Phase 1부터 기본 세팅을 염두에 두고 개발 (CSS Variables, i18n 구조)
+  - 완전한 구현은 Phase 2-3이지만, 처음부터 구조를 고려해서 설계

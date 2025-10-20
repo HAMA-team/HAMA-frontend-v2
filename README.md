@@ -137,9 +137,22 @@ See `references/` folder for detailed design references.
 
 ## Documentation
 
-- `docs/ProductRequirements.md`: Functional requirements
+### Core Documents
+- `docs/ProductRequirements.md`: Functional requirements (User Stories)
 - `docs/TechnicalSpecification.md`: Technical implementation details
-- `docs/BackendRequirements.md`: Backend API specifications
+- `docs/DesignSystem.md`: Design tokens, typography, colors, animations
+- `docs/ErrorHandling.md`: Error scenarios and recovery strategies
+- `docs/InformationArchitecture.md`: IA diagram and page structure
+- `docs/Userflow.md`: User flow diagrams
+
+### Reference Documents
+- `references/BackendPRD.md`: Backend functional requirements
+- `references/backendAPI.md`: Backend API specifications
+- `references/design지시.md`: UI/UX design instructions
+- `references/초기스크리닝.md`: Onboarding question scenarios
+- `references/HAMA Front IA.png`: IA diagram (visual)
+
+### Conventions
 - `docs/conventions/`: Coding and git conventions
 - `CLAUDE.md`: Claude Code development guide
 

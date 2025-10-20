@@ -1,659 +1,899 @@
-# HAMA Frontend - Technical Specification
-
 **Version:** 1.0
+
 **Last Updated:** 2025-10-20
-**Purpose:** 개발팀을 위한 기술 구현 상세 명세
+
+**Parent Document:** PRD v3.0
 
 ---
 
-## 📌 문서 목적
+## 1. System Architecture
 
-이 문서는 **Product Requirements Document (PRD)**에서 분리된 기술 구현 세부사항을 다룹니다.
-- PRD는 "무엇을, 왜" 만드는지 정의
-- 본 문서는 "어떻게" 구현하는지 정의
+### 1.1 Frontend Architecture
 
----
-
-## 1. Component Structure
-
-### 1.1 주요 컴포넌트
 ```
 src/
+├── app/                    # Next.js App Router
+│   ├── layout.tsx         # Global Shell + LNB
+│   ├── page.tsx           # Chat Page (default)
+│   ├── portfolio/         # Portfolio Page
+│   ├── artifacts/         # Artifacts Page
+│   └── settings/          # My Page
+│
 ├── components/
-│   ├── Layout/
-│   │   ├── Shell.tsx
-│   │   ├── LNB.tsx
-│   │   └── ChatInput.tsx (fixed bottom)
-│   ├── Chat/
-│   │   ├── ChatView.tsx
-│   │   ├── MessageBubble.tsx
-│   │   ├── AIResponse.tsx
-│   │   ├── ThinkingToggle.tsx
-│   │   └── SaveArtifactButton.tsx
-│   ├── HITL/
-│   │   ├── HITLPanel.tsx
-│   │   └── ApprovalActions.tsx
-│   ├── Artifacts/
-│   │   ├── ArtifactsList.tsx
-│   │   ├── ArtifactCard.tsx
-│   │   └── ArtifactDetail.tsx
-│   ├── Portfolio/
-│   │   ├── PortfolioView.tsx
-│   │   ├── Treemap.tsx
+│   ├── chat/
+│   │   ├── ChatMessage.tsx
+│   │   ├── ThinkingSection.tsx
+│   │   ├── ChatInput.tsx
+│   │   └── EmptyState.tsx
+│   │
+│   ├── hitl/
+│   │   └── ApprovalPanel.tsx
+│   │
+│   ├── portfolio/
+│   │   ├── PortfolioChart.tsx
+│   │   ├── TreemapChart.tsx
 │   │   ├── PieChart.tsx
-│   │   └── StackedBar.tsx
-│   ├── MyPage/
-│   │   ├── MyPageView.tsx
-│   │   └── AutomationLevelSelector.tsx
-│   ├── Onboarding/
-│   │   ├── OnboardingFlow.tsx
-│   │   └── QuestionStep.tsx
-│   └── Discover/
-│       ├── DiscoverView.tsx
-│       ├── NewsFeed.tsx
-│       └── MarketSidebar.tsx
-├── pages/
-│   ├── index.tsx (Chat)
-│   ├── artifacts.tsx
-│   ├── portfolio.tsx
-│   ├── mypage.tsx
-│   ├── discover.tsx
-│   └── onboarding.tsx
-└── lib/
-    ├── api.ts (API client)
-    └── utils.ts
+│   │   └── BarChart.tsx
+│   │
+│   └── layout/
+│       ├── Shell.tsx
+│       ├── LNB.tsx
+│       └── PersistentChatInput.tsx
+│
+├── lib/
+│   ├── api/               # API clients
+│   ├── hooks/             # Custom hooks
+│   ├── utils/             # Utility functions
+│   └── types/             # TypeScript types
+│
+└── i18n/                  # Translations
+    ├── ko.json
+    └── en.json
+
 ```
 
 ---
 
-## 2. State Management & Data Flow
+## 2. Component Specifications
 
-### 2.1 전역 상태 관리
+### 2.1 ChatMessage Component
 
-#### Context API 또는 Zustand 사용
+**Related PR:** US-1.1 (기본 대화)
 
-```typescript
-// Global State Structure
-interface GlobalState {
-  // User
-  user: User | null;
-  automationLevel: 1 | 2 | 3;
+### Props Interface
 
-  // Chat
-  currentConversationId: string | null;
-  chatSessions: ChatSession[];
-
-  // UI State
-  lnbCollapsed: boolean;
-  hitlPanelOpen: boolean;
-  agentActivityVisible: boolean;
-
-  // Artifacts
-  artifacts: Artifact[];
-
-  // Portfolio
-  portfolio: PortfolioData | null;
+```tsx
+interface ChatMessageProps {
+  role: 'user' | 'assistant';
+  content: string;           // Markdown string
+  thinking?: ThinkingStep[]; // AI 사고 과정
+  timestamp: string;
+  status?: 'sending' | 'sent' | 'error';
+  onSaveArtifact?: () => void;
 }
+
+interface ThinkingStep {
+  agent: 'planner' | 'researcher' | 'strategy';
+  description: string;
+  timestamp: string;
+}
+
 ```
 
-### 2.2 Chat 상태 관리
+### Rendering Rules
 
-#### 메시지 상태
+1. **User Message:**
+    - Gemini 스타일 말풍선
+    - 우측 정렬, 최대 너비 70%
+    - 배경: `bg-blue-100 dark:bg-blue-900`
+2. **AI Message:**
+    - 전체 너비 활용
+    - Markdown 렌더링 (react-markdown)
+    - 코드 블록은 syntax highlighting (react-syntax-highlighter)
+3. **Thinking Section:**
+    - 기본 접힘 (Collapse)
+    - 클릭 시 펼쳐짐
+    - 각 Step은 아이콘 + 설명 + 시간
 
-```typescript
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  status: 'sending' | 'sent' | 'failed' | 'streaming';
-  metadata?: {
-    thinking?: string;
-    requiresApproval?: boolean;
-    approvalRequest?: ApprovalRequest;
+### Error States
+
+```tsx
+// 메시지 전송 실패 시
+<div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500">
+  <div className="flex items-center gap-2">
+    <AlertTriangle size={16} className="text-red-500" />
+    <span>전송 실패</span>
+  </div>
+  <div className="flex gap-2 mt-2">
+    <Button onClick={handleRetry}>재전송</Button>
+    <Button variant="ghost" onClick={handleDelete}>삭제</Button>
+  </div>
+</div>
+
+```
+
+---
+
+### 2.2 ApprovalPanel Component
+
+**Related PR:** US-2.1 (매매 승인 필수)
+
+### Props Interface
+
+```tsx
+interface ApprovalPanelProps {
+  isOpen: boolean;
+  onClose?: () => void;  // 사용자가 결정 전까지 호출 불가
+  approvalRequest: {
+    action: 'buy' | 'sell';
+    stock_code: string;
+    stock_name: string;
+    quantity: number;
+    price: number;
+    total_amount: number;
+    current_weight: number;
+    expected_weight: number;
+    risk_warning?: string;
+    alternatives?: Alternative[];
+  };
+  onApprove: (adjustments?: Adjustments) => Promise<void>;
+  onReject: (reason?: string) => Promise<void>;
+}
+
+interface Alternative {
+  suggestion: string;
+  adjusted_quantity: number;
+  adjusted_amount: number;
+}
+
+interface Adjustments {
+  quantity?: number;
+  price?: number;
+}
+
+```
+
+### Layout
+
+- Claude Artifacts 스타일 우측 패널
+- 너비: 50vw (최소 600px)
+- 오버레이: 좌측 50% 어둡게 처리
+- Z-index: 50
+
+### Interaction Rules
+
+1. **패널 열림:**
+    - Backend `requires_approval: true` 수신 시
+    - 애니메이션: 우측에서 슬라이드 인
+2. **닫힘 방지:**
+    - 오버레이 클릭: 무시
+    - ESC 키: 무시
+    - 우측 상단 X 버튼: 비활성화
+3. **승인/거부 후:**
+    - API 호출 완료 후 패널 자동 닫힘
+    - 토스트 메시지: "매수 주문이 실행되었습니다"
+    - Chat 화면으로 자동 스크롤
+
+### Loading States
+
+```tsx
+// 승인 버튼 클릭 시
+<Button
+  disabled={isApproving}
+  className="w-full"
+>
+  {isApproving ? (
+    <>
+      <Loader2 className="animate-spin mr-2" size={16} />
+      승인 처리 중...
+    </>
+  ) : (
+    '승인'
+  )}
+</Button>
+
+```
+
+---
+
+### 2.3 PortfolioChart Component
+
+**Related PR:** US-3.1 (포트폴리오 즉시 시각화)
+
+### Props Interface
+
+```tsx
+interface PortfolioChartProps {
+  data: PortfolioData;
+  chartType: 'treemap' | 'pie' | 'bar';
+  onChartTypeChange: (type: ChartType) => void;
+  onStockClick?: (stockCode: string) => void;
+}
+
+interface PortfolioData {
+  stocks: Stock[];
+  total_value: number;
+  total_return: number;
+  total_return_percent: number;
+}
+
+interface Stock {
+  stock_code: string;
+  stock_name: string;
+  quantity: number;
+  current_price: number;
+  purchase_price: number;
+  weight: number;           // 비중 (0~1)
+  return_percent: number;
+  sector: string;
+}
+
+```
+
+### Chart Library Selection
+
+- **추천:** Recharts (React 친화적, Tree Map 지원)
+- **대안:** Chart.js (더 많은 커스터마이징)
+
+### Chart Types Implementation
+
+**1. Treemap (기본)**
+
+```tsx
+import { Treemap } from 'recharts';
+
+<Treemap
+  data={treemapData}
+  dataKey="weight"
+  stroke="#fff"
+  fill="#8884d8"
+  content={<CustomizedContent />}
+/>
+
+```
+
+**2. Pie Chart**
+
+```tsx
+import { PieChart, Pie, Cell } from 'recharts';
+
+<PieChart>
+  <Pie
+    data={pieData}
+    cx="50%"
+    cy="50%"
+    labelLine={false}
+    label={renderCustomizedLabel}
+    outerRadius={80}
+    fill="#8884d8"
+    dataKey="weight"
+  >
+    {pieData.map((entry, index) => (
+      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+    ))}
+  </Pie>
+</PieChart>
+
+```
+
+**3. Bar Chart (수익률 순위)**
+
+```tsx
+import { BarChart, Bar, XAxis, YAxis } from 'recharts';
+
+<BarChart data={sortedByReturn}>
+  <XAxis dataKey="stock_name" />
+  <YAxis />
+  <Bar dataKey="return_percent" fill="#8884d8" />
+</BarChart>
+
+```
+
+### Color Scheme
+
+```tsx
+// PilePeak.ai 참조 색상
+const CHART_COLORS = {
+  positive: '#10B981',  // Green
+  negative: '#EF4444',  // Red
+  neutral: '#6B7280',   // Gray
+  accent: '#3B82F6',    // Blue
+};
+
+// 섹터별 색상 (예시)
+const SECTOR_COLORS: Record<string, string> = {
+  '반도체': '#8B5CF6',
+  '배터리': '#F59E0B',
+  '금융': '#3B82F6',
+  '제약': '#10B981',
+  '기타': '#6B7280',
+};
+
+```
+
+---
+
+## 3. API Integration
+
+### 3.1 Chat API
+
+**Endpoint:** `POST /api/v1/chat`
+
+### Request
+
+```tsx
+interface ChatRequest {
+  message: string;
+  thread_id: string;
+  automation_level: 1 | 2 | 3;  // 어드바이저, 코파일럿, 파일럿
+  config?: {
+    language?: 'ko' | 'en';
+    max_tokens?: number;
   };
 }
+
 ```
 
-**상태 전이**:
-```
-[user input] → sending → sent
-                      ↘ failed (재전송 가능)
+### Response (일반)
 
-[AI response] → streaming → sent
-```
-
-### 2.3 HITL 상태 관리
-
-```typescript
-interface HITLState {
-  isOpen: boolean;
-  approvalRequest: ApprovalRequest | null;
-  conversationId: string | null;
-  status: 'pending' | 'approving' | 'rejecting' | 'error';
-}
-```
-
-**HITL 플로우**:
-```
-1. Chat API 응답에서 requires_approval: true 감지
-2. HITLState.isOpen = true
-3. HITL 패널 화면 우측 50%에 표시
-4. 사용자 승인/거부 액션
-5. /api/v1/chat/approve 호출
-6. 성공 시: HITLState 초기화 + 패널 닫기
-7. 실패 시: 오류 메시지 + 상태 유지
-```
-
-### 2.4 로컬 스토리지 사용
-
-#### Artifacts 저장
-
-```typescript
-// LocalStorage Key: 'hama_artifacts'
-interface ArtifactsStorage {
-  version: string; // "1.0"
-  artifacts: Artifact[];
-  lastUpdated: Date;
+```tsx
+interface ChatResponse {
+  message: string;          // AI 답변 (Markdown)
+  thinking?: ThinkingStep[];
+  requires_approval: false;
+  thread_id: string;
+  timestamp: string;
 }
 
-// Quota 관리
-- 최대 저장 용량: 5MB
-- 용량 초과 시: 가장 오래된 Artifact 자동 삭제
-- 사용자에게 경고 메시지 표시
 ```
 
-#### LNB 토글 상태 저장
+### Response (HITL 필요)
 
-```typescript
-// LocalStorage Key: 'hama_lnb_collapsed'
-- 값: boolean
-- 페이지 로드 시 복원
+```tsx
+interface ChatResponseWithApproval extends ChatResponse {
+  requires_approval: true;
+  approval_request: ApprovalRequest;
+}
+
 ```
 
-### 2.5 데이터 동기화 정책
+### Error Handling
 
-#### Chat Sessions 동기화
+```tsx
+try {
+  const response = await fetch('/api/v1/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(chatRequest),
+  });
 
-```typescript
-// 페이지 로드 시
-1. GET /api/v1/chat/sessions 호출
-2. 최근 50개 세션 가져오기
-3. LNB에 표시 (최근 10개만)
-4. 캐시: SessionStorage에 저장 (세션 동안 유지)
-```
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
 
-#### Portfolio 데이터 동기화
+  const data = await response.json();
 
-```typescript
-// 페이지 진입 시
-1. GET /api/v1/portfolio/{id} 호출
-2. 성공 시: 데이터 표시 + LocalStorage에 캐시
-3. 실패 시: LocalStorage 캐시 데이터 사용 + "오래된 데이터" 표시
-4. 새로고침 버튼: 강제로 API 재호출
+  // HITL 체크
+  if (data.requires_approval) {
+    openApprovalPanel(data.approval_request);
+  }
+
+  return data;
+} catch (error) {
+  console.error('Chat API Error:', error);
+  // 사용자에게 에러 메시지 표시
+  toast.error('메시지 전송에 실패했습니다. 다시 시도해주세요.');
+  return null;
+}
+
 ```
 
 ---
 
-## 3. Real-time Features & Reconnection Logic
+### 3.2 SSE (Server-Sent Events) for Real-time Thinking
 
-### 3.1 SSE (Server-Sent Events) 연결
+**Endpoint:** `GET /api/v1/chat/stream`
 
-#### LangGraph Activity View 실시간 업데이트
+### Implementation
 
-```typescript
-// 연결 설정
-const eventSource = new EventSource('/api/v1/chat/stream/{conversation_id}');
+```tsx
+const eventSource = new EventSource(`/api/v1/chat/stream?thread_id=${threadId}`);
 
-// 이벤트 핸들러
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  // UI 업데이트: "📋 계획 수립 중..."
+
+  if (data.type === 'thinking') {
+    // Thinking 섹션 업데이트
+    updateThinking(data.step);
+  } else if (data.type === 'message') {
+    // 최종 답변
+    updateMessage(data.content);
+  }
 };
 
-eventSource.onerror = () => {
-  // 재연결 로직 실행
+eventSource.onerror = (error) => {
+  console.error('SSE Error:', error);
+  eventSource.close();
+
+  // 폴링 모드로 전환 (Fallback)
+  startPolling(threadId);
 };
+
 ```
 
-#### 재연결 로직
+### Retry Logic
 
-```typescript
-// 지수 백오프 재연결
-let retryCount = 0;
-const MAX_RETRIES = Infinity; // 무한 재시도
-const BASE_DELAY = 1000; // 1초
-const MAX_DELAY = 30000; // 최대 30초
+```tsx
+function createSSEConnection(threadId: string, retryCount = 0) {
+  const maxRetries = 3;
+  const backoffMs = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
 
-function reconnect() {
-  const delay = Math.min(BASE_DELAY * Math.pow(2, retryCount), MAX_DELAY);
+  const eventSource = new EventSource(`/api/v1/chat/stream?thread_id=${threadId}`);
 
-  setTimeout(() => {
-    console.log(`Reconnecting... (attempt ${retryCount + 1})`);
-    connectSSE();
-    retryCount++;
-  }, delay);
-}
+  eventSource.onerror = () => {
+    eventSource.close();
 
-// 연결 성공 시 retryCount 초기화
-eventSource.onopen = () => {
-  retryCount = 0;
-  showToast("연결이 복구되었습니다", "success");
-};
-```
-
-### 3.2 WebSocket 대체 방안 (Optional)
-
-#### WebSocket 연결
-
-```typescript
-const ws = new WebSocket('ws://localhost:8000/ws/chat/{conversation_id}');
-
-ws.onopen = () => {
-  console.log("WebSocket connected");
-};
-
-ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  // 실시간 메시지 처리
-};
-
-ws.onerror = () => {
-  // 재연결
-};
-
-ws.onclose = () => {
-  // 재연결
-};
-```
-
-### 3.3 폴링 폴백 (Fallback)
-
-```typescript
-// SSE/WebSocket 연결 실패 시
-// 5초마다 HTTP 폴링
-
-let pollingInterval: NodeJS.Timeout;
-
-function startPolling() {
-  pollingInterval = setInterval(async () => {
-    const response = await fetch(`/api/v1/chat/status/${conversationId}`);
-    const data = await response.json();
-    // UI 업데이트
-  }, 5000);
-}
-
-function stopPolling() {
-  clearInterval(pollingInterval);
-}
-```
-
-### 3.4 연결 상태 UI
-
-```typescript
-// LangGraph Activity View 상태 표시
-interface ConnectionStatus {
-  status: 'connected' | 'connecting' | 'disconnected' | 'error';
-  message: string;
-}
-
-// UI 표시
-- connected: 초록색 점 + "실시간 연결됨"
-- connecting: 노란색 점 + "연결 중..."
-- disconnected: 회색 점 + "연결 끊김 (재연결 시도 중)"
-- error: 빨간색 점 + "연결 실패 (폴링 모드)"
-```
-
----
-
-## 4. Error Handling & Exception Specifications
-
-### 4.1 API Error Handling
-
-#### HTTP Status Code 처리
-
-| Status Code | 의미 | Frontend 동작 |
-|-------------|------|--------------|
-| **200** | 성공 | 정상 처리 |
-| **400** | Bad Request | 입력값 검증 오류 메시지 표시 |
-| **401** | Unauthorized | 로그인 페이지로 리다이렉트 (Phase 2) |
-| **403** | Forbidden | "권한이 없습니다" 토스트 표시 |
-| **404** | Not Found | "요청한 리소스를 찾을 수 없습니다" 표시 |
-| **422** | Validation Error | 상세 검증 오류 메시지 표시 |
-| **429** | Too Many Requests | "잠시 후 다시 시도해주세요" + 재시도 버튼 |
-| **500** | Internal Server Error | "일시적인 오류가 발생했습니다" + 재시도 버튼 |
-| **503** | Service Unavailable | "서비스 점검 중입니다" 전체 화면 표시 |
-
-#### 422 Validation Error 세부 처리
-
-```typescript
-// Response 예시
-{
-  "detail": [
-    {
-      "loc": ["body", "message"],
-      "msg": "메시지는 필수입니다",
-      "type": "value_error.missing"
+    if (retryCount < maxRetries) {
+      setTimeout(() => {
+        createSSEConnection(threadId, retryCount + 1);
+      }, backoffMs);
+    } else {
+      // 폴링 모드로 전환
+      startPolling(threadId);
+      toast.warning('실시간 업데이트를 사용할 수 없습니다. 5초마다 새로고침됩니다.');
     }
-  ]
+  };
+
+  return eventSource;
 }
-```
 
-**Frontend 처리**:
-- `loc` 필드로 어느 입력값이 문제인지 파악
-- 해당 입력 필드에 붉은색 테두리 + 하단에 오류 메시지 표시
-- 첫 번째 오류 필드로 포커스 이동
-
-#### 네트워크 오류 처리
-
-| 오류 유형 | 감지 방법 | Frontend 동작 |
-|----------|---------|--------------|
-| **Timeout** | Request timeout (30초) | "응답 시간 초과" + 재시도 버튼 |
-| **Network Failure** | `fetch` reject | "네트워크 연결을 확인해주세요" |
-| **CORS Error** | Browser console error | 개발 환경에서만 경고 표시 |
-
-### 4.2 Chat API 특수 오류 처리
-
-#### 시나리오 1: Chat 메시지 전송 실패
-
-```typescript
-// 실패 시 동작
-1. 메시지를 전송 중(pending) 상태로 UI에 표시
-2. API 실패 시 메시지 상태를 "전송 실패"로 변경
-3. 메시지 옆에 ⚠️ 아이콘 + "재전송" 버튼 표시
-4. 재전송 버튼 클릭 시 동일한 메시지 재전송
-```
-
-**사용자 경험**:
-- 전송 실패한 메시지는 회색으로 표시
-- "재전송" 또는 "삭제" 옵션 제공
-
-#### 시나리오 2: HITL 승인/거부 API 실패
-
-```typescript
-// 실패 시 동작
-1. HITL 패널에 오류 메시지 표시
-2. "승인/거부" 버튼 다시 활성화
-3. 오류 원인 표시 (예: "승인 처리 중 오류 발생")
-4. "다시 시도" 버튼 제공
-```
-
-**중요**: HITL 패널은 닫히지 않음 (사용자가 반드시 결정을 내려야 함)
-
-### 4.3 Portfolio API 오류 처리
-
-#### 포트폴리오 데이터 로드 실패
-
-```typescript
-// 실패 시 UI
-- 차트 영역에 "포트폴리오 데이터를 불러올 수 없습니다" 메시지
-- "새로고침" 버튼 제공
-- 이전에 캐시된 데이터가 있다면 표시 + "오래된 데이터" 표시
-```
-
-#### 부분 데이터 누락 처리
-
-```typescript
-// 예: 일부 종목의 current_price가 null
-- 해당 종목을 "가격 정보 없음"으로 표시
-- 전체 차트는 정상 렌더링
-- 사용자에게 "일부 데이터가 업데이트되지 않았습니다" 경고
-```
-
-### 4.4 Artifact 저장 실패 처리
-
-```typescript
-// LocalStorage 저장 실패 시 (quota 초과)
-1. "저장 공간이 부족합니다" 토스트 메시지
-2. "오래된 Artifacts 삭제" 버튼 제공
-3. 저장 재시도 옵션 제공
-```
-
-### 4.5 실시간 스트리밍 오류 처리
-
-#### SSE/WebSocket 연결 실패
-
-```typescript
-// 연결 실패 시 동작
-1. 최초 연결 실패: 3회 재시도 (지수 백오프: 1s, 2s, 4s)
-2. 3회 실패 후: "실시간 업데이트를 사용할 수 없습니다" 경고
-3. LangGraph Activity View를 일반 폴링 모드로 전환
-```
-
-#### 연결 중단 처리
-
-```typescript
-// 연결 중단 감지 시
-1. "연결이 끊어졌습니다" 상태 표시
-2. 자동 재연결 시도 (무한 재시도, 백오프: 최대 30초)
-3. 재연결 성공 시: "연결이 복구되었습니다" 토스트
 ```
 
 ---
 
-## 5. Edge Cases & Special Scenarios
+## 4. State Management
 
-### 5.1 동시 HITL 요청
+### 4.1 Global State (Zustand)
 
-**시나리오**: 사용자가 여러 매매 요청을 동시에 보냄
+```tsx
+// stores/chatStore.ts
+import create from 'zustand';
 
-```typescript
-처리 방법:
-1. 첫 번째 HITL 패널만 표시
-2. 나머지 HITL 요청은 대기열(Queue)에 저장
-3. 첫 번째 승인/거부 후, 다음 HITL 요청 자동 표시
-4. 대기 중인 HITL 개수를 패널 상단에 표시
-   예: "승인 대기 (1/3)"
-```
+interface ChatStore {
+  messages: Message[];
+  currentThreadId: string;
+  isLoading: boolean;
+  approvalPanel: {
+    isOpen: boolean;
+    data: ApprovalRequest | null;
+  };
 
-### 5.2 HITL 승인 중 네트워크 끊김
-
-**시나리오**: 승인 버튼 클릭 후 응답 전에 네트워크 끊김
-
-```typescript
-처리 방법:
-1. 로딩 상태 유지 (최대 30초)
-2. 30초 후 타임아웃: "응답 시간 초과" 오류
-3. "재시도" 버튼 제공
-4. HITL 패널은 닫히지 않음
-```
-
-### 5.3 Chat 입력 중 페이지 이탈
-
-**시나리오**: 사용자가 긴 메시지를 입력하다가 실수로 페이지 이동
-
-```typescript
-처리 방법:
-1. 입력 내용이 있을 경우:
-   - "입력한 내용이 저장되지 않을 수 있습니다. 페이지를 나가시겠습니까?" 확인 창
-2. SessionStorage에 임시 저장 (5분간 유지)
-3. 페이지 재진입 시: "이전에 입력한 내용을 복원하시겠습니까?" 확인 창
-```
-
-### 5.4 Artifact 저장 중 중복 클릭
-
-**시나리오**: "Save as Artifact" 버튼을 여러 번 빠르게 클릭
-
-```typescript
-처리 방법:
-1. 버튼 즉시 비활성화
-2. 로딩 스피너 표시
-3. 저장 완료 후 1초 뒤 버튼 재활성화
-```
-
-### 5.5 Portfolio 데이터 부분 누락
-
-**시나리오**: API 응답에서 일부 종목의 `current_price`가 null
-
-```typescript
-처리 방법:
-1. 해당 종목 차트에서 제외 (트리맵/파이차트)
-2. 테이블에는 표시하되 "가격 정보 없음" 표시
-3. 페이지 상단에 경고 메시지:
-   "일부 종목의 가격 정보를 불러올 수 없습니다 (3/10 종목)"
-```
-
-### 5.6 LocalStorage Quota 초과
-
-**시나리오**: Artifacts가 너무 많아 LocalStorage 용량 초과
-
-```typescript
-처리 방법:
-1. 저장 시도 시 DOMException 발생 감지
-2. "저장 공간이 부족합니다" 경고
-3. Artifacts 목록 페이지로 이동 제안
-4. "오래된 Artifacts 삭제" 버튼 제공
-5. 자동 삭제 정책: 30일 이상 된 Artifact 자동 제거 (옵션)
-```
-
-### 5.7 브라우저 뒤로가기/앞으로가기
-
-**시나리오**: HITL 패널이 열린 상태에서 뒤로가기
-
-```typescript
-처리 방법:
-1. HITL 패널이 열려있으면:
-   - "승인이 필요한 작업이 있습니다. 페이지를 나가시겠습니까?" 경고
-2. 사용자 확인 시:
-   - HITL 요청을 자동으로 "거부" 처리
-   - 페이지 이동
-```
-
----
-
-## 6. Performance Optimization
-
-### 6.1 Chat 메시지 렌더링 최적화
-
-```typescript
-// 메시지 많을 때 성능 이슈 방지
-- 가상 스크롤링 (react-window) 사용
-- 최초 로드: 최근 50개 메시지만
-- 스크롤 위로: 이전 메시지 lazy load
-- 이미지/차트: Lazy loading
-```
-
-### 6.2 Markdown 렌더링 최적화
-
-```typescript
-// react-markdown 최적화
-- Memoization: 동일한 마크다운 재렌더링 방지
-- Code highlighting: 필요할 때만 로드
-- 큰 테이블: 페이지네이션 또는 가상 스크롤
-```
-
-### 6.3 Portfolio 차트 최적화
-
-```typescript
-// Chart.js 성능 최적화
-- 데이터 포인트 제한: 최대 100개
-- 애니메이션: 초기 로드 시에만
-- Resize: Debounce 적용 (300ms)
-```
-
----
-
-## 7. Input Validation Rules
-
-### 7.1 Chat Input 검증
-
-| 규칙 | 값 | 검증 실패 시 동작 |
-|------|---|------------------|
-| **최소 길이** | 1자 | 전송 버튼 비활성화 |
-| **최대 길이** | 5000자 | 입력 차단 + "최대 5000자까지 입력 가능합니다" 경고 |
-| **공백만 입력** | 불가 | 전송 버튼 비활성화 |
-| **개행 제한** | 최대 50줄 | 초과 시 "너무 많은 줄바꿈이 포함되어 있습니다" 경고 |
-
-**실시간 검증**:
-```typescript
-- 입력 중: 글자 수 표시 (4900자 이상일 때만)
-- 예: "4952 / 5000"
-```
-
-### 7.2 HITL 수정 입력 검증
-
-#### 매수/매도 수량 수정
-
-| 필드 | 규칙 | 검증 실패 시 |
-|------|------|-------------|
-| **수량** | 양의 정수, 최소 1 | "수량은 1 이상이어야 합니다" |
-| **가격** | 양의 숫자, 최대 소수점 2자리 | "유효한 가격을 입력하세요" |
-
-**실시간 검증**:
-- 입력 시 즉시 유효성 검사
-- 잘못된 입력 시 붉은색 테두리 + 오류 메시지
-- "수정" 버튼: 모든 필드가 유효할 때만 활성화
-
-### 7.3 Artifact 이름 검증
-
-| 규칙 | 값 | 검증 실패 시 |
-|------|---|------------|
-| **최소 길이** | 1자 | "제목을 입력하세요" |
-| **최대 길이** | 100자 | "최대 100자까지 입력 가능합니다" |
-| **특수문자** | 허용 | - |
-
----
-
-## 8. Security Considerations
-
-### 8.1 XSS 방지
-
-```typescript
-// Markdown 렌더링 시 주의
-- react-markdown의 `remarkGfm` 플러그인 사용
-- HTML 태그 이스케이프 처리
-- 외부 링크: rel="noopener noreferrer" 추가
-```
-
-### 8.2 CSRF 방지 (Phase 2)
-
-```typescript
-// API 요청 시 CSRF 토큰 포함
-headers: {
-  'X-CSRF-Token': getCsrfToken()
+  // Actions
+  addMessage: (message: Message) => void;
+  setLoading: (loading: boolean) => void;
+  openApprovalPanel: (data: ApprovalRequest) => void;
+  closeApprovalPanel: () => void;
 }
-```
 
-### 8.3 LocalStorage 보안
+export const useChatStore = create<ChatStore>((set) => ({
+  messages: [],
+  currentThreadId: '',
+  isLoading: false,
+  approvalPanel: {
+    isOpen: false,
+    data: null,
+  },
 
-```typescript
-// 민감 정보 저장 금지
-- ❌ 사용자 비밀번호
-- ❌ API 토큰 (SessionStorage 사용)
-- ✅ Artifacts (민감하지 않음)
-- ✅ UI 설정 (LNB 상태 등)
+  addMessage: (message) => set((state) => ({
+    messages: [...state.messages, message],
+  })),
+
+  setLoading: (loading) => set({ isLoading: loading }),
+
+  openApprovalPanel: (data) => set({
+    approvalPanel: { isOpen: true, data },
+  }),
+
+  closeApprovalPanel: () => set({
+    approvalPanel: { isOpen: false, data: null },
+  }),
+}));
+
 ```
 
 ---
 
-## 9. Testing Requirements
+## 5. Performance Optimization
 
-### 9.1 Unit Tests
+### 5.1 Message List Virtualization
 
-```typescript
-// 필수 테스트 커버리지
-- API client functions: 100%
-- Validation functions: 100%
-- State management: 80%+
-- UI components: 70%+
+**Problem:** Chat 메시지가 많아지면 렌더링 성능 저하
+
+**Solution:** react-window로 가상 스크롤링
+
+```tsx
+import { FixedSizeList } from 'react-window';
+
+<FixedSizeList
+  height={600}
+  itemCount={messages.length}
+  itemSize={100}  // 평균 메시지 높이
+  width="100%"
+>
+  {({ index, style }) => (
+    <div style={style}>
+      <ChatMessage message={messages[index]} />
+    </div>
+  )}
+</FixedSizeList>
+
 ```
 
-### 9.2 Integration Tests
+---
 
-```typescript
-// 주요 시나리오 테스트
-1. Chat 메시지 전송 → AI 응답 → Artifact 저장
-2. HITL 플로우: 요청 → 승인 → 결과 확인
-3. Portfolio 로드 → 차트 렌더링 → 데이터 표시
+### 5.2 Markdown Rendering Optimization
+
+**Problem:** 긴 Markdown 렌더링 시 지연
+
+**Solution:** React.memo + Code Highlighting Lazy Load
+
+```tsx
+import dynamic from 'next/dynamic';
+
+const CodeBlock = dynamic(() => import('./CodeBlock'), {
+  loading: () => <div>Loading...</div>,
+  ssr: false,
+});
+
+const ChatMessage = React.memo(({ content }) => {
+  return (
+    <ReactMarkdown
+      components={{
+        code: CodeBlock,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+});
+
 ```
 
-### 9.3 E2E Tests
+---
 
-```typescript
-// Playwright/Cypress 사용
-1. 온보딩 플로우 전체 완료
-2. Chat 사용 → HITL 승인 → Artifacts 확인
-3. 네트워크 오류 시뮬레이션 → 재시도
+## 6. Error Handling Strategy
+
+### 6.1 Global Error Boundary
+
+```tsx
+// components/ErrorBoundary.tsx
+import React, { Component, ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error Boundary Caught:', error, errorInfo);
+    // 에러 로깅 서비스에 전송 (예: Sentry)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">문제가 발생했습니다</h1>
+            <p className="text-gray-600 mb-4">페이지를 새로고침해주세요.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              새로고침
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+```
+
+---
+
+### 6.2 API Error Handling
+
+```tsx
+// lib/api/errorHandler.ts
+export class APIError extends Error {
+  constructor(
+    public status: number,
+    public message: string,
+    public code?: string
+  ) {
+    super(message);
+  }
+}
+
+export async function handleAPIError(response: Response): Promise<never> {
+  const data = await response.json().catch(() => ({}));
+
+  const errorMessage = data.message || '알 수 없는 오류가 발생했습니다';
+  const errorCode = data.code;
+
+  throw new APIError(response.status, errorMessage, errorCode);
+}
+
+// 사용 예시
+try {
+  const response = await fetch('/api/v1/chat', options);
+
+  if (!response.ok) {
+    await handleAPIError(response);
+  }
+
+  return await response.json();
+} catch (error) {
+  if (error instanceof APIError) {
+    // 상태 코드별 처리
+    switch (error.status) {
+      case 401:
+        toast.error('로그인이 필요합니다');
+        // 로그인 페이지로 리다이렉트
+        break;
+      case 429:
+        toast.error('요청이 너무 많습니다. 잠시 후 다시 시도해주세요');
+        break;
+      case 500:
+        toast.error('서버 오류가 발생했습니다');
+        break;
+      default:
+        toast.error(error.message);
+    }
+  }
+}
+
+```
+
+---
+
+## 7. Testing Strategy
+
+### 7.1 Unit Tests
+
+```tsx
+// __tests__/components/ChatMessage.test.tsx
+import { render, screen } from '@testing-library/react';
+import ChatMessage from '@/components/chat/ChatMessage';
+
+describe('ChatMessage', () => {
+  it('renders user message with correct styling', () => {
+    render(
+      <ChatMessage
+        role="user"
+        content="Hello AI"
+        timestamp="2025-10-20T10:00:00Z"
+      />
+    );
+
+    expect(screen.getByText('Hello AI')).toBeInTheDocument();
+    expect(screen.getByRole('article')).toHaveClass('bg-blue-100');
+  });
+
+  it('renders Markdown in AI message', () => {
+    render(
+      <ChatMessage
+        role="assistant"
+        content="# Heading\\n\\n- Item 1\\n- Item 2"
+        timestamp="2025-10-20T10:00:00Z"
+      />
+    );
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Heading');
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+  });
+});
+
+```
+
+---
+
+### 7.2 Integration Tests
+
+```tsx
+// __tests__/integration/chat-flow.test.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import ChatPage from '@/app/page';
+
+describe('Chat Flow', () => {
+  it('sends message and receives AI response', async () => {
+    render(<ChatPage />);
+
+    const input = screen.getByPlaceholderText('메시지를 입력하세요');
+    await userEvent.type(input, '삼성전자 분석해줘{enter}');
+
+    // 로딩 스피너 표시
+    expect(screen.getByLabelText('로딩 중')).toBeInTheDocument();
+
+    // AI 답변 대기
+    await waitFor(() => {
+      expect(screen.getByText(/삼성전자 분석 결과/)).toBeInTheDocument();
+    }, { timeout: 5000 });
+  });
+
+  it('opens HITL approval panel when required', async () => {
+    render(<ChatPage />);
+
+    const input = screen.getByPlaceholderText('메시지를 입력하세요');
+    await userEvent.type(input, '삼성전자 1000만원 매수해줘{enter}');
+
+    // HITL 패널 대기
+    await waitFor(() => {
+      expect(screen.getByText('⚠️ 승인 필요')).toBeInTheDocument();
+    });
+
+    // 승인 버튼 확인
+    expect(screen.getByRole('button', { name: '승인' })).toBeInTheDocument();
+  });
+});
+
+```
+
+---
+
+## 8. Accessibility Implementation
+
+### 8.1 Keyboard Navigation
+
+```tsx
+// components/chat/ChatInput.tsx
+const ChatInput = () => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Enter: 전송
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+
+    // Shift+Enter: 줄바꿈 (기본 동작 유지)
+
+    // Escape: 입력 취소
+    if (e.key === 'Escape') {
+      setMessage('');
+    }
+  };
+
+  return (
+    <textarea
+      onKeyDown={handleKeyDown}
+      aria-label="메시지 입력"
+      placeholder="메시지를 입력하세요"
+    />
+  );
+};
+
+```
+
+---
+
+### 8.2 ARIA Attributes
+
+```tsx
+// components/hitl/ApprovalPanel.tsx
+<div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="approval-title"
+  aria-describedby="approval-description"
+>
+  <h2 id="approval-title">⚠️ 승인 필요</h2>
+  <div id="approval-description">
+    다음 주문을 검토하고 승인 또는 거부해주세요.
+  </div>
+
+  {/* ... 주문 내역 ... */}
+
+  <div role="group" aria-label="승인 액션">
+    <button
+      onClick={handleApprove}
+      aria-label="매수 주문 승인"
+      className="..."
+    >
+      승인
+    </button>
+    <button
+      onClick={handleReject}
+      aria-label="매수 주문 거부"
+      className="..."
+    >
+      거부
+    </button>
+  </div>
+</div>
+
+```
+
+---
+
+## 9. Development Workflow
+
+### Phase 1 개발 순서
+
+```
+Week 1:
+- [ ] 프로젝트 초기 설정 (Next.js, Tailwind, i18n)
+- [ ] Shell + LNB 구현
+- [ ] Chat Input 구현
+
+Week 2:
+- [ ] ChatMessage 컴포넌트 (Markdown, Thinking)
+- [ ] Chat API 연동
+- [ ] SSE 실시간 업데이트
+
+Week 3:
+- [ ] HITL ApprovalPanel 구현
+- [ ] Approval API 연동
+- [ ] Portfolio 기본 정보 표시
+
+Week 4:
+- [ ] Portfolio 차트 시각화 (Treemap, Pie, Bar)
+- [ ] Save as Artifact 기능
+- [ ] 통합 테스트
+
+```
+
+---
+
+## 10. Deployment
+
+### 10.1 Build Configuration
+
+```jsx
+// next.config.js
+module.exports = {
+  reactStrictMode: true,
+  i18n: {
+    locales: ['ko', 'en'],
+    defaultLocale: 'ko',
+  },
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
+};
+
+```
+
+---
+
+### 10.2 Environment Variables
+
+```bash
+# .env.local (개발)
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+
+# .env.production (배포)
+NEXT_PUBLIC_API_URL=https://api.hama.ai/v1
+
 ```
 
 ---
