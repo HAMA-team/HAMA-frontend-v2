@@ -234,3 +234,88 @@ src/
 - IA 다이어그램과 목업을 반드시 참조하세요
 - **다크 모드 & 다국어**: Phase 1부터 기본 세팅을 염두에 두고 개발 (CSS Variables, i18n 구조)
   - 완전한 구현은 Phase 2-3이지만, 처음부터 구조를 고려해서 설계
+
+## Development Best Practices (교훈)
+
+### 1. Tailwind CSS v4 사용 시 주의사항
+
+**⚠️ CSS 변수를 Tailwind 클래스로 직접 사용 불가**
+
+```tsx
+// ❌ 작동하지 않음
+<div className="bg-[var(--lnb-background)]">
+
+// ✅ inline style 또는 hex 값 사용
+<div style={{ backgroundColor: "#ffffff" }}>
+<div className="bg-white border-[#e5e7eb]">
+```
+
+**이유:** LNB 구현 중 CSS 변수가 Tailwind v4에서 제대로 인식되지 않아 투명하게 표시되는 문제 발생. 해결책으로 inline styles with hex values 사용.
+
+### 2. 상태 간 일관성 유지 (Collapse/Expand)
+
+**원칙:** 컴포넌트의 서로 다른 상태(collapsed/expanded) 간에 시각적 일관성을 유지해야 함.
+
+**LNB 구현 사례:**
+- ✅ **패딩 통일**: collapsed/expanded 모두 `px-3` (12px)
+- ✅ **버튼 높이 일정**: `h-12` (48px) 유지
+- ✅ **아이콘 크기 일정**: `w-4 h-4` 통일
+- ✅ **간격 일관성**: 버튼 간 `gap-0.5` 동일
+
+**반복적으로 수정된 문제들:**
+1. collapsed 시 패딩이 달라져 아이콘 위치가 이동
+2. 버튼 크기 변경으로 높이가 달라짐
+3. 아이콘 크기 불일치로 시각적 불균형
+
+**교훈:** 처음부터 모든 상태에서 동일한 spacing/sizing 값을 사용하도록 설계
+
+### 3. 애니메이션 처리
+
+**문제:** LNB collapse/expand 시 텍스트가 애니메이션 완료 전에 나타나 깨진 것처럼 보임
+
+**시도한 방법들:**
+1. ❌ `opacity` 애니메이션 → 글씨가 아예 안 나타남
+2. ❌ delay 증가 → 여전히 중간에 깨진 글씨 보임
+3. ✅ **`overflow: hidden`** + fade-in 애니메이션 (0.15s delay)
+
+**최종 해결책:**
+```css
+@keyframes fadeInText {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-fadeInText {
+  animation: fadeInText 0.2s ease-in 0.15s both;
+}
+```
+
+```tsx
+<aside className="overflow-hidden transition-all duration-300">
+  <span className="animate-fadeInText">텍스트</span>
+</aside>
+```
+
+### 4. 점진적 개선 (Incremental Refinement)
+
+**원칙:** 큰 변경을 한 번에 하지 말고, 작은 단위로 변경하며 테스트
+
+**LNB 개발 과정:**
+1. 기본 구조 구현 → 테스트
+2. 색상 적용 → 문제 발견 (투명) → inline styles로 수정
+3. collapse/expand 기능 → 테스트
+4. 패딩/간격 조정 → 여러 번 반복하며 픽셀 단위 조정
+5. 애니메이션 추가 → 문제 발견 → 수정
+6. 최종 미세 조정
+
+**교훈:** 처음부터 완벽하게 하려 하지 말고, 작동하는 최소 기능부터 만들고 점진적으로 개선
+
+### 5. 문서와 실제 구현의 동기화
+
+**문제:** DesignSystem.md에는 LNB가 다크 테마로 정의되어 있었으나, 실제 구현은 라이트 테마
+
+**해결:** 구현 후 즉시 DesignSystem.md 업데이트하여 문서와 코드 일치시킴
+
+**교훈:**
+- 구현 중 디자인 변경이 있으면 즉시 문서 업데이트
+- 커밋 전 README.md, CLAUDE.md, ProductRequirements.md 체크박스 확인

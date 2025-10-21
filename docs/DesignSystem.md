@@ -1947,10 +1947,13 @@ Phase 1-3은 데스크탑만 지원. 모바일 반응형은 Out of Scope.
   --main-background: #f5f5f5;
   --container-background: #ffffff;
 
-  --lnb-background: #1f1f1f;
-  --lnb-border: #2a2a2a;
-  --lnb-text: #e5e5e5;
-  --lnb-active-bg: #3b82f6;
+  --lnb-background: #ffffff;
+  --lnb-border: #e5e7eb;
+  --lnb-text: #374151;
+  --lnb-text-muted: #9ca3af;
+  --lnb-active-bg: #e5e7eb;
+  --lnb-active-text: #171717;
+  --lnb-hover-bg: #f3f4f6;
 
   --text-primary: #171717;
   --text-secondary: #6b7280;
@@ -1999,18 +2002,44 @@ Phase 1-3은 데스크탑만 지원. 모바일 반응형은 Out of Scope.
 }
 ```
 
-### 20.2 Tailwind Config Extension
+### 20.2 Tailwind CSS v4 주의사항
+
+**⚠️ IMPORTANT: Tailwind CSS v4 Breaking Changes**
+
+Tailwind CSS v4에서는 CSS 변수를 Tailwind 클래스로 직접 사용할 수 없습니다.
+
+**문제:**
+```tsx
+// ❌ 작동하지 않음
+<div className="bg-[var(--lnb-background)]">
+```
+
+**해결책:**
+```tsx
+// ✅ inline style 사용
+<div style={{ backgroundColor: "#ffffff" }}>
+
+// ✅ 또는 Tailwind 기본 클래스 사용
+<div className="bg-white">
+```
+
+**적용 예시 (LNB.tsx):**
+- 배경색: `style={{ backgroundColor: "#3b82f6" }}` 또는 `className="bg-white"`
+- 텍스트 색상: `style={{ color: "#171717" }}` 또는 `className="text-neutral-900"`
+- 테두리: `className="border-[#e5e7eb]"`
+
+### 20.3 Tailwind Config Extension
 
 ```javascript
-// tailwind.config.js
-module.exports = {
+// tailwind.config.ts
+export default {
   theme: {
     extend: {
       colors: {
-        'lnb-bg': '#1f1f1f',
-        'lnb-border': '#2a2a2a',
-        'lnb-text': '#e5e5e5',
-        'lnb-active': '#3b82f6',
+        'lnb-bg': '#ffffff',        // Light theme
+        'lnb-border': '#e5e7eb',
+        'lnb-text': '#374151',
+        'lnb-active': '#e5e7eb',
         'main-bg': '#f5f5f5',
         'container-bg': '#ffffff',
       },
