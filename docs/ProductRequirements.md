@@ -221,9 +221,9 @@ HAMA Application
 
 **Acceptance Criteria:**
 
-- [ ] Chat, Portfolio 페이지에서 하단에 입력창이 고정됩니다
-- [ ] 최소 1자 이상 입력 시 전송 버튼 활성화됩니다
-- [ ] Enter: 전송, Shift+Enter: 줄바꿈
+- [x] Chat, Portfolio 페이지에서 하단에 입력창이 고정됩니다
+- [x] 최소 1자 이상 입력 시 전송 버튼 활성화됩니다
+- [x] Enter: 전송, Shift+Enter: 줄바꿈
 - [ ] 4900자 이상일 때 글자 수 표시 (예: "4952 / 5000")
 
 **적용 범위:**
@@ -525,7 +525,7 @@ AI가 파악한 당신의 투자 스타일:
 
 **Should Have:**
 
-- [ ] US-1.4: Persistent Chat Input
+- [x] US-1.4: Persistent Chat Input
 - [ ] US-7.1: 다국어 (구조 설정) ⚠️ **우선순위 상향**
 
 **Technical Setup:**

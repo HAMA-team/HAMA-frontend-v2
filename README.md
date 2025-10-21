@@ -120,8 +120,17 @@ See `references/` folder for detailed design references.
 
 ## Development Phases
 
-### Phase 1: Core Demo (Current)
-- Core Layout, Chat, HITL, Artifacts, Portfolio, Dark Mode, i18n structure
+### Phase 1: Core Demo (In Progress)
+**Completed:**
+- ✅ Core Layout (Shell.tsx, LNB.tsx with collapse/expand)
+- ✅ Chat Empty State (suggestion cards)
+- ✅ Persistent Chat Input (ChatInput.tsx)
+- ✅ Tailwind CSS v4 setup with design system
+
+**In Progress:**
+- Chat interface with Markdown support
+- HITL approval panel
+- Portfolio visualization
 
 ### Phase 2: Visualization & Settings
 - Portfolio chart options, My Page, automation level settings

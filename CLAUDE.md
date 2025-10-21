@@ -213,9 +213,14 @@ src/
 
 ## Current Status
 
-- **Phase**: Phase 1 개발 시작 가능 (프로젝트 셋업 완료)
+- **Phase**: Phase 1 진행 중
+- **Completed**:
+  - ✅ 프로젝트 셋업 (Next.js 15, TypeScript, Tailwind CSS v4)
+  - ✅ Shell & LNB 구현 (접기/펼치기, 라이트 테마, fade-in 애니메이션)
+  - ✅ Chat Empty State (제안 카드 4개)
+  - ✅ ChatInput 컴포넌트 (하단 고정, 입력 검증, Enter 전송)
 - **Version**: 3.0 (PRD 개편 완료, 문서 체계화)
-- **Last Updated**: 2025-10-21
+- **Last Updated**: 2025-10-22
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude

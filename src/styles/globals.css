@@ -1,59 +1,197 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  /* Light Mode - PilePeak.ai style */
-  --background: #ffffff;
-  --foreground: #171717;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --card: #f9fafb;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
+/* =============================================================================
+   HAMA Frontend - Global Styles
+   Design System v2.1 (Fluid Layout + rem units)
+   ============================================================================= */
+
+@theme {
+  /* ===== Spacing ===== */
+  --spacing-lnb: 260px;
+  --spacing-hitl: 420px;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    /* Dark Mode */
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --muted: #9ca3af;
-    --border: #374151;
-    --card: #1f2937;
-    --primary: #60a5fa;
-    --primary-foreground: #0a0a0a;
+    /* ===== Global Background ===== */
+    --app-background: #e5e5e5;
+    --main-background: #f5f5f5;
+    --container-background: #ffffff;
+
+    /* ===== LNB (Light Theme) ===== */
+    --lnb-background: #ffffff;
+    --lnb-border: #e5e7eb;
+    --lnb-text: #374151;
+    --lnb-text-muted: #9ca3af;
+    --lnb-active-bg: #3b82f6;
+    --lnb-active-text: #ffffff;
+    --lnb-hover-bg: #f3f4f6;
+    --lnb-divider: #e5e7eb;
+    --lnb-recent-hover: #f9fafb;
+
+    /* ===== Text Colors ===== */
+    --text-primary: #171717;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --text-link: #3b82f6;
+    --text-error: #ef4444;
+    --text-success: #10b981;
+
+    /* ===== Border & Divider ===== */
+    --border-default: #e5e7eb;
+    --border-emphasis: #d1d5db;
+    --border-input: #d1d5db;
+    --border-input-focus: #3b82f6;
+    --border-card: #e5e7eb;
+
+    /* ===== Primary Colors ===== */
+    --primary-50: #eff6ff;
+    --primary-100: #dbeafe;
+    --primary-500: #3b82f6;
+    --primary-600: #2563eb;
+    --primary-700: #1d4ed8;
+
+    /* ===== Semantic Colors ===== */
+    --success-50: #d1fae5;
+    --success-500: #10b981;
+    --success-600: #059669;
+
+    --error-50: #fee2e2;
+    --error-500: #ef4444;
+    --error-600: #dc2626;
+
+    --warning-50: #fef3c7;
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+
+    --info-50: #dbeafe;
+    --info-500: #3b82f6;
+    --info-600: #2563eb;
+
+    /* ===== Icon Background Colors (제안 카드) ===== */
+    --icon-blue-bg: #dbeafe;
+    --icon-blue-fg: #3b82f6;
+    --icon-green-bg: #d1fae5;
+    --icon-green-fg: #10b981;
+    --icon-purple-bg: #ede9fe;
+    --icon-purple-fg: #8b5cf6;
+    --icon-orange-bg: #fed7aa;
+    --icon-orange-fg: #f59e0b;
+    --icon-pink-bg: #fce7f3;
+    --icon-pink-fg: #ec4899;
+    --icon-red-bg: #fee2e2;
+    --icon-red-fg: #ef4444;
+
+    /* ===== Chart Colors (Portfolio) ===== */
+    --chart-blue: #3b82f6;
+    --chart-green: #10b981;
+    --chart-purple: #8b5cf6;
+    --chart-orange: #f59e0b;
+    --chart-pink: #ec4899;
+    --chart-indigo: #6366f1;
+    --chart-cyan: #06b6d4;
+    --chart-yellow: #eab308;
+    --chart-profit: #10b981;
+    --chart-loss: #ef4444;
+
+    /* ===== Layout ===== */
+    --lnb-width: 260px;
+    --hitl-width: 420px;
+
+    /* ===== Shadows ===== */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+    --shadow-xl: -2px 0 8px 0 rgba(0, 0, 0, 0.08);
+    --shadow-2xl: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
+
+    /* ===== Z-Index Scale ===== */
+    --z-base: 0;
+    --z-lnb: 10;
+    --z-chat-input: 20;
+    --z-dropdown: 30;
+    --z-hitl-panel: 50;
+    --z-modal: 100;
+    --z-toast: 9999;
+  }
+
+  /* ===== Dark Mode (Phase 2+) ===== */
+  .dark {
+    --app-background: #0a0a0a;
+    --main-background: #121212;
+    --container-background: #1e1e1e;
+
+    --text-primary: #ededed;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+
+    --border-default: #27272a;
+    --border-emphasis: #3f3f46;
+    --border-input: #3f3f46;
+  }
+
+  /* ===== Base Styles ===== */
+
+  html {
+    font-size: 16px; /* Base for rem calculations */
+  }
+
+  body {
+    color: var(--text-primary);
+    background: var(--app-background);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard Variable", Pretendard, "Segoe UI", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-width: 1280px; /* Desktop only */
+  }
+
+  /* ===== Typography ===== */
+
+  h1, h2, h3 {
+    font-weight: 700; /* Bold for titles */
+    letter-spacing: -0.02em;
+  }
+
+  h4, h5, h6 {
+    font-weight: 600; /* Semibold */
+    letter-spacing: -0.01em;
+  }
+
+  /* ===== Links ===== */
+
+  a {
+    color: var(--text-link);
+    text-decoration: none;
+    transition: color 100ms ease;
+  }
+
+  a:hover {
+    color: var(--primary-600);
+  }
+
+  /* ===== Buttons Reset ===== */
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* ===== Input Reset ===== */
+
+  input, textarea {
+    font-family: inherit;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Typography - Design system rules */
-h1, h2, h3, h4, h5, h6 {
-  letter-spacing: -0.025em; /* tracking-tight for titles >20px */
-}
-
-/* Lucide icons default strokeWidth */
-svg[class*='lucide'] {
-  stroke-width: 1.5;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
+/* =============================================================================
+   Components Layer
+   ============================================================================= */
 
 @layer components {
-  /* Custom scrollbar for consistency */
+  /* ===== Custom Scrollbar ===== */
+
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -64,11 +202,41 @@ svg[class*='lucide'] {
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: var(--border-default);
     border-radius: 3px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: var(--muted);
+    background: var(--text-muted);
+  }
+
+  /* ===== Lucide Icons ===== */
+
+  .lucide {
+    stroke-width: 1.5;
+  }
+}
+
+/* =============================================================================
+   Utilities Layer
+   ============================================================================= */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Fade-in animation for LNB text */
+  @keyframes fadeInText {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .animate-fadeInText {
+    animation: fadeInText 0.2s ease-in 0.15s both;
   }
 }

@@ -1,9 +1,10 @@
-import type { Metadata } from 'next';
-import '../styles/globals.css';
+import type { Metadata } from "next";
+import "../styles/globals.css";
+import Shell from "@/components/layout/Shell";
 
 export const metadata: Metadata = {
-  title: 'HAMA - Human-in-the-Loop AI Investment System',
-  description: 'AI-powered investment decision support system',
+  title: "HAMA - Human-in-the-Loop AI Investment System",
+  description: "AI-powered investment decision support system",
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body>
+        <Shell>{children}</Shell>
+      </body>
     </html>
   );
 }

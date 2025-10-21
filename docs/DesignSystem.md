@@ -1,6 +1,6 @@
-# Design System
+# HAMA Frontend - Design System (Mockup-Based)
 
-**Version:** 1.1
+**Version:** 2.1 (Fluid Layout + rem 단위 적용)
 
 **Last Updated:** 2025-10-21
 
@@ -10,528 +10,1781 @@
 
 ## Overview
 
-HAMA Frontend의 디자인 시스템은 **PilePeak.ai Light Mode**를 기본으로 하며, Claude (Shell/LNB), Gemini (Chat), PilePeak.ai (Portfolio)의 UX 패턴을 차용합니다.
+이 디자인 시스템은 **실제 mockup 이미지**를 정확히 분석하여 작성되었습니다.
 
-### Design Principles
+**단위 사용 원칙:**
+- **고정 요소** (LNB, HITL Panel, 아이콘): `px`
+- **유연한 콘텐츠** (Chat, Portfolio): `max-width` + `%`
+- **간격/폰트**: `rem` (사용자 설정 존중, 확장성)
+- **레이아웃**: `flexbox` (반응형 준비)
 
-1. **Clean & Minimal**: 불필요한 장식 제거, 콘텐츠 중심
-2. **Consistent Spacing**: 8px 기반 그리드 시스템
-3. **Accessible Contrast**: WCAG AA 기준 4.5:1 이상
-4. **Readable Typography**: 제목은 tight tracking, 본문은 편안한 line-height
-5. **Perplexity-style Chat Input**: 지속적인 챗 프롬프트가 항상 화면 중앙 하단에 고정
+**화면 크기 대응:**
+- 최소: `1280px` (Desktop)
+- 일반: `1440px` (여유 있는 간격)
+- 큰 화면: `1920px+` (콘텐츠 max-width 증가)
 
----
+### Design References (실제 사용)
 
-## Color Palette
-
-### Light Mode (Default)
-
-| Token | Hex | Usage | Contrast |
-|-------|-----|-------|----------|
-| `--background` | `#ffffff` | 페이지 배경 | - |
-| `--foreground` | `#171717` | 본문 텍스트 | 12.6:1 ✅ |
-| `--muted` | `#6b7280` | 보조 텍스트 | 4.5:1 ✅ |
-| `--border` | `#e5e7eb` | 구분선, 테두리 | - |
-| `--card` | `#f9fafb` | 카드 배경 | - |
-| `--primary` | `#3b82f6` | CTA 버튼, 링크 | 4.5:1 ✅ |
-| `--primary-hover` | `#2563eb` | Primary hover state | - |
-| `--secondary` | `#6b7280` | 보조 버튼 | - |
-| `--secondary-hover` | `#4b5563` | Secondary hover state | - |
-| `--destructive` | `#ef4444` | 삭제, 에러 | 4.5:1 ✅ |
-| `--destructive-hover` | `#dc2626` | Destructive hover | - |
-| `--success` | `#10b981` | 성공 메시지, 토스트 | 3.9:1 ⚠️ (배경 조정 필요) |
-| `--warning` | `#f59e0b` | 경고 메시지 | 2.9:1 ⚠️ (배경 조정 필요) |
-
-### Dark Mode
-
-| Token | Hex | Usage | Contrast |
-|-------|-----|-------|----------|
-| `--background` | `#0a0a0a` | 페이지 배경 | - |
-| `--foreground` | `#ededed` | 본문 텍스트 | 13.1:1 ✅ |
-| `--muted` | `#9ca3af` | 보조 텍스트 | 5.8:1 ✅ |
-| `--border` | `#27272a` | 구분선, 테두리 | - |
-| `--card` | `#18181b` | 카드 배경 | - |
-| `--primary` | `#3b82f6` | CTA 버튼, 링크 | 4.5:1 ✅ |
-| `--primary-hover` | `#60a5fa` | Primary hover state | - |
-| `--secondary` | `#71717a` | 보조 버튼 | - |
-| `--secondary-hover` | `#a1a1aa` | Secondary hover state | - |
-| `--destructive` | `#ef4444` | 삭제, 에러 | 4.5:1 ✅ |
-| `--destructive-hover` | `#f87171` | Destructive hover | - |
-| `--success` | `#34d399` | 성공 메시지 | 5.1:1 ✅ |
-| `--warning` | `#fbbf24` | 경고 메시지 | 3.1:1 ⚠️ |
-
-### Semantic Colors
-
-| Purpose | Light | Dark |
-|---------|-------|------|
-| Chat User Message Bubble | `#f3f4f6` | `#27272a` |
-| Chat AI Response Background | `transparent` | `transparent` |
-| HITL Panel Background | `#ffffff` | `#18181b` |
-| HITL Panel Overlay | `rgba(0, 0, 0, 0.3)` | `rgba(0, 0, 0, 0.6)` |
-| LNB Background | `#f9fafb` | `#18181b` |
-| LNB Active Item | `#e5e7eb` | `#27272a` |
-| Toast Success Background | `#d1fae5` | `#064e3b` |
-| Toast Error Background | `#fee2e2` | `#7f1d1d` |
-| Toast Warning Background | `#fef3c7` | `#78350f` |
-| Toast Info Background | `#dbeafe` | `#1e3a8a` |
+- **LNB (Left Navigation Bar)**: Claude 다크 사이드바 그대로
+- **Main Content Area**: 밝은 회색 배경 (#f5f5f5)
+- **Chat Message Layout**: Gemini 스타일
+- **Portfolio Charts**: PilePeak.ai 색상 팔레트
+- **HITL Panel**: Claude Artifacts 우측 패널
 
 ---
 
-## Typography
+## 1. Color System
 
-### Font Family
+### 1.1 Global Background
 
 ```css
-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+/* 전체 앱 배경 (LNB 외부) */
+--app-background: #e5e5e5;
+
+/* 메인 콘텐츠 영역 배경 */
+--main-background: #f5f5f5;
+
+/* 콘텐츠 컨테이너 배경 (카드, 패널 등) */
+--container-background: #ffffff;
 ```
 
-### Font Scale
-
-| Level | Size | Weight | Line Height | Letter Spacing | Usage |
-|-------|------|--------|-------------|----------------|-------|
-| `h1` | `36px` | 600 | `40px` | `-0.025em` | 페이지 제목 |
-| `h2` | `30px` | 600 | `36px` | `-0.025em` | 섹션 제목 |
-| `h3` | `24px` | 600 | `32px` | `-0.025em` | 서브섹션 제목 |
-| `h4` | `20px` | 600 | `28px` | `-0.025em` | 카드 제목 |
-| `body-lg` | `18px` | 400 | `28px` | `0` | 본문 (강조) |
-| `body` | `16px` | 400 | `24px` | `0` | 본문 (기본) |
-| `body-sm` | `14px` | 400 | `20px` | `0` | 보조 텍스트 |
-| `caption` | `12px` | 400 | `16px` | `0` | 작은 텍스트 |
-| `code` | `14px` | 400 | `20px` | `0` | 코드 블록 |
-
-### Typography Rules
-
-- **제목 (>20px)**: `letter-spacing: -0.025em` (tracking-tight)
-- **Bold 대신 Semibold**: Font weight 600 사용 (한 단계 얇게)
-- **Markdown 렌더링**: react-markdown 기본 스타일 적용
-
----
-
-## Spacing System
-
-8px 기반 그리드 시스템 사용 (Tailwind의 기본 spacing 사용)
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `xs` | `4px` | 아이콘과 텍스트 간격 |
-| `sm` | `8px` | 밀집된 요소 간격 |
-| `md` | `16px` | 기본 요소 간격 |
-| `lg` | `24px` | 섹션 내부 간격 |
-| `xl` | `32px` | 섹션 간 간격 |
-| `2xl` | `48px` | 큰 섹션 간 간격 |
-| `3xl` | `64px` | 페이지 상단/하단 여백 |
-
-### Component-Specific Spacing
-
-- **LNB Padding**: `16px` (좌우), `12px` (상하)
-- **Chat Message Padding**: `16px` (사용자 메시지), `24px` (AI 답변)
-- **HITL Panel Padding**: `24px` (내부 콘텐츠)
-- **Card Padding**: `24px` (기본 카드), `16px` (작은 카드)
-- **Button Padding**: `12px 24px` (Primary), `8px 16px` (Small)
-
----
-
-## Layout Dimensions
-
-### Global Shell
-
-| Component | Width | Behavior |
-|-----------|-------|----------|
-| **LNB (Left Navigation Bar)** | `260px` | 고정 너비 (접기 시 `60px`) |
-| **Main Content** | `calc(100vw - 260px)` | 유동 너비 (LNB 접기 시 `calc(100vw - 60px)`) |
-| **HITL Panel** | `50vw` | 우측 오버레이 (최소 `400px`, 최대 `600px`) |
-
-### Content Max Width
-
-- **Chat 페이지**: `800px` (중앙 정렬)
-- **Portfolio 페이지**: `1200px` (전체 너비)
-- **Artifacts 목록**: `1200px` (그리드)
-- **Artifact 상세**: `800px` (Markdown 가독성)
-
----
-
-## Icons
-
-### Icon Library
-
-**Lucide React** 사용
-
-### Icon Standards
-
-- **Stroke Width**: `1.5` (기본)
-- **Size**:
-  - Small: `16px` (caption 텍스트 옆)
-  - Medium: `20px` (body 텍스트 옆)
-  - Large: `24px` (버튼, 제목 옆)
-  - XL: `32px` (Empty State)
-
-### Icon Usage
-
-| Context | Icon | Size |
-|---------|------|------|
-| LNB 메뉴 | MessageSquare, BarChart3, Archive, User | `20px` |
-| Chat Input | Send | `20px` |
-| HITL Actions | Check, X | `20px` |
-| Thinking Section | ChevronDown, ChevronUp | `16px` |
-| Toast | CheckCircle, AlertCircle, Info, AlertTriangle | `20px` |
-| Empty State | MessageSquareText, Archive, BarChart3 | `32px` |
-
----
-
-## Animation & Transitions
-
-### Timing Functions
+### 1.2 LNB (Left Navigation Bar) - Light Theme
 
 ```css
-/* Ease Out Cubic (기본) */
-cubic-bezier(0.215, 0.610, 0.355, 1.000)
+/* LNB 배경 */
+--lnb-background: #ffffff;
 
-/* Ease In Out Cubic (모달, 패널) */
-cubic-bezier(0.645, 0.045, 0.355, 1.000)
+/* LNB 테두리 */
+--lnb-border: #e5e7eb;
 
-/* Ease Out Expo (강조 애니메이션) */
-cubic-bezier(0.190, 1.000, 0.220, 1.000)
+/* LNB 텍스트 (기본) */
+--lnb-text: #374151;
+
+/* LNB 텍스트 (비활성) */
+--lnb-text-muted: #9ca3af;
+
+/* LNB Active 버튼 배경 */
+--lnb-active-bg: #3b82f6;
+
+/* LNB Active 버튼 텍스트 */
+--lnb-active-text: #ffffff;
+
+/* LNB Hover 배경 */
+--lnb-hover-bg: #f3f4f6;
+
+/* LNB 구분선 */
+--lnb-divider: #e5e7eb;
+
+/* 최근 채팅 항목 배경 (hover) */
+--lnb-recent-hover: #f9fafb;
 ```
 
-### Duration Standards
+### 1.3 Text Colors
+
+```css
+/* 본문 텍스트 (기본) */
+--text-primary: #171717;
+
+/* 보조 텍스트 */
+--text-secondary: #6b7280;
+
+/* 비활성 텍스트 */
+--text-muted: #9ca3af;
+
+/* 링크 텍스트 */
+--text-link: #3b82f6;
+
+/* 에러 텍스트 */
+--text-error: #ef4444;
+
+/* 성공 텍스트 */
+--text-success: #10b981;
+```
+
+### 1.4 Border & Divider Colors
+
+```css
+/* 기본 테두리 */
+--border-default: #e5e7eb;
+
+/* 강조 테두리 */
+--border-emphasis: #d1d5db;
+
+/* Input 테두리 */
+--border-input: #d1d5db;
+
+/* Input 테두리 (focus) */
+--border-input-focus: #3b82f6;
+
+/* 카드 테두리 */
+--border-card: #e5e7eb;
+```
+
+### 1.5 Primary Colors
+
+```css
+/* Primary (파란색) */
+--primary-50: #eff6ff;
+--primary-100: #dbeafe;
+--primary-200: #bfdbfe;
+--primary-300: #93c5fd;
+--primary-400: #60a5fa;
+--primary-500: #3b82f6;  /* 기본 */
+--primary-600: #2563eb;  /* hover */
+--primary-700: #1d4ed8;
+--primary-800: #1e40af;
+--primary-900: #1e3a8a;
+```
+
+### 1.6 Semantic Colors
+
+```css
+/* Success (초록색) */
+--success-50: #d1fae5;
+--success-500: #10b981;
+--success-600: #059669;
+
+/* Error (빨간색) */
+--error-50: #fee2e2;
+--error-500: #ef4444;
+--error-600: #dc2626;
+
+/* Warning (주황색) */
+--warning-50: #fef3c7;
+--warning-500: #f59e0b;
+--warning-600: #d97706;
+
+/* Info (파란색) */
+--info-50: #dbeafe;
+--info-500: #3b82f6;
+--info-600: #2563eb;
+```
+
+### 1.7 Icon Background Colors (제안 카드)
+
+```css
+/* 아이콘 컨테이너 배경 색상 */
+--icon-blue-bg: #dbeafe;
+--icon-blue-fg: #3b82f6;
+
+--icon-green-bg: #d1fae5;
+--icon-green-fg: #10b981;
+
+--icon-purple-bg: #ede9fe;
+--icon-purple-fg: #8b5cf6;
+
+--icon-orange-bg: #fed7aa;
+--icon-orange-fg: #f59e0b;
+
+--icon-pink-bg: #fce7f3;
+--icon-pink-fg: #ec4899;
+
+--icon-red-bg: #fee2e2;
+--icon-red-fg: #ef4444;
+```
+
+### 1.8 Chart Colors (Portfolio)
+
+```css
+/* 트리맵/차트 색상 (PilePeak.ai 스타일) */
+--chart-blue: #3b82f6;
+--chart-green: #10b981;
+--chart-purple: #8b5cf6;
+--chart-orange: #f59e0b;
+--chart-pink: #ec4899;
+--chart-indigo: #6366f1;
+--chart-cyan: #06b6d4;
+--chart-yellow: #eab308;
+
+/* 수익률 색상 */
+--chart-profit: #10b981;   /* 양수 */
+--chart-loss: #ef4444;     /* 음수 */
+```
+
+---
+
+## 2. Typography
+
+### 2.1 Font Family
+
+```css
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+```
+
+### 2.2 Font Scale (rem 기반)
+
+**Base Size:** `16px` (브라우저 기본값)
+
+| Name | Size (rem) | Size (px) | Weight | Line Height | Letter Spacing | Usage |
+|------|-----------|-----------|--------|-------------|----------------|-------|
+| `display` | `2rem` | `32px` | `700` (Bold) | `1.25` | `-0.02em` | 페이지 대제목 "안녕하세요!" |
+| `h1` | `1.75rem` | `28px` | `700` (Bold) | `1.29` | `-0.02em` | 섹션 제목 "포트폴리오" |
+| `h2` | `1.5rem` | `24px` | `700` (Bold) | `1.33` | `-0.02em` | 서브섹션 제목 |
+| `h3` | `1.25rem` | `20px` | `600` (Semibold) | `1.4` | `-0.01em` | 카드 제목 |
+| `h4` | `1.125rem` | `18px` | `600` (Semibold) | `1.33` | `-0.01em` | 작은 제목 |
+| `body-lg` | `1rem` | `16px` | `400` (Regular) | `1.5` | `0` | 본문 강조 |
+| `body` | `0.9375rem` | `15px` | `400` (Regular) | `1.47` | `0` | 본문 기본 |
+| `body-sm` | `0.875rem` | `14px` | `400` (Regular) | `1.43` | `0` | 보조 텍스트 |
+| `caption` | `0.8125rem` | `13px` | `400` (Regular) | `1.38` | `0` | 캡션 (날짜 등) |
+| `caption-xs` | `0.75rem` | `12px` | `400` (Regular) | `1.33` | `0` | 아주 작은 텍스트 |
+
+### 2.3 Font Weight Usage
+
+```css
+/* 제목에만 Bold 사용 */
+.page-title {
+  font-size: 2rem; /* 32px */
+  font-weight: 700; /* Bold */
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+/* 카드 제목, 버튼은 Semibold */
+.card-title, .button {
+  font-size: 1rem; /* 16px */
+  font-weight: 600; /* Semibold */
+  line-height: 1.5;
+}
+
+/* 본문, 설명은 Regular */
+.body-text, .description {
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 400; /* Regular */
+  line-height: 1.47;
+}
+
+/* 보조 텍스트 */
+.secondary-text {
+  font-size: 0.875rem; /* 14px */
+  color: #6b7280;
+  font-weight: 400;
+  line-height: 1.43;
+}
+```
+
+---
+
+## 3. Spacing System
+
+**8px (0.5rem) 기반 그리드 시스템** 사용.
+
+| Token | Value (rem) | Value (px) | Usage |
+|-------|------------|-----------|-------|
+| `spacing-1` | `0.25rem` | `4px` | 아이콘과 텍스트 간격 |
+| `spacing-2` | `0.5rem` | `8px` | 밀집된 요소 간격 |
+| `spacing-3` | `0.75rem` | `12px` | 작은 패딩 |
+| `spacing-4` | `1rem` | `16px` | 기본 패딩 |
+| `spacing-5` | `1.25rem` | `20px` | 중간 패딩 |
+| `spacing-6` | `1.5rem` | `24px` | 큰 패딩 |
+| `spacing-8` | `2rem` | `32px` | 섹션 간격 |
+| `spacing-10` | `2.5rem` | `40px` | 큰 섹션 간격 |
+| `spacing-12` | `3rem` | `48px` | 페이지 여백 |
+
+### 3.1 Component-Specific Spacing
+
+```css
+/* LNB */
+.lnb {
+  padding: 1rem 0.75rem; /* 16px 12px */
+}
+
+.lnb-item {
+  padding: 0.625rem 0.75rem; /* 10px 12px */
+  margin-bottom: 0.25rem; /* 4px */
+}
+
+.lnb-recent-item {
+  padding: 0.5rem 0.75rem; /* 8px 12px */
+  margin-bottom: 0.125rem; /* 2px */
+}
+
+/* 카드 */
+.suggestion-card {
+  padding: 1.25rem; /* 20px */
+}
+
+.artifact-card {
+  padding: 1.25rem; /* 20px */
+}
+
+/* Chat Input */
+.chat-input {
+  padding: 0.875rem 3.25rem 0.875rem 1.25rem; /* 14px 52px 14px 20px */
+}
+
+/* HITL Panel */
+.hitl-panel {
+  padding: 2rem 1.5rem; /* 32px 24px */
+}
+
+/* Portfolio Summary Cards */
+.portfolio-summary-card {
+  padding: 1.25rem; /* 20px */
+}
+```
+
+---
+
+## 4. Layout Dimensions
+
+### 4.1 Global Shell (Flexbox Layout)
+
+```css
+/* ===== Shell (전체 레이아웃) ===== */
+
+.shell {
+  display: flex;
+  height: 100vh;
+  min-width: 1280px; /* 최소 화면 너비 */
+  background: var(--app-background);
+}
+
+/* ===== LNB (고정 너비) ===== */
+
+.lnb {
+  width: 260px; /* 고정 - 내비게이션 일관성 */
+  flex-shrink: 0;
+  height: 100vh;
+  background: var(--lnb-background);
+  border-right: 1px solid var(--lnb-border);
+  overflow-y: auto;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.lnb.collapsed {
+  width: 60px; /* Phase 2+ */
+}
+
+/* ===== Main Content (유연) ===== */
+
+.main-content {
+  flex: 1; /* 남은 공간 모두 사용 */
+  margin-left: 260px; /* LNB 너비만큼 밀어냄 */
+  padding: 2rem; /* 32px */
+  background: var(--main-background);
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.main-content.lnb-collapsed {
+  margin-left: 60px;
+}
+
+/* HITL 열렸을 때 */
+.main-content.hitl-open {
+  margin-right: 420px; /* HITL Panel 너비 */
+}
+```
+
+### 4.2 Content Max Width (화면 크기별)
+
+```css
+/* ===== Chat Container ===== */
+
+.chat-container {
+  max-width: 800px; /* 기본 (1280px~1919px) */
+  width: 100%;
+  margin: 0 auto;
+  background: var(--container-background);
+  border-radius: 1rem; /* 16px */
+  padding: 2rem; /* 32px */
+}
+
+/* 큰 화면 (1920px+) */
+@media (min-width: 1920px) {
+  .chat-container {
+    max-width: 1000px; /* 더 여유롭게 */
+  }
+}
+
+/* ===== Portfolio Container ===== */
+
+.portfolio-container {
+  max-width: 1200px; /* 기본 */
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem; /* 32px */
+}
+
+@media (min-width: 1920px) {
+  .portfolio-container {
+    max-width: 1400px; /* 차트 더 크게 */
+  }
+}
+
+/* ===== Artifacts Grid ===== */
+
+.artifacts-grid {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem; /* 20px */
+  padding: 2rem;
+}
+
+@media (min-width: 1920px) {
+  .artifacts-grid {
+    max-width: 1400px;
+    gap: 1.5rem; /* 24px */
+  }
+}
+
+/* ===== Artifact Detail ===== */
+
+.artifact-detail {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  background: var(--container-background);
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+@media (min-width: 1920px) {
+  .artifact-detail {
+    max-width: 1000px;
+  }
+}
+
+/* ===== My Page ===== */
+
+.mypage-container {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+}
+```
+
+### 4.3 HITL Panel (고정 너비)
+
+```css
+.hitl-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px; /* 고정 - 읽기 편한 너비 유지 */
+  height: 100vh;
+  background: var(--container-background);
+  border-left: 1px solid var(--border-default);
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
+
+  /* 슬라이드 애니메이션 */
+  transform: translateX(100%);
+  transition: transform 300ms cubic-bezier(0.645, 0.045, 0.355, 1.000);
+}
+
+.hitl-panel.open {
+  transform: translateX(0);
+}
+```
+
+### 4.4 Persistent Chat Input (유연)
+
+```css
+.persistent-chat-input {
+  position: fixed;
+  bottom: 2rem; /* 32px */
+  left: calc(260px + 2rem); /* LNB + 패딩 */
+  right: 2rem;
+  max-width: 800px; /* 기본 */
+  width: auto;
+  margin: 0 auto;
+  z-index: 20;
+}
+
+/* 큰 화면에서 */
+@media (min-width: 1920px) {
+  .persistent-chat-input {
+    max-width: 1000px; /* Chat 컨테이너와 동일 */
+  }
+}
+
+/* LNB 접힌 상태 */
+.persistent-chat-input.lnb-collapsed {
+  left: calc(60px + 2rem);
+}
+
+/* HITL 열렸을 때 */
+.persistent-chat-input.hitl-open {
+  right: calc(420px + 2rem);
+}
+```
+
+---
+
+## 5. Border Radius
+
+| Token | Value (rem) | Value (px) | Usage |
+|-------|------------|-----------|-------|
+| `radius-sm` | `0.375rem` | `6px` | 작은 버튼, Badge |
+| `radius-md` | `0.5rem` | `8px` | 버튼, Input |
+| `radius-lg` | `0.75rem` | `12px` | 카드 |
+| `radius-xl` | `1rem` | `16px` | 큰 컨테이너, Chat 컨테이너 |
+| `radius-2xl` | `1.5rem` | `24px` | Chat Input (둥근 입력창) |
+| `radius-full` | `9999px` | `9999px` | 원형 아이콘 버튼, 아바타 |
+
+### 5.1 Component-Specific Radius
+
+```css
+/* 제안 카드 */
+.suggestion-card {
+  border-radius: 0.75rem; /* 12px */
+}
+
+/* 아이콘 컨테이너 */
+.icon-container {
+  border-radius: 0.5rem; /* 8px */
+  width: 40px; /* 고정 */
+  height: 40px; /* 고정 */
+}
+
+/* Chat Input */
+.chat-input {
+  border-radius: 1.5rem; /* 24px - 둥글게 */
+}
+
+/* 버튼 */
+.button-primary, .button-secondary {
+  border-radius: 0.5rem; /* 8px */
+}
+
+/* 카드 */
+.card {
+  border-radius: 0.75rem; /* 12px */
+}
+
+/* Chat 컨테이너 */
+.chat-container {
+  border-radius: 1rem; /* 16px */
+}
+```
+
+---
+
+## 6. Shadows
+
+### 6.1 Elevation Levels
+
+```css
+/* 없음 */
+--shadow-none: none;
+
+/* 아주 subtle */
+--shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+
+/* 카드 기본 */
+--shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+
+/* 카드 hover */
+--shadow-md: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+
+/* Chat Input */
+--shadow-lg: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+
+/* HITL Panel */
+--shadow-xl: -2px 0 8px 0 rgba(0, 0, 0, 0.08);
+
+/* 모달 */
+--shadow-2xl: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
+```
+
+### 6.2 Component Shadows
+
+```css
+/* 제안 카드 */
+.suggestion-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.suggestion-card:hover {
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Chat Input */
+.chat-input {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+}
+
+.chat-input:focus-within {
+  box-shadow: 0 4px 16px 0 rgba(59, 130, 246, 0.15);
+}
+
+/* HITL Panel */
+.hitl-panel {
+  box-shadow: -2px 0 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Artifact 카드 */
+.artifact-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.artifact-card:hover {
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+```
+
+---
+
+## 7. Buttons
+
+### 7.1 Primary Button
+
+```css
+.button-primary {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.button-primary:hover {
+  background: #2563eb;
+}
+
+.button-primary:active {
+  background: #1d4ed8;
+}
+
+.button-primary:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+```
+
+### 7.2 Secondary Button
+
+```css
+.button-secondary {
+  background: transparent;
+  color: #171717;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.button-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.button-secondary:active {
+  background: #f3f4f6;
+}
+```
+
+### 7.3 Destructive Button
+
+```css
+.button-destructive {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.button-destructive:hover {
+  background: #dc2626;
+}
+```
+
+### 7.4 LNB Active Button (새 채팅)
+
+```css
+.button-lnb-active {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 150ms ease;
+}
+
+.button-lnb-active:hover {
+  background: #2563eb;
+}
+```
+
+### 7.5 Button Sizes
+
+```css
+/* Small */
+.button-sm {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Medium (기본) */
+.button-md {
+  padding: 10px 20px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+/* Large */
+.button-lg {
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+```
+
+---
+
+## 8. Forms & Inputs
+
+### 8.1 Chat Input (Persistent)
+
+```css
+.chat-input-container {
+  position: fixed;
+  bottom: 32px;
+  left: calc(260px + 32px);
+  right: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+  z-index: 20;
+}
+
+.chat-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 24px;
+  padding: 14px 52px 14px 20px; /* 우측 전송버튼 공간 */
+  font-size: 15px;
+  line-height: 22px;
+  font-family: inherit;
+  resize: none;
+  min-height: 50px;
+  max-height: 200px;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+  transition: all 150ms ease;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 16px 0 rgba(59, 130, 246, 0.15);
+}
+
+.chat-input::placeholder {
+  color: #9ca3af;
+}
+
+/* 전송 버튼 */
+.chat-input-send {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 32px;
+  height: 32px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms ease;
+}
+
+.chat-input-send:hover {
+  background: #2563eb;
+}
+
+.chat-input-send:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+```
+
+### 8.2 Standard Input
+
+```css
+.input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 15px;
+  line-height: 22px;
+  font-family: inherit;
+  transition: border-color 150ms ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* 에러 상태 */
+.input.error {
+  border-color: #ef4444;
+}
+```
+
+### 8.3 Search Input
+
+```css
+.search-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 14px 10px 40px; /* 좌측 아이콘 공간 */
+  font-size: 15px;
+  line-height: 22px;
+  transition: border-color 150ms ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  width: 20px;
+  height: 20px;
+}
+```
+
+---
+
+## 9. Cards
+
+### 9.1 Suggestion Card (시작 제안 카드)
+
+```css
+.suggestion-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.suggestion-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+.suggestion-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.suggestion-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 6px;
+}
+
+.suggestion-card-description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  line-height: 20px;
+}
+```
+
+### 9.2 Artifact Card
+
+```css
+.artifact-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.artifact-card:hover {
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+.artifact-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.artifact-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 4px;
+}
+
+.artifact-card-preview {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  line-height: 20px;
+  margin-bottom: 8px;
+  /* 3줄 말줄임 */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.artifact-card-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+```
+
+### 9.3 Portfolio Summary Card
+
+```css
+.portfolio-summary-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.portfolio-summary-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.portfolio-summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #171717;
+  letter-spacing: -0.02em;
+}
+
+.portfolio-summary-change {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.portfolio-summary-change.positive {
+  color: #10b981;
+}
+
+.portfolio-summary-change.negative {
+  color: #ef4444;
+}
+```
+
+---
+
+## 10. LNB (Left Navigation Bar)
+
+### 10.1 LNB Container
+
+```css
+.lnb {
+  width: 260px;
+  height: 100vh;
+  background: #1f1f1f;
+  border-right: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.lnb.collapsed {
+  width: 60px;
+}
+```
+
+### 10.2 LNB Header
+
+```css
+.lnb-header {
+  padding: 16px 12px;
+  border-bottom: 1px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lnb-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lnb-logo-icon {
+  width: 28px;
+  height: 28px;
+  background: #3b82f6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.lnb-logo-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
+.lnb-toggle {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease;
+}
+
+.lnb-toggle:hover {
+  color: #e5e5e5;
+}
+```
+
+### 10.3 LNB Navigation
+
+```css
+.lnb-nav {
+  padding: 16px 12px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.lnb-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  color: #e5e5e5;
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.lnb-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lnb-nav-item.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.lnb-nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+```
+
+### 10.4 LNB Recent Chats
+
+```css
+.lnb-recent {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+
+.lnb-recent-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9ca3af;
+  margin-bottom: 12px;
+  padding: 0 12px;
+}
+
+.lnb-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 2px;
+  border-radius: 6px;
+  color: #e5e5e5;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.lnb-recent-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lnb-recent-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.lnb-recent-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lnb-recent-time {
+  font-size: 12px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+```
+
+### 10.5 LNB Footer (User)
+
+```css
+.lnb-footer {
+  padding: 16px 12px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.lnb-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.lnb-user:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lnb-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.lnb-user-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.lnb-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e5e5e5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lnb-user-status {
+  font-size: 12px;
+  color: #9ca3af;
+}
+```
+
+---
+
+## 11. Chat Messages
+
+### 11.1 User Message (우측 정렬)
+
+```css
+.chat-message-user {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.chat-message-user-content {
+  max-width: 70%;
+  background: transparent;
+  color: #171717;
+  font-size: 15px;
+  line-height: 22px;
+  padding: 0;
+  text-align: right;
+}
+```
+
+**중요:** Mockup에서 사용자 메시지는 **말풍선이 없고**, 그냥 우측 정렬된 텍스트입니다!
+
+### 11.2 AI Message (전체 너비)
+
+```css
+.chat-message-ai {
+  margin-bottom: 32px;
+  width: 100%;
+}
+
+.chat-message-ai-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chat-message-ai-avatar {
+  width: 28px;
+  height: 28px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.chat-message-ai-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+}
+
+.chat-message-ai-content {
+  padding: 0;
+  font-size: 15px;
+  line-height: 24px;
+  color: #171717;
+}
+
+/* Markdown 스타일 */
+.chat-message-ai-content h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.chat-message-ai-content h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.chat-message-ai-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.chat-message-ai-content p {
+  margin-bottom: 16px;
+}
+
+.chat-message-ai-content ul, .chat-message-ai-content ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.chat-message-ai-content li {
+  margin-bottom: 8px;
+}
+
+.chat-message-ai-content code {
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+}
+
+.chat-message-ai-content pre {
+  background: #1f2937;
+  color: #e5e7eb;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.chat-message-ai-content pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+```
+
+### 11.3 Thinking Section (접기/펼치기)
+
+```css
+.thinking-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.thinking-header {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.thinking-header:hover {
+  background: #f3f4f6;
+}
+
+.thinking-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.thinking-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 200ms ease;
+}
+
+.thinking-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.thinking-content {
+  padding: 0 16px 16px 16px;
+  display: none;
+}
+
+.thinking-content.expanded {
+  display: block;
+}
+
+.thinking-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.thinking-step:last-child {
+  border-bottom: none;
+}
+
+.thinking-step-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.thinking-step-content {
+  flex: 1;
+}
+
+.thinking-step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 2px;
+}
+
+.thinking-step-description {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 18px;
+}
+
+.thinking-step-time {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+```
+
+---
+
+## 12. HITL Panel
+
+### 12.1 Panel Container
+
+```css
+.hitl-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
+
+  /* 슬라이드 애니메이션 */
+  transform: translateX(100%);
+  transition: transform 300ms cubic-bezier(0.645, 0.045, 0.355, 1.000);
+}
+
+.hitl-panel.open {
+  transform: translateX(0);
+}
+```
+
+### 12.2 Panel Header
+
+```css
+.hitl-panel-header {
+  padding: 24px 24px 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.hitl-panel-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #171717;
+  margin-bottom: 4px;
+}
+
+.hitl-panel-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+```
+
+### 12.3 Panel Content
+
+```css
+.hitl-panel-content {
+  padding: 24px;
+}
+
+.hitl-section {
+  margin-bottom: 32px;
+}
+
+.hitl-section:last-child {
+  margin-bottom: 0;
+}
+
+.hitl-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 12px;
+}
+
+.hitl-info-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.hitl-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.hitl-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.hitl-info-label {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.hitl-info-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #171717;
+}
+
+.hitl-info-value.highlight {
+  color: #3b82f6;
+}
+```
+
+### 12.4 Risk Warning
+
+```css
+.hitl-risk-warning {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.hitl-risk-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+
+.hitl-risk-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.hitl-risk-text {
+  font-size: 13px;
+  color: #92400e;
+  line-height: 18px;
+}
+```
+
+### 12.5 Panel Actions
+
+```css
+.hitl-panel-actions {
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+  background: #ffffff;
+}
+
+.hitl-panel-actions .button-primary,
+.hitl-panel-actions .button-secondary {
+  flex: 1;
+}
+```
+
+---
+
+## 13. Icons
+
+### 13.1 Icon Standards
+
+```css
+/* Lucide React 사용 */
+/* strokeWidth: 1.5 */
+
+/* 크기 */
+--icon-xs: 14px;
+--icon-sm: 16px;
+--icon-md: 20px;
+--icon-lg: 24px;
+--icon-xl: 28px;
+--icon-2xl: 32px;
+```
+
+### 13.2 Icon Usage
+
+| Context | Icon | Size | Color |
+|---------|------|------|-------|
+| LNB 메뉴 | MessageSquare, Archive, etc. | 20px | #e5e5e5 |
+| LNB Active | Same | 20px | #ffffff |
+| Chat Input 전송 | Send | 16px | #ffffff |
+| HITL 경고 | AlertTriangle | 16px | #f59e0b |
+| Thinking 아이콘 | ChevronDown/Up | 16px | #6b7280 |
+| 제안 카드 아이콘 | Custom | 20px | 색상별 |
+| Empty State 아이콘 | Custom | 32px | #3b82f6 |
+
+---
+
+## 14. Animations
+
+### 14.1 Timing Functions
+
+```css
+/* 기본 easing */
+--ease-out: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+
+/* 모달/패널 */
+--ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1.000);
+
+/* 강조 애니메이션 */
+--ease-out-expo: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+```
+
+### 14.2 Duration Standards
 
 | Action | Duration | Easing |
 |--------|----------|--------|
-| Button Hover | `150ms` | ease-out-cubic |
-| Link Hover | `100ms` | ease-out-cubic |
-| Modal Open/Close | `300ms` | ease-in-out-cubic |
-| HITL Panel Slide In | `300ms` | ease-in-out-cubic |
-| HITL Panel Slide Out | `200ms` | ease-in-out-cubic |
-| Thinking Section Toggle | `200ms` | ease-out-cubic |
-| Chart Type Change | `500ms` | ease-out-expo |
-| Toast Fade In | `200ms` | ease-out-cubic |
-| Toast Fade Out | `150ms` | ease-out-cubic |
-| Loading Spinner | `1000ms` | linear (infinite) |
+| Button hover | `150ms` | ease-out |
+| Link hover | `100ms` | ease-out |
+| HITL Panel slide in | `300ms` | ease-in-out |
+| HITL Panel slide out | `200ms` | ease-in-out |
+| Thinking toggle | `200ms` | ease-out |
+| Chart transition | `500ms` | ease-out-expo |
+| Toast fade in | `200ms` | ease-out |
+| Toast fade out | `150ms` | ease-out |
 
-### Specific Animations
+### 14.3 HITL Panel Animation
 
-**HITL Panel Slide In:**
 ```css
 @keyframes hitl-slide-in {
   from {
     transform: translateX(100%);
-    opacity: 0;
   }
   to {
     transform: translateX(0);
-    opacity: 1;
   }
 }
-/* Duration: 300ms, Easing: ease-in-out-cubic */
+
+.hitl-panel.open {
+  animation: hitl-slide-in 300ms cubic-bezier(0.645, 0.045, 0.355, 1.000);
+}
 ```
 
-**Thinking Section Accordion:**
+### 14.4 Thinking Accordion
+
 ```css
-/* Default: 접힘 상태 */
-max-height: 0;
-overflow: hidden;
+.thinking-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 200ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
+}
 
-/* 펼침 시 */
-max-height: 1000px; /* 충분히 큰 값 */
-transition: max-height 200ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
+.thinking-content.expanded {
+  max-height: 1000px;
+}
 
-/* 아이콘 회전 */
-transform: rotate(180deg); /* 펼침 시 */
-transition: transform 200ms ease-out;
-```
+.thinking-icon {
+  transition: transform 200ms ease-out;
+}
 
-**Toast Notification:**
-```css
-/* Slide up + Fade in (200ms) */
-@keyframes toast-in {
-  from {
-    transform: translateY(16px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.thinking-icon.expanded {
+  transform: rotate(180deg);
 }
 ```
 
 ---
 
-## Shadows
+## 15. Loading States
 
-### Elevation Levels
-
-| Level | Box Shadow | Usage |
-|-------|------------|-------|
-| `sm` | `0 1px 2px 0 rgba(0, 0, 0, 0.05)` | 카드 (기본) |
-| `md` | `0 4px 6px -1px rgba(0, 0, 0, 0.1)` | 버튼 hover, Dropdown |
-| `lg` | `0 10px 15px -3px rgba(0, 0, 0, 0.1)` | 모달, HITL 패널 |
-| `xl` | `0 20px 25px -5px rgba(0, 0, 0, 0.1)` | 강조된 오버레이 |
-
-### Dark Mode Shadows
-
-Dark 모드에서는 shadow 대신 border 사용:
+### 15.1 Loading Spinner
 
 ```css
-/* Light Mode */
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-/* Dark Mode */
-border: 1px solid var(--border);
-box-shadow: none;
-```
-
----
-
-## Border Radius
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `sm` | `4px` | 작은 버튼, Badge |
-| `md` | `8px` | 기본 버튼, Input, 카드 |
-| `lg` | `12px` | 모달, HITL 패널 |
-| `xl` | `16px` | 큰 섹션, Chart 컨테이너 |
-| `full` | `9999px` | 원형 아이콘 버튼 |
-
----
-
-## Buttons
-
-### Primary Button
-
-```css
-background: var(--primary);
-color: #ffffff;
-padding: 12px 24px;
-border-radius: 8px;
-font-weight: 600;
-font-size: 16px;
-transition: background 150ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
-
-/* Hover */
-background: var(--primary-hover);
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-```
-
-### Secondary Button
-
-```css
-background: transparent;
-color: var(--foreground);
-border: 1px solid var(--border);
-padding: 12px 24px;
-border-radius: 8px;
-font-weight: 600;
-font-size: 16px;
-transition: all 150ms cubic-bezier(0.215, 0.610, 0.355, 1.000);
-
-/* Hover */
-background: var(--card);
-border-color: var(--muted);
-```
-
-### Destructive Button
-
-```css
-background: var(--destructive);
-color: #ffffff;
-padding: 12px 24px;
-border-radius: 8px;
-font-weight: 600;
-font-size: 16px;
-
-/* Hover */
-background: var(--destructive-hover);
-```
-
-### Button Sizes
-
-| Size | Padding | Font Size | Icon Size |
-|------|---------|-----------|-----------|
-| Small | `8px 16px` | `14px` | `16px` |
-| Medium (기본) | `12px 24px` | `16px` | `20px` |
-| Large | `16px 32px` | `18px` | `24px` |
-
----
-
-## Forms
-
-### Input Field
-
-```css
-background: var(--background);
-border: 1px solid var(--border);
-border-radius: 8px;
-padding: 12px 16px;
-font-size: 16px;
-line-height: 24px;
-transition: border-color 150ms ease-out;
-
-/* Focus */
-border-color: var(--primary);
-outline: 2px solid rgba(59, 130, 246, 0.1);
-outline-offset: 2px;
-
-/* Error */
-border-color: var(--destructive);
-```
-
-### Chat Input (Persistent - Perplexity Style)
-
-```css
-/* Container */
-position: fixed;
-bottom: 32px; /* 2rem */
-left: 50%;
-transform: translateX(-50%);
-width: calc(100% - 260px - 8rem); /* LNB 너비 + 좌우 여백 */
-max-width: 900px;
-z-index: 20;
-
-/* Input */
-background: var(--background);
-border: 1px solid var(--border);
-border-radius: 16px; /* 더 둥글게 */
-padding: 16px 48px 16px 16px; /* 우측 Send 버튼 공간 */
-font-size: 16px;
-line-height: 24px;
-min-height: 56px;
-max-height: 200px;
-resize: none;
-box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-
-/* Focus */
-border-color: var(--primary);
-box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
-```
-
-### Textarea Behavior
-
-- **Shift+Enter**: 줄바꿈
-- **Enter**: 전송
-- **Auto-resize**: 콘텐츠에 따라 높이 자동 조정 (최대 200px)
-- **Character Counter**: 4900자 이상 시 우측 하단에 `4900/5000` 표시
-- **Disclaimer**: 입력창 하단에 "AI가 실수할 수 있습니다. 중요한 정보는 확인하세요." (12px, gray-500)
-
----
-
-## Cards
-
-### Default Card
-
-```css
-background: var(--card);
-border: 1px solid var(--border);
-border-radius: 12px;
-padding: 24px; /* HTML 레퍼런스 기준 */
-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-transition: box-shadow 150ms ease-out;
-
-/* Hover (클릭 가능한 카드) */
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-cursor: pointer;
-```
-
-### Suggestion Card (Empty State)
-
-```css
-/* 시작 제안 카드뷰의 4개 카드 */
-padding: 24px;
-background: white;
-border: 1px solid var(--border);
-border-radius: 12px;
-
-/* Icon Container */
-width: 40px;
-height: 40px;
-border-radius: 8px;
-background: [color]-50; /* blue-50, green-50, etc. */
-
-/* Hover */
-border-color: var(--primary);
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-```
-
-### Chat Message Bubble (User)
-
-```css
-background: #f3f4f6; /* Light Mode */
-border-radius: 16px 16px 4px 16px; /* 우측 하단만 각짐 */
-padding: 12px 16px;
-max-width: 80%;
-align-self: flex-end;
-```
-
-### AI Response (Full Width)
-
-```css
-background: transparent;
-padding: 24px 0;
-width: 100%;
-```
-
----
-
-## Toast Notifications
-
-### Toast Structure
-
-```
-[Toast Container]
-├─ [Icon] (20px, left aligned)
-├─ [Message] (body-sm, 14px)
-└─ [Close Button] (optional)
-```
-
-### Toast Styles
-
-| Type | Background (Light) | Background (Dark) | Icon | Duration |
-|------|-------------------|-------------------|------|----------|
-| Success | `#d1fae5` | `#064e3b` | CheckCircle | 3000ms |
-| Error | `#fee2e2` | `#7f1d1d` | AlertCircle | 5000ms |
-| Warning | `#fef3c7` | `#78350f` | AlertTriangle | 4000ms |
-| Info | `#dbeafe` | `#1e3a8a` | Info | 3000ms |
-
-### Toast Position
-
-```css
-position: fixed;
-top: 24px;
-right: 24px;
-z-index: 9999;
-```
-
----
-
-## Loading States
-
-### Loading Spinner
-
-```css
-/* Circular spinner */
-border: 2px solid var(--border);
-border-top-color: var(--primary);
-border-radius: 50%;
-width: 24px;
-height: 24px;
-animation: spin 1000ms linear infinite;
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1000ms linear infinite;
+}
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 ```
 
-### Loading Skeleton
+### 15.2 Skeleton Loader
 
 ```css
-background: linear-gradient(
-  90deg,
-  var(--card) 0%,
-  var(--border) 50%,
-  var(--card) 100%
-);
-background-size: 200% 100%;
-animation: loading 1500ms ease-in-out infinite;
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f3f4f6 0%,
+    #e5e7eb 50%,
+    #f3f4f6 100%
+  );
+  background-size: 200% 100%;
+  animation: loading 1500ms ease-in-out infinite;
+  border-radius: 8px;
+}
 
 @keyframes loading {
   0% { background-position: 200% 0; }
@@ -541,150 +1794,270 @@ animation: loading 1500ms ease-in-out infinite;
 
 ---
 
-## Empty States
+## 16. Empty States
 
-### Structure
-
-```
-[Empty State Container]
-├─ [Icon] (32px, muted color)
-├─ [Heading] (h4, 20px)
-├─ [Description] (body-sm, muted)
-└─ [CTA Button] (optional)
-```
-
-### Style
+### 16.1 Empty State Container
 
 ```css
-text-align: center;
-padding: 64px 24px;
-color: var(--muted);
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+}
 
-/* Icon */
-color: var(--muted);
-margin-bottom: 16px;
+.empty-state-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  color: #9ca3af;
+}
 
-/* Heading */
-color: var(--foreground);
-margin-bottom: 8px;
+.empty-state-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 8px;
+}
+
+.empty-state-description {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
 ```
 
 ---
 
-## Accessibility
+## 17. Toast Notifications
 
-### Color Contrast Requirements
-
-- **Normal Text (16px)**: 최소 4.5:1 (WCAG AA)
-- **Large Text (20px+)**: 최소 3:1 (WCAG AA)
-- **UI Components**: 최소 3:1
-
-### Focus Indicators
+### 17.1 Toast Container
 
 ```css
-/* Keyboard focus */
-outline: 2px solid var(--primary);
-outline-offset: 2px;
-border-radius: 8px;
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 ```
 
-### Screen Reader Support
+### 17.2 Toast Types
 
-- **aria-label**: 아이콘 버튼에 필수
-- **role**: 커스텀 컴포넌트에 적절한 role 지정
-- **aria-live**: Toast, 로딩 상태 등 동적 콘텐츠에 사용
+```css
+.toast {
+  min-width: 300px;
+  max-width: 400px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  animation: toast-in 200ms ease-out;
+}
 
----
+@keyframes toast-in {
+  from {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
-## Keyboard Shortcuts
+.toast-success {
+  border-left: 3px solid #10b981;
+}
 
-| Shortcut | Action | Context |
-|----------|--------|---------|
-| `Enter` | 메시지 전송 | Chat Input (포커스 시) |
-| `Shift + Enter` | 줄바꿈 | Chat Input |
-| `Cmd/Ctrl + K` | Chat Input 포커스 | 전역 |
-| `Cmd/Ctrl + B` | LNB 토글 | 전역 |
-| `Escape` | HITL 패널 닫기 (불가) | HITL 패널 (차단됨) |
-| `Cmd/Ctrl + /` | 키보드 단축키 도움말 | 전역 (Phase 2) |
+.toast-error {
+  border-left: 3px solid #ef4444;
+}
 
-**Note:** Phase 1에서는 Enter, Shift+Enter만 구현. 나머지는 Phase 2 이후.
+.toast-warning {
+  border-left: 3px solid #f59e0b;
+}
 
----
+.toast-info {
+  border-left: 3px solid #3b82f6;
+}
 
-## Responsive Breakpoints
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
 
-| Breakpoint | Min Width | Usage |
-|------------|-----------|-------|
-| `sm` | `640px` | 모바일 → 태블릿 |
-| `md` | `768px` | 태블릿 → 데스크탑 |
-| `lg` | `1024px` | 데스크탑 (기본) |
-| `xl` | `1280px` | 큰 데스크탑 |
-| `2xl` | `1536px` | 초대형 화면 |
+.toast-content {
+  flex: 1;
+}
 
-**Note:** Phase 1-4는 데스크탑 우선. 모바일 반응형은 Out of Scope.
+.toast-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #171717;
+  margin-bottom: 4px;
+}
 
----
-
-## Z-Index Scale
-
-| Layer | Z-Index | Usage |
-|-------|---------|-------|
-| Base | `0` | 기본 콘텐츠 |
-| LNB | `10` | 좌측 내비게이션 바 |
-| Chat Input | `20` | 하단 고정 Chat Input |
-| Dropdown | `50` | 드롭다운 메뉴 |
-| HITL Overlay | `100` | HITL 패널 뒤 오버레이 |
-| HITL Panel | `110` | HITL 승인 패널 |
-| Modal | `200` | 모달 다이얼로그 |
-| Toast | `9999` | 최상단 알림 |
-
----
-
-## References
-
-- **Design Inspiration**: PilePeak.ai Light Mode
-- **Shell & LNB**: Claude
-- **Chat Layout**: Gemini
-- **Portfolio**: PilePeak.ai
-- **참조 이미지**: `references/img_references/`, `references/mockup_references/`
-- **HTML 프로토타입**: `references/html_references/`
-
----
-
-## Data Storage (Phase 1-2)
-
-### Artifacts Storage
-
-- **방식**: 프론트엔드 캐시 (LocalStorage)
-- **용량**: 최대 5MB (브라우저 제한)
-- **목적**: 시연자가 시연할 때마다 생성된 것만 저장
-- **Phase 3 변경**: Backend DB로 영구 저장 전환
-
-### Chat History Storage
-
-- **방식**: SessionStorage (임시) + Backend API (Phase 3)
-- **Phase 1-2**: SessionStorage만 사용 (탭 닫으면 사라짐)
-- **Phase 3**: Backend DB 연동으로 영구 저장
-
-### User Preferences
-
-- **LNB 토글 상태**: LocalStorage (`lnb_collapsed`)
-- **차트 타입 선택**: LocalStorage (`portfolio_chart_type`)
-- **언어 설정**: LocalStorage (`language`)
-- **테마 설정**: LocalStorage (`theme`) (Phase 2)
+.toast-message {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 18px;
+}
+```
 
 ---
 
-## Implementation Notes
+## 18. Z-Index Scale
 
-- **CSS Variables**: `globals.css`에서 정의 후 Tailwind `theme.extend`에서 참조
-- **Dark Mode**: `class` 전략 사용 (Tailwind `dark:` prefix)
-- **Component Library**: Headless UI 또는 Radix UI 고려 (Phase 2)
-- **Chart Library**: Recharts (기본 스타일 커스터마이징 필요)
-- **SSE (Server-Sent Events)**: LangGraph 에이전트 활동 실시간 표시용 (Phase 1)
+```css
+/* 레이어 순서 */
+--z-base: 0;
+--z-lnb: 10;
+--z-chat-input: 20;
+--z-dropdown: 30;
+--z-hitl-panel: 50;
+--z-modal: 100;
+--z-toast: 9999;
+```
+
+---
+
+## 19. Responsive (Phase 4+)
+
+Phase 1-3은 데스크탑만 지원. 모바일 반응형은 Out of Scope.
+
+최소 화면 너비: `1280px`
+
+---
+
+## 20. Implementation Notes
+
+### 20.1 CSS Variables (globals.css)
+
+```css
+:root {
+  /* Colors */
+  --app-background: #e5e5e5;
+  --main-background: #f5f5f5;
+  --container-background: #ffffff;
+
+  --lnb-background: #1f1f1f;
+  --lnb-border: #2a2a2a;
+  --lnb-text: #e5e5e5;
+  --lnb-active-bg: #3b82f6;
+
+  --text-primary: #171717;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+
+  --border-default: #e5e7eb;
+  --border-input: #d1d5db;
+
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+
+  --success-500: #10b981;
+  --error-500: #ef4444;
+  --warning-500: #f59e0b;
+
+  /* Spacing */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+
+  /* Layout */
+  --lnb-width: 260px;
+  --hitl-width: 420px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+
+  /* Z-Index */
+  --z-lnb: 10;
+  --z-chat-input: 20;
+  --z-hitl-panel: 50;
+  --z-toast: 9999;
+}
+```
+
+### 20.2 Tailwind Config Extension
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'lnb-bg': '#1f1f1f',
+        'lnb-border': '#2a2a2a',
+        'lnb-text': '#e5e5e5',
+        'lnb-active': '#3b82f6',
+        'main-bg': '#f5f5f5',
+        'container-bg': '#ffffff',
+      },
+      spacing: {
+        'lnb': '260px',
+        'hitl': '420px',
+      },
+    },
+  },
+};
+```
+
+---
+
+## 21. Component Library
+
+- **Headless UI**: Dropdown, Modal, Tabs 등
+- **Radix UI**: 고급 컴포넌트 (Phase 2+)
+- **Recharts**: 차트 라이브러리
+- **react-markdown**: Markdown 렌더링
+
+---
+
+## 22. Mockup References
+
+모든 디자인은 다음 mockup 이미지를 정확히 따릅니다:
+
+1. `시작 제안 카드뷰.png` - Empty State, 제안 카드 디자인
+2. `대화 기록 뷰.png` - Chat 메시지 레이아웃
+3. `AI 생각 과정 뷰.png` - Thinking 섹션
+4. `HITL 승인 패널.png` - HITL Panel 디자인
+5. `Portfolio.png` - Portfolio 차트 색상
+6. `아티팩트 목록 그리드 뷰.png` - Artifact 카드 그리드
+7. `아티팩트 본문 뷰.png` - Artifact 상세 뷰
+8. `My Page.png` - My Page 레이아웃
+9. `Chat History.png` - Chat History 리스트
+
+그리고 참조 이미지들:
+- `Claude 챗 시작화면(LNB 열린상태).png` - LNB 다크 테마
+- `Gemini 챗 도중..png` - Chat 메시지 레이아웃
+- `PilePeak 포트폴리오페이지.png` - Portfolio 차트 색상
+- `Claude chat화면에서 Canvas 열린상태.png` - HITL Panel 구조
 
 ---
 
 **Version History:**
-- v1.0 (2025-10-21): 초안 작성 (PRD v3.0 기반, v2.0 세부사항 통합)
-- v1.1 (2025-10-21): design지시.md 및 HTML 레퍼런스 반영 (Card padding 수정, Keyboard shortcuts 추가, Thinking 기본 상태 명시, Artifacts 저장 방식 추가)
+- v2.1 (2025-10-21): **Fluid Layout + rem 단위 적용**. 다양한 데스크탑 화면 크기 대응. Flexbox 레이아웃, 1920px+ 미디어 쿼리 추가.
+- v2.0 (2025-10-21): Mockup 이미지 기반 완전 재작성. 모든 색상, 간격, 크기를 픽셀 단위로 정확히 분석.
+- v1.1 (2025-10-21): 이전 버전 (부정확)
+- v1.0 (2025-10-21): 초안 (부정확)
