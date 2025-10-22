@@ -216,9 +216,14 @@ src/
 - **Phase**: Phase 1 진행 중
 - **Completed**:
   - ✅ 프로젝트 셋업 (Next.js 15, TypeScript, Tailwind CSS v4)
-  - ✅ Shell & LNB 구현 (접기/펼치기, 라이트 테마, fade-in 애니메이션)
-  - ✅ Chat Empty State (제안 카드 4개)
-  - ✅ ChatInput 컴포넌트 (하단 고정, 입력 검증, Enter 전송)
+  - ✅ Shell & LNB 구현 (접기/펼치기, 라이트 테마, fade-in 애니메이션, 전역 상태 관리)
+  - ✅ 반응형 레이아웃 (LNB 연동 가운데 정렬, 가로 스크롤 방지, 동적 width 계산)
+  - ✅ Chat Empty State (제안 카드 4개, 반응형 그리드)
+  - ✅ ChatInput 컴포넌트 (하단 고정, LNB 너비 반응, 입력 검증, Enter 전송)
+  - ✅ Chat Interface (Markdown 렌더링, Thinking 섹션, Save Artifact 버튼, Copy 버튼)
+  - ✅ ChatMessage 컴포넌트 (사용자 말풍선, AI 전체 너비, 코드 블록 지원)
+  - ✅ Zustand 상태 관리 (chatStore, useLNBWidth)
+  - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
 - **Version**: 3.0 (PRD 개편 완료, 문서 체계화)
 - **Last Updated**: 2025-10-22
 - **Target**: 캡스톤 프로젝트 발표회 시연용
@@ -319,3 +324,52 @@ src/
 **교훈:**
 - 구현 중 디자인 변경이 있으면 즉시 문서 업데이트
 - 커밋 전 README.md, CLAUDE.md, ProductRequirements.md 체크박스 확인
+
+### 6. 반응형 레이아웃 구현 (LNB 연동)
+
+**문제:** Fixed positioning된 LNB와 페이지 콘텐츠의 가운데 정렬이 제대로 작동하지 않음
+
+**시도한 방법들:**
+1. ❌ `flex-1`만 사용 → main이 전체 viewport 너비를 차지해서 콘텐츠가 잘못된 위치에 정렬됨
+2. ❌ ChatInput만 `left: ${lnbWidth}px` 적용 → 페이지 콘텐츠는 여전히 전체 화면 기준으로 정렬
+3. ❌ Shell에 `width: 100vw` 추가 → 가로 스크롤 여전히 발생
+4. ✅ **종합 해결책**
+
+**최종 해결책:**
+
+```tsx
+// 1. Shell.tsx - main의 너비를 명시적으로 제한
+<main
+  className="overflow-x-hidden transition-all duration-300 ease-in-out"
+  style={{
+    marginLeft: `${lnbWidth}px`,
+    width: `calc(100vw - ${lnbWidth}px)`
+  }}
+>
+
+// 2. layout.tsx - 최상위 overflow 방지
+<html lang="en" style={{ overflowX: "hidden" }}>
+  <body style={{ overflowX: "hidden", margin: 0, padding: 0 }}>
+
+// 3. ChatInput.tsx - LNB 너비 반응
+<div
+  className="fixed bottom-0 right-0 z-[var(--z-chat-input)] pointer-events-none transition-[left] duration-300 ease-in-out"
+  style={{ left: `${lnbWidth}px` }}
+>
+
+// 4. 모든 페이지 - 반응형 콘텐츠
+<div className="max-w-[800px] mx-auto px-4 w-full min-w-0">
+```
+
+**핵심 교훈:**
+1. Fixed positioning 사용 시 형제 요소의 너비를 명시적으로 계산해야 함
+2. 최상위(html, body)부터 하위까지 모든 레벨에서 overflow-x-hidden 적용 필요
+3. `w-full min-w-0`로 콘텐츠가 부모 너비를 초과하지 않도록 제한
+4. `break-words`로 텍스트가 컨테이너를 넘지 않도록 처리
+5. LNB 상태 변경 시 전역 상태(Zustand) 사용 필수 - 로컬 state로는 다른 컴포넌트가 반응하지 않음
+
+**반복적으로 발견된 문제들:**
+1. ChatInput은 반응하는데 페이지는 반응하지 않음 → Shell의 main에 동적 width 필요
+2. 페이지 콘텐츠가 전체 화면 기준으로 정렬됨 → main의 marginLeft + width 조합 필요
+3. 가로 스크롤 발생 → html, body 레벨에서 overflowX 제어 필요
+4. 화면 축소 시 콘텐츠가 고집부림 → w-full, min-w-0, break-words 조합 필요

@@ -123,12 +123,15 @@ See `references/` folder for detailed design references.
 ### Phase 1: Core Demo (In Progress)
 **Completed:**
 - ✅ Core Layout (Shell.tsx, LNB.tsx with collapse/expand)
-- ✅ Chat Empty State (suggestion cards)
-- ✅ Persistent Chat Input (ChatInput.tsx)
+- ✅ Responsive Layout (LNB-aware centering, no horizontal scroll)
+- ✅ Chat Empty State (suggestion cards with responsive grid)
+- ✅ Persistent Chat Input (ChatInput.tsx with LNB integration)
+- ✅ Chat Interface (Markdown, Thinking section, Save Artifact)
+- ✅ ChatMessage component (user bubble, AI full-width, copy button)
 - ✅ Tailwind CSS v4 setup with design system
+- ✅ Zustand state management (chatStore, useLNBWidth)
 
 **In Progress:**
-- Chat interface with Markdown support
 - HITL approval panel
 - Portfolio visualization
 

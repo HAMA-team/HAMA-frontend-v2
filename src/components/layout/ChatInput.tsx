@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Paperclip, ArrowUp } from "lucide-react";
+import { useLNBWidth } from "@/hooks/useLNBWidth";
 
 /**
  * ChatInput Component
@@ -11,9 +12,11 @@ import { Paperclip, ArrowUp } from "lucide-react";
  * - 중앙 정렬, 최대 너비 제한
  * - 파일 첨부, 전송 버튼
  * - 자동 높이 조절 (텍스트 입력 시)
+ * - LNB 너비를 고려한 중앙 정렬
  */
 export default function ChatInput() {
   const [message, setMessage] = useState("");
+  const { width: lnbWidth } = useLNBWidth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +28,10 @@ export default function ChatInput() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[var(--z-chat-input)] pointer-events-none">
+    <div
+      className="fixed bottom-0 right-0 z-[var(--z-chat-input)] pointer-events-none transition-[left] duration-300 ease-in-out"
+      style={{ left: `${lnbWidth}px` }}
+    >
       <div className="max-w-[800px] mx-auto px-4 pb-6 pointer-events-auto">
         <form onSubmit={handleSubmit} className="relative">
           {/* Input Container */}

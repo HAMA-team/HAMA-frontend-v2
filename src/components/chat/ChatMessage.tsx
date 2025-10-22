@@ -154,7 +154,7 @@ export default function ChatMessage({
               <li style={{ marginBottom: "8px", color: "#171717" }} {...props} />
             ),
             // Code
-            code: ({ node, inline, ...props }) =>
+            code: ({ node, inline, ...props }: any) =>
               inline ? (
                 <code
                   style={{

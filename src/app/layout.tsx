@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" style={{ overflowX: "hidden" }}>
+      <body style={{ overflowX: "hidden", margin: 0, padding: 0 }}>
         <Shell>{children}</Shell>
       </body>
     </html>

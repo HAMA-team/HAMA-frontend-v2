@@ -1,13 +1,15 @@
-'use client';
+"use client";
 
 export default function SettingsPage() {
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full w-full flex-col overflow-x-hidden" style={{ backgroundColor: "#f5f5f5" }}>
       {/* Settings Content Area */}
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-[800px] px-4 py-8">
-          <h1 className="text-3xl font-semibold tracking-tight">My Page</h1>
-          <p className="mt-2 text-muted">
+        <div className="max-w-[800px] mx-auto px-4 py-8 w-full">
+          <h1 className="text-3xl font-semibold tracking-tight break-words" style={{ color: "#171717" }}>
+            My Page
+          </h1>
+          <p className="mt-2 text-base break-words" style={{ color: "#6b7280" }}>
             Account settings and preferences
           </p>
           {/* TODO: Implement user settings, automation level, investment profile */}

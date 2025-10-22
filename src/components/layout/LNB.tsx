@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,6 +13,7 @@ import {
   PanelLeft,
   ChevronRight,
 } from "lucide-react";
+import { useLNBWidth } from "@/hooks/useLNBWidth";
 
 /**
  * LNB (Left Navigation Bar) Component
@@ -29,7 +30,7 @@ import {
  */
 export default function LNB() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, setCollapsed } = useLNBWidth();
 
   const mainNavItems = [
     { href: "/", icon: MessageSquare, label: "채팅" },
@@ -48,11 +49,11 @@ export default function LNB() {
 
   if (isCollapsed) {
     return (
-      <aside className="fixed left-0 top-0 h-screen w-16 bg-white border-r border-[#e5e7eb] flex flex-col z-10 transition-all duration-300">
+      <aside className="fixed left-0 top-0 h-screen w-[60px] bg-white border-r border-[#e5e7eb] flex flex-col z-10 transition-all duration-300">
         {/* Collapsed Header: 펼치기 버튼만 */}
         <div className="flex items-center justify-center border-b border-[#e5e7eb]" style={{ height: "56px", minHeight: "56px", maxHeight: "56px" }}>
           <button
-            onClick={() => setIsCollapsed(false)}
+            onClick={() => setCollapsed(false)}
             className="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6] transition-colors duration-150"
             aria-label="사이드바 펼치기"
           >
@@ -61,9 +62,9 @@ export default function LNB() {
         </div>
 
         {/* 새 채팅 버튼 (collapsed) */}
-        <div className="pt-3 pb-3 px-3 flex justify-start">
+        <div className="p-3">
           <button
-            className="w-10 h-12 flex items-center justify-start pl-3 rounded-lg transition-colors duration-150"
+            className="w-10 h-12 flex items-center justify-center rounded-lg transition-colors duration-150"
             style={{ backgroundColor: "#3b82f6" }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#3b82f6"}
@@ -120,7 +121,7 @@ export default function LNB() {
           </h1>
         </div>
         <button
-          onClick={() => setIsCollapsed(true)}
+          onClick={() => setCollapsed(true)}
           className="w-8 h-8 flex items-center justify-center rounded hover:bg-[#f3f4f6] transition-colors duration-150 flex-shrink-0"
           aria-label="사이드바 접기"
         >

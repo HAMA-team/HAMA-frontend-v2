@@ -144,11 +144,12 @@ def calculate_portfolio():
   };
 
   return (
-    <div className="flex flex-col h-screen" style={{ backgroundColor: "#f5f5f5" }}>
+    <div className="flex flex-col h-full w-full overflow-x-hidden" style={{ backgroundColor: "#f5f5f5" }}>
       {/* Conditional Rendering: Empty State or Chat View */}
       {messages.length === 0 ? (
         // Empty State
-        <div className="flex-1 flex flex-col items-center justify-center px-8 pb-32">
+        <div className="flex-1 flex flex-col items-center justify-center pb-32">
+          <div className="max-w-[800px] mx-auto px-4 w-full flex flex-col items-center">
           {/* Logo */}
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
@@ -158,22 +159,22 @@ def calculate_portfolio():
           </div>
 
           {/* Greeting */}
-          <h1 className="text-3xl font-bold mb-2" style={{ color: "#171717" }}>
+          <h1 className="text-3xl font-bold mb-2 text-center" style={{ color: "#171717" }}>
             안녕하세요!
           </h1>
-          <p className="text-base mb-12" style={{ color: "#6b7280" }}>
+          <p className="text-base mb-12 text-center" style={{ color: "#6b7280" }}>
             무엇을 도와드릴까요?
           </p>
 
           {/* Suggestion Cards - 2x2 Grid */}
-          <div className="grid grid-cols-2 gap-4 max-w-[600px] w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-[600px] w-full">
             {suggestions.map((suggestion, index) => {
               const Icon = suggestion.icon;
               return (
                 <button
                   key={index}
                   onClick={() => handleSuggestionClick(suggestion.prompt)}
-                  className="flex flex-col items-start p-5 rounded-2xl border transition-all duration-150 hover:shadow-md"
+                  className="flex flex-col items-start p-5 rounded-2xl border transition-all duration-150 hover:shadow-md min-w-0"
                   style={{
                     backgroundColor: "#ffffff",
                     borderColor: "#e5e7eb",
@@ -196,17 +197,18 @@ def calculate_portfolio():
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-sm font-semibold mb-1" style={{ color: "#171717" }}>
+                  <h3 className="text-sm font-semibold mb-1 break-words" style={{ color: "#171717" }}>
                     {suggestion.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-xs text-left" style={{ color: "#6b7280" }}>
+                  <p className="text-xs text-left break-words" style={{ color: "#6b7280" }}>
                     {suggestion.description}
                   </p>
                 </button>
               );
             })}
+          </div>
           </div>
         </div>
       ) : (
