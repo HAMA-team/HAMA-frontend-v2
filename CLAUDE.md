@@ -224,8 +224,9 @@ src/
   - ✅ ChatMessage 컴포넌트 (사용자 말풍선, AI 전체 너비, 코드 블록 지원)
   - ✅ Zustand 상태 관리 (chatStore, useLNBWidth)
   - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
+  - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
 - **Version**: 3.0 (PRD 개편 완료, 문서 체계화)
-- **Last Updated**: 2025-10-22
+- **Last Updated**: 2025-10-23
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude
