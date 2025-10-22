@@ -130,9 +130,9 @@ See `references/` folder for detailed design references.
 - ✅ ChatMessage component (user bubble, AI full-width, copy button)
 - ✅ Tailwind CSS v4 setup with design system
 - ✅ Zustand state management (chatStore, useLNBWidth)
+- ✅ HITL approval panel (50vw right panel, overlay, approve/reject handlers)
 
 **In Progress:**
-- HITL approval panel
 - Portfolio visualization
 
 ### Phase 2: Visualization & Settings

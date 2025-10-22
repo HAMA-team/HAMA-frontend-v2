@@ -4,6 +4,7 @@ import React from "react";
 import { PieChart, TrendingUp, Sparkles, Shield } from "lucide-react";
 import ChatInput from "@/components/layout/ChatInput";
 import ChatView from "@/components/chat/ChatView";
+import HITLPanel from "@/components/hitl/HITLPanel";
 import { useChatStore } from "@/store/chatStore";
 import { Message, ThinkingStep } from "@/lib/types/chat";
 
@@ -25,7 +26,7 @@ interface SuggestionCard {
 }
 
 export default function Home() {
-  const { messages, addMessage, deleteMessage } = useChatStore();
+  const { messages, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId } = useChatStore();
 
   const suggestions: SuggestionCard[] = [
     {
@@ -143,6 +144,69 @@ def calculate_portfolio():
     alert("Artifact가 저장되었습니다!");
   };
 
+  const handleApprove = async (messageId: string) => {
+    try {
+      // TODO: 실제 API 호출로 대체 필요
+      // const response = await axios.post("/api/v1/chat/approve", {
+      //   thread_id: currentThreadId,
+      //   decision: "approved",
+      //   automation_level: 2,
+      // });
+
+      console.log("Approve:", messageId, currentThreadId);
+      alert("매수 주문이 실행되었습니다");
+      closeApprovalPanel();
+    } catch (error) {
+      console.error("Approval error:", error);
+      alert("승인 처리 중 오류가 발생했습니다");
+    }
+  };
+
+  const handleReject = async (messageId: string) => {
+    try {
+      // TODO: 실제 API 호출로 대체 필요
+      // const response = await axios.post("/api/v1/chat/approve", {
+      //   thread_id: currentThreadId,
+      //   decision: "rejected",
+      //   automation_level: 2,
+      // });
+
+      console.log("Reject:", messageId, currentThreadId);
+      alert("매수 주문이 거부되었습니다");
+      closeApprovalPanel();
+    } catch (error) {
+      console.error("Rejection error:", error);
+      alert("거부 처리 중 오류가 발생했습니다");
+    }
+  };
+
+  // TEST: HITL 패널 테스트용 함수 (개발 완료 후 제거)
+  const handleTestHITL = () => {
+    openApprovalPanel({
+      action: "buy",
+      stock_code: "005930",
+      stock_name: "삼성전자",
+      quantity: 100,
+      price: 70000,
+      total_amount: 7000000,
+      current_weight: 25.0,
+      expected_weight: 43.2,
+      risk_warning: "이 거래는 포트폴리오의 43.2%를 차지하게 되어 과도한 집중 리스크가 발생할 수 있습니다.",
+      alternatives: [
+        {
+          suggestion: "매수 수량을 50주로 조정하여 포트폴리오 비중을 34%로 유지",
+          adjusted_quantity: 50,
+          adjusted_amount: 3500000,
+        },
+        {
+          suggestion: "매수 수량을 30주로 조정하여 포트폴리오 비중을 28%로 유지",
+          adjusted_quantity: 30,
+          adjusted_amount: 2100000,
+        },
+      ],
+    });
+  };
+
   return (
     <div className="flex flex-col h-full w-full overflow-x-hidden" style={{ backgroundColor: "#f5f5f5" }}>
       {/* Conditional Rendering: Empty State or Chat View */}
@@ -209,6 +273,20 @@ def calculate_portfolio():
               );
             })}
           </div>
+
+          {/* TEST: HITL 패널 테스트 버튼 (개발 완료 후 제거) */}
+          <button
+            onClick={handleTestHITL}
+            className="mt-8 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
+            style={{
+              backgroundColor: "#f59e0b",
+              color: "#ffffff",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#d97706"}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f59e0b"}
+          >
+            🧪 HITL 패널 테스트
+          </button>
           </div>
         </div>
       ) : (
@@ -223,6 +301,24 @@ def calculate_portfolio():
 
       {/* Chat Input - Fixed Bottom */}
       <ChatInput />
+
+      {/* HITL Approval Panel - Overlay + Panel */}
+      {approvalPanel.isOpen && approvalPanel.data && (
+        <>
+          {/* Overlay - Left Side Dimming */}
+          <div
+            className="fixed top-0 left-0 w-full h-full z-40"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
+          />
+          {/* HITL Panel */}
+          <HITLPanel
+            request={approvalPanel.data}
+            messageId="temp-message-id"
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
+        </>
+      )}
     </div>
   );
 }
