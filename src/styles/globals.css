@@ -215,6 +215,12 @@
   .lucide {
     stroke-width: 1.5;
   }
+
+  /* ===== Recharts Treemap Background Fix ===== */
+
+  .treemap-container svg {
+    background-color: #ffffff;
+  }
 }
 
 /* =============================================================================

@@ -225,6 +225,7 @@ src/
   - ✅ Zustand 상태 관리 (chatStore, useLNBWidth)
   - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
   - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
+  - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
 - **Version**: 3.0 (PRD 개편 완료, 문서 체계화)
 - **Last Updated**: 2025-10-23
 - **Target**: 캡스톤 프로젝트 발표회 시연용
@@ -240,6 +241,7 @@ src/
 - IA 다이어그램과 목업을 반드시 참조하세요
 - **다크 모드 & 다국어**: Phase 1부터 기본 세팅을 염두에 두고 개발 (CSS Variables, i18n 구조)
   - 완전한 구현은 Phase 2-3이지만, 처음부터 구조를 고려해서 설계
+- **⚠️ Portfolio 페이지 디자인 업그레이드 필요**: 현재 기능은 구현되었으나 UI/UX가 PilePeak.ai 레퍼런스 수준에 미달. 향후 개선 필요
 
 ## Development Best Practices (교훈)
 

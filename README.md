@@ -131,9 +131,11 @@ See `references/` folder for detailed design references.
 - ✅ Tailwind CSS v4 setup with design system
 - ✅ Zustand state management (chatStore, useLNBWidth)
 - ✅ HITL approval panel (50vw right panel, overlay, approve/reject handlers)
+- ✅ Portfolio visualization (4 summary cards, 3 chart types: treemap/pie/bar, Recharts)
 
-**In Progress:**
-- Portfolio visualization
+**Next:**
+- i18n structure setup
+- Dark mode support
 
 ### Phase 2: Visualization & Settings
 - Portfolio chart options, My Page, automation level settings
