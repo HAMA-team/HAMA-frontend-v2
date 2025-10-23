@@ -13,6 +13,7 @@ import Link from "next/link";
  * - 링크 버튼 지원 (예: "Artifacts 페이지에서 보기")
  *
  * @see ProductRequirements.md - US-1.3
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 
 export interface ToastProps {
@@ -40,7 +41,11 @@ export default function Toast({
     return () => clearTimeout(timer);
   }, [duration, onClose]);
 
-  const bgColor = type === "success" ? "#10b981" : type === "error" ? "#ef4444" : "#3b82f6";
+  const bgColor = type === "success"
+    ? "var(--success-500)"
+    : type === "error"
+    ? "var(--error-500)"
+    : "var(--info-500)";
 
   return (
     <div
@@ -52,7 +57,7 @@ export default function Toast({
         className="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg"
         style={{
           backgroundColor: bgColor,
-          color: "#ffffff",
+          color: "var(--lnb-active-text)",
           minWidth: "320px",
           maxWidth: "480px",
         }}
@@ -67,7 +72,7 @@ export default function Toast({
             <Link
               href={linkHref}
               className="text-xs underline mt-1 inline-block hover:opacity-80 transition-opacity duration-150"
-              style={{ color: "#ffffff" }}
+              style={{ color: "var(--lnb-active-text)" }}
             >
               {linkText}
             </Link>

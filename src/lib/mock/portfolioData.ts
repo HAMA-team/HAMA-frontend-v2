@@ -91,25 +91,8 @@ export const mockPortfolio: Portfolio = {
 };
 
 /**
- * 차트 색상 매핑
- * Design System의 Chart Colors 사용
+ * 차트 색상 및 수익률 색상은 useChartColors 훅으로 이동
+ * @see src/lib/hooks/useChartColors.ts
+ *
+ * 모든 색상은 CSS 변수로 관리되며, 다크 모드에 따라 자동으로 변경됩니다.
  */
-export const CHART_COLORS = [
-  "#3b82f6", // chart-blue
-  "#10b981", // chart-green
-  "#8b5cf6", // chart-purple
-  "#f59e0b", // chart-orange
-  "#ec4899", // chart-pink
-  "#6366f1", // chart-indigo
-  "#06b6d4", // chart-cyan
-  "#eab308", // chart-yellow
-];
-
-/**
- * 수익률에 따른 색상 반환
- */
-export const getReturnColor = (returnRate: number): string => {
-  if (returnRate > 0) return "#10b981"; // chart-profit
-  if (returnRate < 0) return "#ef4444"; // chart-loss
-  return "#6b7280"; // neutral
-};

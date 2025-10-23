@@ -25,20 +25,26 @@ const resources = {
   },
 };
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources,
-    fallbackLng: "ko",
-    debug: false,
-    interpolation: {
-      escapeValue: false,
-    },
-    detection: {
-      order: ["localStorage", "navigator"],
-      caches: ["localStorage"],
-    },
-  });
+// 클라이언트 사이드에서만 초기화
+if (typeof window !== "undefined") {
+  i18n
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+      resources,
+      fallbackLng: "ko",
+      debug: false,
+      interpolation: {
+        escapeValue: false,
+      },
+      detection: {
+        order: ["localStorage", "navigator"],
+        caches: ["localStorage"],
+      },
+      react: {
+        useSuspense: false, // SSR 지원 비활성화
+      },
+    });
+}
 
 export default i18n;

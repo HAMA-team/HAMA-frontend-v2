@@ -13,6 +13,7 @@ import { useToastStore } from "@/store/toastStore";
  * - Phase 3부터 Backend API 연동
  *
  * @see ProductRequirements.md - US-1.3
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 
 interface SaveArtifactButtonProps {
@@ -69,21 +70,21 @@ export default function SaveArtifactButton({ messageId, onClick }: SaveArtifactB
       disabled={isSaving || isSaved}
       className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border transition-all duration-150"
       style={{
-        backgroundColor: isSaved ? "#f0fdf4" : "transparent",
-        borderColor: isSaved ? "#10b981" : "#e5e7eb",
-        color: isSaved ? "#10b981" : "#171717",
+        backgroundColor: isSaved ? "var(--success-50)" : "transparent",
+        borderColor: isSaved ? "var(--success-500)" : "var(--border-default)",
+        color: isSaved ? "var(--success-500)" : "var(--text-primary)",
         cursor: isSaved ? "default" : "pointer",
       }}
       onMouseEnter={(e) => {
         if (!isSaving && !isSaved) {
-          e.currentTarget.style.backgroundColor = "#f9fafb";
-          e.currentTarget.style.borderColor = "#d1d5db";
+          e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)";
+          e.currentTarget.style.borderColor = "var(--border-emphasis)";
         }
       }}
       onMouseLeave={(e) => {
         if (!isSaving && !isSaved) {
           e.currentTarget.style.backgroundColor = "transparent";
-          e.currentTarget.style.borderColor = "#e5e7eb";
+          e.currentTarget.style.borderColor = "var(--border-default)";
         }
       }}
       aria-label={isSaved ? "저장됨" : "Artifact로 저장"}

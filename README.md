@@ -120,7 +120,7 @@ See `references/` folder for detailed design references.
 
 ## Development Phases
 
-### Phase 1: Core Demo (In Progress)
+### Phase 1: Core Demo (✅ Completed)
 **Completed:**
 - ✅ Core Layout (Shell.tsx, LNB.tsx with collapse/expand)
 - ✅ Responsive Layout (LNB-aware centering, no horizontal scroll)
@@ -132,10 +132,9 @@ See `references/` folder for detailed design references.
 - ✅ Zustand state management (chatStore, useLNBWidth)
 - ✅ HITL approval panel (50vw right panel, overlay, approve/reject handlers)
 - ✅ Portfolio visualization (4 summary cards, 3 chart types: treemap/pie/bar, Recharts)
-
-**Next:**
-- i18n structure setup
-- Dark mode support
+- ✅ Dark mode support (CSS variables, theme toggle, all components)
+- ✅ i18n structure (Korean/English, language toggle)
+- ✅ Dynamic chart colors (useChartColors hook, dark mode adaptive)
 
 ### Phase 2: Visualization & Settings
 - Portfolio chart options, My Page, automation level settings

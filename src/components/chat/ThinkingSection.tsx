@@ -15,6 +15,7 @@ import { ThinkingStep, AgentType } from "@/lib/types/chat";
  * @see DesignSystem.md - Section 11.3 Thinking Section
  * @see references/mockup_references/AI 생각 과정 뷰.png
  * @see references/img_references/Claude LLM Thinking.png
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 
 interface ThinkingSectionProps {
@@ -79,8 +80,8 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
     <div
       className="rounded-lg border overflow-hidden mb-4"
       style={{
-        backgroundColor: "#f9fafb",
-        borderColor: "#e5e7eb",
+        backgroundColor: "var(--lnb-recent-hover)",
+        borderColor: "var(--border-default)",
       }}
       role="region"
       aria-label="AI 생각 과정"
@@ -89,9 +90,12 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full px-4 py-3 flex items-center justify-between transition-colors duration-150"
-        style={{ cursor: "pointer" }}
+        style={{
+          cursor: "pointer",
+          backgroundColor: "transparent"
+        }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = "#f3f4f6";
+          e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = "transparent";
@@ -100,10 +104,10 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
         aria-controls="thinking-content"
       >
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold" style={{ color: "#6b7280" }}>
+          <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
             AI 생각 과정
           </span>
-          <span className="text-xs" style={{ color: "#9ca3af" }}>
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
             ({steps.length}단계)
           </span>
         </div>
@@ -111,7 +115,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
           className={`w-4 h-4 transition-transform duration-200 ${
             isExpanded ? "rotate-180" : ""
           }`}
-          style={{ color: "#6b7280" }}
+          style={{ color: "var(--text-secondary)" }}
           strokeWidth={1.5}
         />
       </button>
@@ -134,14 +138,14 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                 className="flex items-start gap-2 py-2"
                 style={{
                   borderBottom:
-                    index < steps.length - 1 ? "1px solid #e5e7eb" : "none",
+                    index < steps.length - 1 ? "1px solid var(--border-default)" : "none",
                 }}
               >
                 {/* Icon */}
                 <div className="flex-shrink-0 mt-1">
                   <Icon
                     className="w-5 h-5"
-                    style={{ color: "#6b7280" }}
+                    style={{ color: "var(--text-secondary)" }}
                     strokeWidth={1.5}
                   />
                 </div>
@@ -149,20 +153,20 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   {/* Title */}
-                  <div className="text-sm font-semibold mb-1" style={{ color: "#171717" }}>
+                  <div className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
                     {agentName}
                   </div>
 
                   {/* Description */}
                   <div
                     className="text-xs mb-1"
-                    style={{ color: "#6b7280", lineHeight: "18px" }}
+                    style={{ color: "var(--text-secondary)", lineHeight: "18px" }}
                   >
                     {step.description}
                   </div>
 
                   {/* Time */}
-                  <div className="text-xs" style={{ color: "#9ca3af" }}>
+                  <div className="text-xs" style={{ color: "var(--text-muted)" }}>
                     {formatTime(step.timestamp)}
                   </div>
                 </div>

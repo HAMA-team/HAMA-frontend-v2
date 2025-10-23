@@ -234,7 +234,7 @@ src/
 
 ## Current Status
 
-- **Phase**: Phase 1 완료
+- **Phase**: Phase 1 완료 ✅
 - **Completed**:
   - ✅ 프로젝트 셋업 (Next.js 15, TypeScript, Tailwind CSS v4)
   - ✅ Shell & LNB 구현 (접기/펼치기, 라이트/다크 테마, fade-in 애니메이션, 전역 상태 관리)
@@ -249,10 +249,12 @@ src/
   - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
   - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
   - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
-  - ✅ i18n 구조 설정 (react-i18next, LanguageDetector, 한국어/영어 번역 파일, LNB 적용)
-  - ✅ Dark Mode 완전 구현 (CSS 변수, ThemeToggle, ThemeProvider, LocalStorage 저장)
-- **Version**: 4.0 (Phase 1 완료 - Dark Mode 지원)
-- **Last Updated**: 2025-10-23
+  - ✅ i18n 구조 설정 (react-i18next, 한국어/영어, 토글 버튼)
+  - ✅ Dark Mode 완전 구현 (CSS 변수, 모든 컴포넌트 색상 전환, ThemeToggle, 차트 색상 adaptive)
+  - ✅ useChartColors 훅 (CSS 변수 기반 차트 색상, 다크 모드 자동 전환)
+  - ✅ Dynamic import로 i18n hydration 에러 해결
+- **Version**: 5.0 (Phase 1 완료 - Dark Mode & i18n 완성)
+- **Last Updated**: 2025-01-24
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude
