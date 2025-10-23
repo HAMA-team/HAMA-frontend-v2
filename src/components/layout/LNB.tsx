@@ -16,6 +16,7 @@ import {
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "@/components/common/LanguageSelector";
+import ThemeToggle from "@/components/common/ThemeToggle";
 
 /**
  * LNB (Left Navigation Bar) Component
@@ -200,11 +201,12 @@ export default function LNB() {
         </div>
       </div>
 
-      {/* Language Selector & User Info - 하단 고정 */}
+      {/* Theme Toggle, Language Selector & User Info - 하단 고정 */}
       <div className="border-t border-[#e5e7eb] p-3 space-y-2">
-        {/* Language Selector */}
-        <div className="px-3 py-2">
+        {/* Theme Toggle & Language Selector */}
+        <div className="flex items-center justify-between px-3 py-2">
           <LanguageSelector />
+          <ThemeToggle />
         </div>
 
         {/* User Info */}

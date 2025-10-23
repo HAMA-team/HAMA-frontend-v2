@@ -116,19 +116,60 @@
     --z-toast: 9999;
   }
 
-  /* ===== Dark Mode (Phase 2+) ===== */
+  /* ===== Dark Mode ===== */
   .dark {
+    /* Global Background */
     --app-background: #0a0a0a;
     --main-background: #121212;
     --container-background: #1e1e1e;
 
+    /* LNB (Dark Theme) */
+    --lnb-background: #1a1a1a;
+    --lnb-border: #27272a;
+    --lnb-text: #e5e5e5;
+    --lnb-text-muted: #71717a;
+    --lnb-active-bg: #3b82f6;
+    --lnb-active-text: #ffffff;
+    --lnb-hover-bg: #27272a;
+    --lnb-divider: #27272a;
+    --lnb-recent-hover: #27272a;
+
+    /* Text Colors */
     --text-primary: #ededed;
     --text-secondary: #a1a1aa;
     --text-muted: #71717a;
+    --text-link: #60a5fa;
+    --text-error: #f87171;
+    --text-success: #34d399;
 
+    /* Border & Divider */
     --border-default: #27272a;
     --border-emphasis: #3f3f46;
     --border-input: #3f3f46;
+    --border-input-focus: #60a5fa;
+    --border-card: #27272a;
+
+    /* Icon Background Colors (제안 카드) - Dark Mode */
+    --icon-blue-bg: #1e3a8a;
+    --icon-blue-fg: #93c5fd;
+    --icon-green-bg: #065f46;
+    --icon-green-fg: #6ee7b7;
+    --icon-purple-bg: #5b21b6;
+    --icon-purple-fg: #c4b5fd;
+    --icon-orange-bg: #92400e;
+    --icon-orange-fg: #fbbf24;
+    --icon-pink-bg: #831843;
+    --icon-pink-fg: #f9a8d4;
+    --icon-red-bg: #7f1d1d;
+    --icon-red-fg: #fca5a5;
+
+    /* Shadows - 다크 모드용 */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 8px 0 rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
+    --shadow-xl: -2px 0 8px 0 rgba(0, 0, 0, 0.5);
+    --shadow-2xl: 0 8px 24px 0 rgba(0, 0, 0, 0.6);
   }
 
   /* ===== Base Styles ===== */
@@ -219,7 +260,7 @@
   /* ===== Recharts Treemap Background Fix ===== */
 
   .treemap-container svg {
-    background-color: #ffffff;
+    background-color: var(--container-background);
   }
 }
 

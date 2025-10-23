@@ -1,10 +1,12 @@
 # HAMA Frontend - Design System (Mockup-Based)
 
-**Version:** 2.1 (Fluid Layout + rem 단위 적용)
+**Version:** 3.0 (Dark Mode Support + CSS Variables)
 
-**Last Updated:** 2025-10-21
+**Last Updated:** 2025-10-23
 
 **Related:** PRD v3.0, TechnicalSpecification.md
+
+**⚠️ IMPORTANT:** Read [DESIGN_RULES.md](../DESIGN_RULES.md) first - **NO HARDCODED COLORS ALLOWED**
 
 ---
 
@@ -25,74 +27,85 @@
 
 ### Design References (실제 사용)
 
-- **LNB (Left Navigation Bar)**: Claude 다크 사이드바 그대로
-- **Main Content Area**: 밝은 회색 배경 (#f5f5f5)
+- **LNB (Left Navigation Bar)**: Claude 사이드바 (라이트/다크 모드 지원)
+- **Main Content Area**: 라이트 모드 배경 (`var(--main-background)`)
 - **Chat Message Layout**: Gemini 스타일
-- **Portfolio Charts**: PilePeak.ai 색상 팔레트
+- **Portfolio Charts**: PilePeak.ai 색상 팔레트 (`var(--chart-*)`)
 - **HITL Panel**: Claude Artifacts 우측 패널
+
+### Theme Support
+
+- **Light Mode**: 기본 테마 (PilePeak.ai 스타일)
+- **Dark Mode**: 완전 지원 (모든 CSS 변수가 자동 전환)
+- **Toggle**: LNB 하단의 Sun/Moon 아이콘으로 전환
+- **Persistence**: LocalStorage에 사용자 선택 저장
 
 ---
 
 ## 1. Color System
 
+**⚠️ CRITICAL:** All colors MUST be used via CSS variables (`var(--variable-name)`). Never hardcode hex values in components.
+
+### How to Use Colors
+
+```tsx
+// ✅ CORRECT
+<div style={{ backgroundColor: "var(--container-background)", color: "var(--text-primary)" }}>
+
+// ❌ WRONG - DO NOT DO THIS
+<div style={{ backgroundColor: "#ffffff", color: "#171717" }}>
+```
+
 ### 1.1 Global Background
 
-```css
-/* 전체 앱 배경 (LNB 외부) */
---app-background: #e5e5e5;
+**Usage:** `var(--app-background)`, `var(--main-background)`, `var(--container-background)`
 
-/* 메인 콘텐츠 영역 배경 */
---main-background: #f5f5f5;
+| Variable | Light Mode | Dark Mode | Purpose |
+|----------|------------|-----------|---------|
+| `--app-background` | `#e5e5e5` | `#0a0a0a` | 전체 앱 배경 (LNB 외부) |
+| `--main-background` | `#f5f5f5` | `#121212` | 메인 콘텐츠 영역 배경 |
+| `--container-background` | `#ffffff` | `#1e1e1e` | 콘텐츠 컨테이너 배경 (카드, 패널) |
 
-/* 콘텐츠 컨테이너 배경 (카드, 패널 등) */
---container-background: #ffffff;
-```
+### 1.2 LNB (Left Navigation Bar)
 
-### 1.2 LNB (Left Navigation Bar) - Light Theme
+**Usage:** `var(--lnb-background)`, `var(--lnb-text)`, etc.
 
-```css
-/* LNB 배경 */
---lnb-background: #ffffff;
-
-/* LNB 테두리 */
---lnb-border: #e5e7eb;
-
-/* LNB 텍스트 (기본) */
---lnb-text: #374151;
-
-/* LNB 텍스트 (비활성) */
---lnb-text-muted: #9ca3af;
-
-/* LNB Active 버튼 배경 */
---lnb-active-bg: #3b82f6;
-
-/* LNB Active 버튼 텍스트 */
---lnb-active-text: #ffffff;
-
-/* LNB Hover 배경 */
---lnb-hover-bg: #f3f4f6;
-
-/* LNB 구분선 */
---lnb-divider: #e5e7eb;
-
-/* 최근 채팅 항목 배경 (hover) */
---lnb-recent-hover: #f9fafb;
-```
+| Variable | Light Mode | Dark Mode | Purpose |
+|----------|------------|-----------|---------|
+| `--lnb-background` | `#ffffff` | `#1a1a1a` | LNB 배경 |
+| `--lnb-border` | `#e5e7eb` | `#27272a` | LNB 테두리 |
+| `--lnb-text` | `#374151` | `#e5e5e5` | LNB 텍스트 (기본) |
+| `--lnb-text-muted` | `#9ca3af` | `#71717a` | LNB 텍스트 (비활성) |
+| `--lnb-active-bg` | `#3b82f6` | `#3b82f6` | LNB Active 버튼 배경 |
+| `--lnb-active-text` | `#ffffff` | `#ffffff` | LNB Active 버튼 텍스트 |
+| `--lnb-hover-bg` | `#f3f4f6` | `#27272a` | LNB Hover 배경 |
+| `--lnb-divider` | `#e5e7eb` | `#27272a` | LNB 구분선 |
+| `--lnb-recent-hover` | `#f9fafb` | `#27272a` | 최근 채팅 항목 hover 배경 |
 
 ### 1.3 Text Colors
 
-```css
-/* 본문 텍스트 (기본) */
---text-primary: #171717;
+**Usage:** `var(--text-primary)`, `var(--text-secondary)`, etc.
 
-/* 보조 텍스트 */
---text-secondary: #6b7280;
+| Variable | Light Mode | Dark Mode | Purpose |
+|----------|------------|-----------|---------|
+| `--text-primary` | `#171717` | `#ededed` | 본문 텍스트 (기본) |
+| `--text-secondary` | `#6b7280` | `#a1a1aa` | 보조 텍스트 |
+| `--text-muted` | `#9ca3af` | `#71717a` | 비활성 텍스트 |
+| `--text-link` | `#3b82f6` | `#60a5fa` | 링크 텍스트 |
+| `--text-error` | `#ef4444` | `#f87171` | 에러 텍스트 |
+| `--text-success` | `#10b981` | `#34d399` | 성공 텍스트 |
 
-/* 비활성 텍스트 */
---text-muted: #9ca3af;
+### 1.4 Border & Divider
 
-/* 링크 텍스트 */
---text-link: #3b82f6;
+**Usage:** `var(--border-default)`, `var(--border-input-focus)`, etc.
+
+| Variable | Light Mode | Dark Mode | Purpose |
+|----------|------------|-----------|---------|
+| `--border-default` | `#e5e7eb` | `#27272a` | 기본 테두리 |
+| `--border-emphasis` | `#d1d5db` | `#3f3f46` | 강조 테두리 |
+| `--border-input` | `#d1d5db` | `#3f3f46` | Input 테두리 |
+| `--border-input-focus` | `#3b82f6` | `#60a5fa` | Input 테두리 (focus) |
+| `--border-card` | `#e5e7eb` | `#27272a` | 카드 테두리 |
 
 /* 에러 텍스트 */
 --text-error: #ef4444;
