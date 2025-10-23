@@ -14,6 +14,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
+import { useTranslation } from "react-i18next";
+import LanguageSelector from "@/components/common/LanguageSelector";
 
 /**
  * LNB (Left Navigation Bar) Component
@@ -31,13 +33,14 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
 export default function LNB() {
   const pathname = usePathname();
   const { isCollapsed, setCollapsed } = useLNBWidth();
+  const { t } = useTranslation();
 
   const mainNavItems = [
-    { href: "/", icon: MessageSquare, label: "채팅" },
-    { href: "/artifacts", icon: FileText, label: "아티팩트" },
-    { href: "/portfolio", icon: PieChart, label: "포트폴리오" },
-    { href: "/settings", icon: User, label: "마이페이지" },
-    { href: "/discover", icon: Sparkles, label: "디스커버" },
+    { href: "/", icon: MessageSquare, label: t("nav.chat") },
+    { href: "/artifacts", icon: FileText, label: t("nav.artifacts") },
+    { href: "/portfolio", icon: PieChart, label: t("nav.portfolio") },
+    { href: "/settings", icon: User, label: t("nav.mypage") },
+    { href: "/discover", icon: Sparkles, label: t("nav.discover") },
   ];
 
   // Phase 1: Recent Chats는 하드코딩 (Phase 3에서 API 연동)
@@ -197,8 +200,14 @@ export default function LNB() {
         </div>
       </div>
 
-      {/* User Info - 하단 고정 */}
-      <div className="border-t border-[#e5e7eb] p-3">
+      {/* Language Selector & User Info - 하단 고정 */}
+      <div className="border-t border-[#e5e7eb] p-3 space-y-2">
+        {/* Language Selector */}
+        <div className="px-3 py-2">
+          <LanguageSelector />
+        </div>
+
+        {/* User Info */}
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f3f4f6] transition-colors duration-150">
           <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#9ca3af" }}>
             <span className="text-sm font-semibold text-white">김</span>

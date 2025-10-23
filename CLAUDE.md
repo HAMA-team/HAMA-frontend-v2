@@ -40,7 +40,7 @@ src/
 ├── components/
 │   ├── Layout/
 │   │   ├── Shell.tsx              # 전체 레이아웃
-│   │   ├── LNB.tsx                # 좌측 내비게이션 바
+│   │   ├── LNB.tsx                # 좌측 내비게이션 바 (i18n 적용)
 │   │   └── ChatInput.tsx          # 하단 고정 채팅 입력창 (자동 높이, 글자 수 제한)
 │   ├── Chat/
 │   │   ├── ChatView.tsx           # 채팅 메인 뷰
@@ -50,7 +50,10 @@ src/
 │   │   └── SaveArtifactButton.tsx # Artifact 저장 버튼 (저장 상태 표시)
 │   ├── common/
 │   │   ├── Toast.tsx              # 토스트 메시지 컴포넌트
-│   │   └── ToastContainer.tsx     # 토스트 컨테이너
+│   │   ├── ToastContainer.tsx     # 토스트 컨테이너
+│   │   └── LanguageSelector.tsx   # 언어 선택 드롭다운
+│   ├── providers/
+│   │   └── I18nProvider.tsx       # i18n 초기화 Provider
 │   ├── HITL/
 │   │   ├── HITLPanel.tsx          # HITL 승인 패널
 │   │   └── ApprovalActions.tsx    # 승인/거부 액션
@@ -83,9 +86,15 @@ src/
 ├── store/
 │   ├── chatStore.ts               # 채팅 전역 상태 관리 (Zustand)
 │   └── toastStore.ts              # 토스트 전역 상태 관리 (Zustand)
-└── lib/
-    ├── api.ts                     # API 클라이언트
-    └── utils.ts                   # 유틸리티 함수
+├── lib/
+│   ├── api.ts                     # API 클라이언트
+│   ├── utils.ts                   # 유틸리티 함수
+│   └── i18n.ts                    # i18n 설정 (react-i18next)
+└── locales/
+    ├── ko/
+    │   └── translation.json       # 한국어 번역
+    └── en/
+        └── translation.json       # 영어 번역
 ```
 
 ## Key Features (Phase 1: 시연 필수 코어)
@@ -128,7 +137,10 @@ src/
 
 ### 7. i18n 구조
 - react-i18next 기반 다국어 지원 구조
-- 한국어/영어 지원 (번역은 Phase 3)
+- 한국어/영어 지원 (구조 완료, 전체 번역은 Phase 3)
+- LanguageDetector를 통한 자동 언어 감지
+- LocalStorage에 언어 설정 저장
+- LNB 하단에 언어 선택 드롭다운 (Globe 아이콘)
 
 ## API Integration
 
@@ -237,7 +249,8 @@ src/
   - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
   - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
   - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
-- **Version**: 3.1 (Toast 시스템 및 ChatInput 개선)
+  - ✅ i18n 구조 설정 (react-i18next, LanguageDetector, 한국어/영어 번역 파일, LNB 적용)
+- **Version**: 3.2 (i18n 구조 설정 완료)
 - **Last Updated**: 2025-10-23
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 

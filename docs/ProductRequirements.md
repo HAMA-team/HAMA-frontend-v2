@@ -494,14 +494,19 @@ AI가 파악한 당신의 투자 스타일:
 
 **Acceptance Criteria:**
 
-- [ ] 언어 선택 드롭다운 (Header 또는 My Page)
-- [ ] 모든 UI 텍스트 번역 (한국어/영어)
-- [ ] 선택 상태 LocalStorage 저장
+- [x] 언어 선택 드롭다운 (LNB 하단에 구현)
+- [x] i18n 구조 설정 완료 (react-i18next + LanguageDetector)
+- [x] 선택 상태 LocalStorage 저장
+- [x] 기본 번역 파일 생성 (한국어/영어)
+- [x] LNB 내비게이션 번역 적용
+- [ ] 모든 UI 텍스트 번역 완료 (Chat, HITL, Portfolio 등 - Phase 3)
 
 **Phase 1 Scope:**
 
-- i18n 구조 설정 (react-i18next)
-- 핵심 화면 번역 (Chat, HITL, Portfolio)
+- ✅ i18n 구조 설정 (react-i18next)
+- ✅ LanguageSelector 컴포넌트 구현
+- ✅ 번역 파일 구조 생성 (ko/en)
+- ✅ LNB 내비게이션 번역 적용
 
 **Phase 3 Scope:**
 
@@ -532,7 +537,7 @@ AI가 파악한 당신의 투자 스타일:
 **Should Have:**
 
 - [x] US-1.4: Persistent Chat Input
-- [ ] US-7.1: 다국어 (구조 설정) ⚠️ **우선순위 상향**
+- [x] US-7.1: 다국어 (구조 설정) ⚠️ **우선순위 상향**
 
 **Technical Setup:**
 

@@ -1,0 +1,103 @@
+{
+  "common": {
+    "save": "저장",
+    "cancel": "취소",
+    "confirm": "확인",
+    "delete": "삭제",
+    "edit": "수정",
+    "close": "닫기",
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다"
+  },
+  "nav": {
+    "chat": "채팅",
+    "portfolio": "포트폴리오",
+    "artifacts": "저장된 분석",
+    "mypage": "마이페이지",
+    "discover": "발견하기"
+  },
+  "chat": {
+    "inputPlaceholder": "메시지를 입력하세요...",
+    "helperText": "AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.",
+    "sendMessage": "전송",
+    "attachFile": "파일 첨부",
+    "saveAsArtifact": "Save as Artifact",
+    "saved": "저장됨",
+    "saving": "저장 중...",
+    "copy": "복사",
+    "copied": "복사됨",
+    "emptyState": {
+      "greeting": "안녕하세요!",
+      "subGreeting": "무엇을 도와드릴까요?",
+      "suggestions": {
+        "portfolio": {
+          "title": "포트폴리오 현황",
+          "description": "현재 보유 자산과 수익률을 확인하세요",
+          "prompt": "내 포트폴리오 현황을 보여줘"
+        },
+        "market": {
+          "title": "시장 분석",
+          "description": "최신 시장 동향과 투자 전략",
+          "prompt": "최근 시장 동향을 분석해줘"
+        },
+        "recommendation": {
+          "title": "종목 추천",
+          "description": "AI 기반 맞춤형 투자 아이디어",
+          "prompt": "내 투자 성향에 맞는 종목을 추천해줘"
+        },
+        "risk": {
+          "title": "리스크 분석",
+          "description": "포트폴리오 위험 요소 점검",
+          "prompt": "내 포트폴리오의 리스크를 분석해줘"
+        }
+      }
+    }
+  },
+  "hitl": {
+    "title": "매매 승인 요청",
+    "orderInfo": "주문 정보",
+    "stockName": "종목명",
+    "stockCode": "종목 코드",
+    "orderType": "주문 유형",
+    "buy": "매수",
+    "sell": "매도",
+    "quantity": "수량",
+    "amount": "금액",
+    "currentPrice": "현재가",
+    "riskWarning": "리스크 경고",
+    "currentWeight": "현재 비중",
+    "expectedWeight": "예상 비중",
+    "alternatives": "권장 대안",
+    "approve": "승인",
+    "reject": "거부",
+    "approved": "매수 주문이 실행되었습니다",
+    "rejected": "매수 주문이 거부되었습니다"
+  },
+  "portfolio": {
+    "title": "포트폴리오",
+    "summary": {
+      "totalValue": "총 평가금액",
+      "totalReturn": "총 수익률",
+      "holdings": "보유 종목 수",
+      "cash": "현금 보유액"
+    },
+    "chartTypes": {
+      "treemap": "트리맵",
+      "pie": "원형 차트",
+      "bar": "막대 그래프"
+    }
+  },
+  "artifacts": {
+    "title": "저장된 분석",
+    "empty": "저장된 분석이 없습니다",
+    "viewInArtifacts": "Artifacts 페이지에서 보기"
+  },
+  "toast": {
+    "artifactSaved": "Artifact가 저장되었습니다",
+    "artifactSaveFailed": "Artifact 저장에 실패했습니다"
+  },
+  "language": {
+    "ko": "한국어",
+    "en": "English"
+  }
+}

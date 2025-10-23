@@ -1,0 +1,103 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "An error occurred"
+  },
+  "nav": {
+    "chat": "Chat",
+    "portfolio": "Portfolio",
+    "artifacts": "Artifacts",
+    "mypage": "My Page",
+    "discover": "Discover"
+  },
+  "chat": {
+    "inputPlaceholder": "Type a message...",
+    "helperText": "AI can make mistakes. Please verify important information.",
+    "sendMessage": "Send",
+    "attachFile": "Attach file",
+    "saveAsArtifact": "Save as Artifact",
+    "saved": "Saved",
+    "saving": "Saving...",
+    "copy": "Copy",
+    "copied": "Copied",
+    "emptyState": {
+      "greeting": "Hello!",
+      "subGreeting": "How can I help you?",
+      "suggestions": {
+        "portfolio": {
+          "title": "Portfolio Status",
+          "description": "Check your current assets and returns",
+          "prompt": "Show me my portfolio status"
+        },
+        "market": {
+          "title": "Market Analysis",
+          "description": "Latest market trends and investment strategies",
+          "prompt": "Analyze recent market trends"
+        },
+        "recommendation": {
+          "title": "Stock Recommendations",
+          "description": "AI-powered personalized investment ideas",
+          "prompt": "Recommend stocks for my investment style"
+        },
+        "risk": {
+          "title": "Risk Analysis",
+          "description": "Review portfolio risk factors",
+          "prompt": "Analyze my portfolio risks"
+        }
+      }
+    }
+  },
+  "hitl": {
+    "title": "Trade Approval Request",
+    "orderInfo": "Order Information",
+    "stockName": "Stock Name",
+    "stockCode": "Stock Code",
+    "orderType": "Order Type",
+    "buy": "Buy",
+    "sell": "Sell",
+    "quantity": "Quantity",
+    "amount": "Amount",
+    "currentPrice": "Current Price",
+    "riskWarning": "Risk Warning",
+    "currentWeight": "Current Weight",
+    "expectedWeight": "Expected Weight",
+    "alternatives": "Recommended Alternatives",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Buy order has been executed",
+    "rejected": "Buy order has been rejected"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "summary": {
+      "totalValue": "Total Value",
+      "totalReturn": "Total Return",
+      "holdings": "Holdings",
+      "cash": "Cash"
+    },
+    "chartTypes": {
+      "treemap": "Treemap",
+      "pie": "Pie Chart",
+      "bar": "Bar Chart"
+    }
+  },
+  "artifacts": {
+    "title": "Artifacts",
+    "empty": "No saved artifacts",
+    "viewInArtifacts": "View in Artifacts"
+  },
+  "toast": {
+    "artifactSaved": "Artifact has been saved",
+    "artifactSaveFailed": "Failed to save artifact"
+  },
+  "language": {
+    "ko": "한국어",
+    "en": "English"
+  }
+}
