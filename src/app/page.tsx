@@ -141,7 +141,7 @@ def calculate_portfolio():
   const handleSaveArtifact = (messageId: string) => {
     console.log("Save artifact:", messageId);
     // TODO: Artifact 저장 로직 구현 (Phase 3)
-    alert("Artifact가 저장되었습니다!");
+    // Toast는 SaveArtifactButton에서 자동으로 표시됨
   };
 
   const handleApprove = async (messageId: string) => {

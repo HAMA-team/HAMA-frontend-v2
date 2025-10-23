@@ -17,15 +17,38 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
 export default function ChatInput() {
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
+  const charLimit = 5000;
+  const showCharCount = message.length >= 4900;
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim()) {
+    if (message.trim() && message.length <= charLimit) {
       // TODO: Phase 3에서 API 연동
       console.log("Message:", message);
       setMessage("");
+      // Reset textarea height
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
     }
   };
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value);
+
+    // Auto-resize textarea (1 line ~ 5 lines)
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const lineHeight = 24; // 24px per line
+      const maxHeight = lineHeight * 5; // Max 5 lines
+      textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
+    }
+  };
+
+  const isOverLimit = message.length > charLimit;
+  const isMultiLine = textareaRef.current && textareaRef.current.scrollHeight > 24;
 
   return (
     <div
@@ -36,7 +59,7 @@ export default function ChatInput() {
         <form onSubmit={handleSubmit} className="relative">
           {/* Input Container */}
           <div
-            className="flex items-end gap-2 px-4 py-3 rounded-2xl border transition-colors duration-150"
+            className={`flex gap-2 px-4 py-3 rounded-2xl border transition-colors duration-150 ${isMultiLine ? "items-end" : "items-center"}`}
             style={{
               backgroundColor: "#ffffff",
               borderColor: message.trim() ? "#3b82f6" : "#d1d5db",
@@ -45,7 +68,7 @@ export default function ChatInput() {
             {/* Attach Button */}
             <button
               type="button"
-              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f3f4f6] transition-colors duration-150"
+              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f3f4f6] transition-colors duration-150 mb-0"
               aria-label="파일 첨부"
             >
               <Paperclip className="w-5 h-5" style={{ color: "#6b7280" }} />
@@ -53,8 +76,9 @@ export default function ChatInput() {
 
             {/* Textarea */}
             <textarea
+              ref={textareaRef}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleChange}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -62,12 +86,14 @@ export default function ChatInput() {
                 }
               }}
               placeholder="메시지를 입력하세요..."
-              className="flex-1 resize-none outline-none text-sm"
+              className="flex-1 resize-none outline-none"
               style={{
                 color: "#171717",
-                minHeight: "36px",
-                maxHeight: "200px",
-                lineHeight: "1.5",
+                fontSize: "15px",
+                lineHeight: "24px",
+                height: "24px",
+                maxHeight: "120px",
+                overflowY: "auto",
               }}
               rows={1}
             />
@@ -75,28 +101,37 @@ export default function ChatInput() {
             {/* Send Button */}
             <button
               type="submit"
-              disabled={!message.trim()}
-              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150"
+              disabled={!message.trim() || isOverLimit}
+              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150 mb-0"
               style={{
-                backgroundColor: message.trim() ? "#3b82f6" : "#e5e7eb",
-                cursor: message.trim() ? "pointer" : "not-allowed",
+                backgroundColor: message.trim() && !isOverLimit ? "#3b82f6" : "#e5e7eb",
+                cursor: message.trim() && !isOverLimit ? "pointer" : "not-allowed",
               }}
               aria-label="전송"
             >
               <ArrowUp
                 className="w-5 h-5"
-                style={{ color: message.trim() ? "#ffffff" : "#9ca3af" }}
+                style={{ color: message.trim() && !isOverLimit ? "#ffffff" : "#9ca3af" }}
               />
             </button>
           </div>
 
-          {/* Helper Text */}
-          <p
-            className="text-xs text-center mt-2"
-            style={{ color: "#9ca3af" }}
-          >
-            AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.
-          </p>
+          {/* Helper Text & Character Count */}
+          <div className={`flex items-center mt-2 text-xs ${showCharCount ? "justify-between" : "justify-center"}`}>
+            <p style={{ color: "#9ca3af" }}>
+              AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.
+            </p>
+            {showCharCount && (
+              <p
+                style={{
+                  color: isOverLimit ? "#ef4444" : "#9ca3af",
+                  fontWeight: isOverLimit ? 600 : 400,
+                }}
+              >
+                {message.length} / {charLimit}
+              </p>
+            )}
+          </div>
         </form>
       </div>
     </div>

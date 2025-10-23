@@ -3,6 +3,7 @@
 import React from "react";
 import LNB from "./LNB";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
+import ToastContainer from "@/components/common/ToastContainer";
 
 interface ShellProps {
   children: React.ReactNode;
@@ -35,6 +36,9 @@ export default function Shell({ children }: ShellProps) {
       >
         {children}
       </main>
+
+      {/* Toast Container - 전역 토스트 메시지 */}
+      <ToastContainer />
     </div>
   );
 }
