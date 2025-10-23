@@ -42,7 +42,10 @@ export default function ChatView({
     <div
       ref={containerRef}
       className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden py-8"
-      style={{ backgroundColor: "var(--main-background)" }}
+      style={{
+        backgroundColor: "var(--main-background)",
+        paddingBottom: "120px" // ChatInput 높이 + 최소 여유 공간
+      }}
       role="log"
       aria-live="polite"
       aria-label="채팅 메시지 목록"

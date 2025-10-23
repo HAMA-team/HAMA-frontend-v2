@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   MessageSquare,
   FileText,
@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
+import { useChatStore } from "@/store/chatStore";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "@/components/common/LanguageSelector";
 import ThemeToggle from "@/components/common/ThemeToggle";
@@ -33,7 +34,9 @@ import ThemeToggle from "@/components/common/ThemeToggle";
  */
 export default function LNB() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isCollapsed, setCollapsed } = useLNBWidth();
+  const { clearMessages } = useChatStore();
   const { t } = useTranslation();
 
   const mainNavItems = [
@@ -43,6 +46,14 @@ export default function LNB() {
     { href: "/settings", icon: User, label: t("nav.mypage") },
     { href: "/discover", icon: Sparkles, label: t("nav.discover") },
   ];
+
+  // 새 채팅 시작
+  const handleNewChat = () => {
+    clearMessages();
+    if (pathname !== "/") {
+      router.push("/");
+    }
+  };
 
   // Phase 1: Recent Chats는 하드코딩 (Phase 3에서 API 연동)
   const recentChats = [
@@ -85,6 +96,7 @@ export default function LNB() {
         {/* 새 채팅 버튼 (collapsed) */}
         <div className="p-3">
           <button
+            onClick={handleNewChat}
             className="w-10 h-12 flex items-center justify-center rounded-lg transition-colors duration-150"
             style={{ backgroundColor: "var(--lnb-active-bg)" }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-600)"}
@@ -170,6 +182,7 @@ export default function LNB() {
       {/* 새 채팅 버튼 */}
       <div className="p-3">
         <button
+          onClick={handleNewChat}
           className="w-full h-12 flex items-center gap-2 pl-3 pr-4 rounded-lg text-sm font-medium transition-colors duration-150"
           style={{
             backgroundColor: "var(--lnb-active-bg)",

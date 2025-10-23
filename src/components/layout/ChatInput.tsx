@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Paperclip, ArrowUp } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
+import { useChatStore } from "@/store/chatStore";
+import { Message } from "@/lib/types/chat";
 
 /**
  * ChatInput Component
@@ -19,6 +21,7 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
 export default function ChatInput() {
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
+  const { addMessage } = useChatStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -26,13 +29,33 @@ export default function ChatInput() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && message.length <= charLimit) {
-      // TODO: Phase 3에서 API 연동
-      console.log("Message:", message);
+      // 사용자 메시지 추가
+      const userMessage: Message = {
+        id: `user-${Date.now()}`,
+        role: "user",
+        content: message.trim(),
+        timestamp: new Date().toISOString(),
+        status: "sent",
+      };
+      addMessage(userMessage);
+
+      // 입력창 초기화
       setMessage("");
-      // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
+
+      // AI 응답 (API 미연결 상태)
+      setTimeout(() => {
+        const aiMessage: Message = {
+          id: `ai-${Date.now()}`,
+          role: "assistant",
+          content: "⚠️ **API에 연결되지 않은 상태입니다**\n\n현재 백엔드 서버에 연결되지 않아 실제 AI 응답을 생성할 수 없습니다.\n\n**개발 중 기능:**\n- 사용자 메시지 전송 ✅\n- AI 응답 생성 (백엔드 연결 필요)\n- 매매 승인 요청 처리 (백엔드 연결 필요)\n\n백엔드 API 연동 후 정상 작동합니다.",
+          timestamp: new Date().toISOString(),
+          status: "sent",
+        };
+        addMessage(aiMessage);
+      }, 500);
     }
   };
 
@@ -125,7 +148,7 @@ export default function ChatInput() {
           {/* Helper Text & Character Count */}
           <div className={`flex items-center mt-2 text-xs ${showCharCount ? "justify-between" : "justify-center"}`}>
             <p style={{ color: "var(--text-muted)" }}>
-              AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.
+              AI가 실수할 수 있습니다. 중요한 정보는 확인하세요. • Shift+Enter로 줄바꿈
             </p>
             {showCharCount && (
               <p
