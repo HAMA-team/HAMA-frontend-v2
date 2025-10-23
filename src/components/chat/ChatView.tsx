@@ -12,6 +12,7 @@ import ChatMessage from "./ChatMessage";
  * - 메시지가 없으면 Empty State 표시
  *
  * @see DesignSystem.md - Section 4.2 Content Max Width
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 
 interface ChatViewProps {
@@ -41,7 +42,7 @@ export default function ChatView({
     <div
       ref={containerRef}
       className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden py-8"
-      style={{ backgroundColor: "#f5f5f5" }}
+      style={{ backgroundColor: "var(--main-background)" }}
       role="log"
       aria-live="polite"
       aria-label="채팅 메시지 목록"
@@ -51,7 +52,7 @@ export default function ChatView({
         {messages.length === 0 ? (
           // Empty State는 page.tsx에서 처리
           <div className="flex items-center justify-center h-full">
-            <p className="text-base" style={{ color: "#6b7280" }}>
+            <p className="text-base" style={{ color: "var(--text-secondary)" }}>
               대화를 시작해보세요
             </p>
           </div>

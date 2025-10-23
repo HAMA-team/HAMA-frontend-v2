@@ -1,9 +1,12 @@
 "use client";
 
 import React from "react";
-import LNB from "./LNB";
+import dynamic from "next/dynamic";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import ToastContainer from "@/components/common/ToastContainer";
+
+// LNB를 dynamic import로 불러와서 SSR 비활성화 (i18n hydration 에러 방지)
+const LNB = dynamic(() => import("./LNB"), { ssr: false });
 
 interface ShellProps {
   children: React.ReactNode;

@@ -23,6 +23,7 @@ interface PortfolioViewProps {
  *
  * @see DesignSystem.md - Layout Dimensions
  * @see Userflow.md - 포트폴리오 조회 + 추가 질문 플로우
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function PortfolioView({ portfolio }: PortfolioViewProps) {
   const [chartType, setChartType] = useState<ChartType>("treemap");
@@ -55,13 +56,13 @@ export default function PortfolioView({ portfolio }: PortfolioViewProps) {
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto pb-32" style={{ backgroundColor: "#f5f5f5" }}>
+    <div className="w-full h-full overflow-y-auto pb-32" style={{ backgroundColor: "var(--main-background)" }}>
       <div className="max-w-[1200px] mx-auto px-8 py-8 w-full min-w-0">
         {/* 페이지 제목 */}
         <h1
           className="text-[28px] font-bold tracking-tight mb-6"
           style={{
-            color: "#171717",
+            color: "var(--text-primary)",
             letterSpacing: "-0.02em",
           }}
         >

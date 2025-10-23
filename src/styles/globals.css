@@ -149,6 +149,30 @@
     --border-input-focus: #60a5fa;
     --border-card: #27272a;
 
+    /* Primary Colors - Dark Mode */
+    --primary-50: #1e3a8a;
+    --primary-100: #1e40af;
+    --primary-500: #3b82f6;
+    --primary-600: #60a5fa;
+    --primary-700: #93c5fd;
+
+    /* Semantic Colors - Dark Mode */
+    --success-50: #064e3b;
+    --success-500: #10b981;
+    --success-600: #34d399;
+
+    --error-50: #7f1d1d;
+    --error-500: #ef4444;
+    --error-600: #f87171;
+
+    --warning-50: #451a03;
+    --warning-500: #f59e0b;
+    --warning-600: #fbbf24;
+
+    --info-50: #1e3a8a;
+    --info-500: #3b82f6;
+    --info-600: #60a5fa;
+
     /* Icon Background Colors (제안 카드) - Dark Mode */
     --icon-blue-bg: #1e3a8a;
     --icon-blue-fg: #93c5fd;
@@ -162,6 +186,18 @@
     --icon-pink-fg: #f9a8d4;
     --icon-red-bg: #7f1d1d;
     --icon-red-fg: #fca5a5;
+
+    /* Chart Colors (Portfolio) - Dark Mode - 명도 낮춤 */
+    --chart-blue: #2563eb;
+    --chart-green: #059669;
+    --chart-purple: #7c3aed;
+    --chart-orange: #d97706;
+    --chart-pink: #db2777;
+    --chart-indigo: #4f46e5;
+    --chart-cyan: #0891b2;
+    --chart-yellow: #ca8a04;
+    --chart-profit: #059669;
+    --chart-loss: #dc2626;
 
     /* Shadows - 다크 모드용 */
     --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);

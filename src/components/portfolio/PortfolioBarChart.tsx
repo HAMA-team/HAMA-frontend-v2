@@ -13,7 +13,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { Stock } from "@/lib/types/portfolio";
-import { getReturnColor } from "@/lib/mock/portfolioData";
+import { useChartColors } from "@/lib/hooks/useChartColors";
 
 interface PortfolioBarChartProps {
   stocks: Stock[];
@@ -30,8 +30,11 @@ interface PortfolioBarChartProps {
  *
  * @see DesignSystem.md - Chart Colors
  * @see ProductRequirements.md - US-3.1 포트폴리오 즉시 시각화
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function PortfolioBarChart({ stocks }: PortfolioBarChartProps) {
+  const { getReturnColor } = useChartColors();
+
   // 수익률 높은 순으로 정렬
   const data = [...stocks]
     .sort((a, b) => b.returnRate - a.returnRate)
@@ -58,25 +61,25 @@ export default function PortfolioBarChart({ stocks }: PortfolioBarChartProps) {
         <div
           className="rounded-lg p-3 shadow-lg border"
           style={{
-            backgroundColor: "#ffffff",
-            borderColor: "#e5e7eb",
+            backgroundColor: "var(--container-background)",
+            borderColor: "var(--border-default)",
           }}
         >
-          <p className="text-sm font-semibold mb-1" style={{ color: "#171717" }}>
+          <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
             {data.name}
           </p>
           <p
             className="text-xs font-semibold mb-0.5"
             style={{
-              color: data.returnRate >= 0 ? "#10b981" : "#ef4444",
+              color: data.returnRate >= 0 ? "var(--chart-profit)" : "var(--chart-loss)",
             }}
           >
             수익률: {formatPercentage(data.returnRate)}
           </p>
-          <p className="text-xs mb-0.5" style={{ color: "#6b7280" }}>
+          <p className="text-xs mb-0.5" style={{ color: "var(--text-secondary)" }}>
             수익금액: {formatCurrency(data.return)}
           </p>
-          <p className="text-xs" style={{ color: "#6b7280" }}>
+          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
             평가금액: {formatCurrency(data.value)}
           </p>
         </div>
@@ -89,8 +92,8 @@ export default function PortfolioBarChart({ stocks }: PortfolioBarChartProps) {
     <div
       className="rounded-xl p-6 border"
       style={{
-        backgroundColor: "#ffffff",
-        borderColor: "#e5e7eb",
+        backgroundColor: "var(--container-background)",
+        borderColor: "var(--border-default)",
       }}
     >
       <ResponsiveContainer width="100%" height={500}>
@@ -103,19 +106,19 @@ export default function PortfolioBarChart({ stocks }: PortfolioBarChartProps) {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--lnb-hover-bg)" />
           <XAxis
             dataKey="name"
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            axisLine={{ stroke: "#e5e7eb" }}
+            tick={{ fill: "var(--text-secondary)", fontSize: 12 }}
+            axisLine={{ stroke: "var(--border-default)" }}
           />
           <YAxis
-            tick={{ fill: "#6b7280", fontSize: 12 }}
-            axisLine={{ stroke: "#e5e7eb" }}
+            tick={{ fill: "var(--text-secondary)", fontSize: 12 }}
+            axisLine={{ stroke: "var(--border-default)" }}
             tickFormatter={(value) => `${value}%`}
           />
           <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine y={0} stroke="#9ca3af" strokeDasharray="3 3" />
+          <ReferenceLine y={0} stroke="var(--text-muted)" strokeDasharray="3 3" />
           <Bar dataKey="returnRate" radius={[8, 8, 0, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getReturnColor(entry.returnRate)} />

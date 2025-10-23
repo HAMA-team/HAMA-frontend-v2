@@ -31,32 +31,32 @@ export default function Home() {
   const suggestions: SuggestionCard[] = [
     {
       icon: PieChart,
-      iconBg: "#dbeafe",
-      iconFg: "#3b82f6",
+      iconBg: "var(--icon-blue-bg)",
+      iconFg: "var(--icon-blue-fg)",
       title: "포트폴리오 현황",
       description: "현재 보유 자산과 수익률을 확인하세요",
       prompt: "내 포트폴리오 현황을 보여줘",
     },
     {
       icon: TrendingUp,
-      iconBg: "#d1fae5",
-      iconFg: "#10b981",
+      iconBg: "var(--icon-green-bg)",
+      iconFg: "var(--icon-green-fg)",
       title: "시장 분석",
       description: "최신 시장 동향과 투자 전략",
       prompt: "최근 시장 동향을 분석해줘",
     },
     {
       icon: Sparkles,
-      iconBg: "#ede9fe",
-      iconFg: "#8b5cf6",
+      iconBg: "var(--icon-purple-bg)",
+      iconFg: "var(--icon-purple-fg)",
       title: "종목 추천",
       description: "AI 기반 맞춤형 투자 아이디어",
       prompt: "내 투자 성향에 맞는 종목을 추천해줘",
     },
     {
       icon: Shield,
-      iconBg: "#fed7aa",
-      iconFg: "#f59e0b",
+      iconBg: "var(--icon-orange-bg)",
+      iconFg: "var(--icon-orange-fg)",
       title: "리스크 분석",
       description: "포트폴리오 위험 요소 점검",
       prompt: "내 포트폴리오의 리스크를 분석해줘",
@@ -208,7 +208,7 @@ def calculate_portfolio():
   };
 
   return (
-    <div className="flex flex-col h-full w-full overflow-x-hidden" style={{ backgroundColor: "#f5f5f5" }}>
+    <div className="flex flex-col h-full w-full overflow-x-hidden" style={{ backgroundColor: "var(--main-background)" }}>
       {/* Conditional Rendering: Empty State or Chat View */}
       {messages.length === 0 ? (
         // Empty State
@@ -217,16 +217,16 @@ def calculate_portfolio():
           {/* Logo */}
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-            style={{ backgroundColor: "#3b82f6" }}
+            style={{ backgroundColor: "var(--primary-500)" }}
           >
-            <span className="text-2xl font-bold text-white">H</span>
+            <span className="text-2xl font-bold" style={{ color: "var(--lnb-active-text)" }}>H</span>
           </div>
 
           {/* Greeting */}
-          <h1 className="text-3xl font-bold mb-2 text-center" style={{ color: "#171717" }}>
+          <h1 className="text-3xl font-bold mb-2 text-center" style={{ color: "var(--text-primary)" }}>
             안녕하세요!
           </h1>
-          <p className="text-base mb-12 text-center" style={{ color: "#6b7280" }}>
+          <p className="text-base mb-12 text-center" style={{ color: "var(--text-secondary)" }}>
             무엇을 도와드릴까요?
           </p>
 
@@ -240,16 +240,16 @@ def calculate_portfolio():
                   onClick={() => handleSuggestionClick(suggestion.prompt)}
                   className="flex flex-col items-start p-5 rounded-2xl border transition-all duration-150 hover:shadow-md min-w-0"
                   style={{
-                    backgroundColor: "#ffffff",
-                    borderColor: "#e5e7eb",
+                    backgroundColor: "var(--container-background)",
+                    borderColor: "var(--border-default)",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#d1d5db";
-                    e.currentTarget.style.backgroundColor = "#fafafa";
+                    e.currentTarget.style.borderColor = "var(--border-emphasis)";
+                    e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#e5e7eb";
-                    e.currentTarget.style.backgroundColor = "#ffffff";
+                    e.currentTarget.style.borderColor = "var(--border-default)";
+                    e.currentTarget.style.backgroundColor = "var(--container-background)";
                   }}
                 >
                   {/* Icon */}
@@ -261,12 +261,12 @@ def calculate_portfolio():
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-sm font-semibold mb-1 break-words" style={{ color: "#171717" }}>
+                  <h3 className="text-sm font-semibold mb-1 break-words" style={{ color: "var(--text-primary)" }}>
                     {suggestion.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-xs text-left break-words" style={{ color: "#6b7280" }}>
+                  <p className="text-xs text-left break-words" style={{ color: "var(--text-secondary)" }}>
                     {suggestion.description}
                   </p>
                 </button>
@@ -279,11 +279,11 @@ def calculate_portfolio():
             onClick={handleTestHITL}
             className="mt-8 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
             style={{
-              backgroundColor: "#f59e0b",
-              color: "#ffffff",
+              backgroundColor: "var(--warning-500)",
+              color: "var(--lnb-active-text)",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#d97706"}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f59e0b"}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--warning-600)"}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--warning-500)"}
           >
             🧪 HITL 패널 테스트
           </button>

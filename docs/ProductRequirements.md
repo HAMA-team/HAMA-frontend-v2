@@ -541,8 +541,8 @@ AI가 파악한 당신의 투자 스타일:
 
 **Technical Setup:**
 
-- Dark mode CSS 변수 설정 (토글은 Phase 2)
-- i18n 구조 설정
+- ✅ Dark mode CSS 변수 설정 및 토글 완성 (Phase 1)
+- ✅ i18n 구조 설정 및 토글 완성 (Phase 1)
 - Responsive 고려 설계 (완성은 Phase 4)
 
 ---
@@ -558,7 +558,7 @@ AI가 파악한 당신의 투자 스타일:
 
 **Should Have:**
 
-- [ ] Dark mode 토글 완성
+- [x] Dark mode 토글 완성 ✅ (Phase 1 완료)
 - [ ] Artifacts 페이지 (목록)
 
 ---

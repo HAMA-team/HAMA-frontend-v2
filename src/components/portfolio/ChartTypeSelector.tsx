@@ -18,6 +18,7 @@ interface ChartTypeSelectorProps {
  *
  * @see DesignSystem.md - Buttons
  * @see Userflow.md - 차트 타입 변경
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function ChartTypeSelector({
   selectedType,
@@ -31,7 +32,7 @@ export default function ChartTypeSelector({
 
   return (
     <div className="flex items-center gap-3 mb-6">
-      <span className="text-sm font-medium" style={{ color: "#6b7280" }}>
+      <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
         차트 타입:
       </span>
       <div className="flex gap-2">
@@ -43,20 +44,20 @@ export default function ChartTypeSelector({
               onClick={() => onTypeChange(type)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 border"
               style={{
-                backgroundColor: isSelected ? "#3b82f6" : "#ffffff",
-                borderColor: isSelected ? "#3b82f6" : "#e5e7eb",
-                color: isSelected ? "#ffffff" : "#374151",
+                backgroundColor: isSelected ? "var(--primary-500)" : "var(--container-background)",
+                borderColor: isSelected ? "var(--primary-500)" : "var(--border-default)",
+                color: isSelected ? "var(--lnb-active-text)" : "var(--lnb-text)",
               }}
               onMouseEnter={(e) => {
                 if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = "#f9fafb";
-                  e.currentTarget.style.borderColor = "#d1d5db";
+                  e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)";
+                  e.currentTarget.style.borderColor = "var(--border-emphasis)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = "#ffffff";
-                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.backgroundColor = "var(--container-background)";
+                  e.currentTarget.style.borderColor = "var(--border-default)";
                 }
               }}
             >

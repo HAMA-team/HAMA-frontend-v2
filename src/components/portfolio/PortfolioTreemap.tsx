@@ -3,7 +3,7 @@
 import React from "react";
 import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
 import { Stock } from "@/lib/types/portfolio";
-import { CHART_COLORS } from "@/lib/mock/portfolioData";
+import { useChartColors } from "@/lib/hooks/useChartColors";
 
 interface PortfolioTreemapProps {
   stocks: Stock[];
@@ -19,14 +19,17 @@ interface PortfolioTreemapProps {
  *
  * @see DesignSystem.md - Chart Colors
  * @see ProductRequirements.md - US-3.1 포트폴리오 즉시 시각화
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
+  const { chartColors } = useChartColors();
+
   const data = stocks.map((stock, index) => ({
     name: stock.name,
     size: stock.value,
     weight: stock.weight,
     returnRate: stock.returnRate,
-    fill: CHART_COLORS[index % CHART_COLORS.length],
+    fill: chartColors[index % chartColors.length] || "#3b82f6", // fallback
   }));
 
   const formatCurrency = (value: number) => {
@@ -45,23 +48,23 @@ export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
         <div
           className="rounded-lg p-3 shadow-lg border"
           style={{
-            backgroundColor: "#ffffff",
-            borderColor: "#e5e7eb",
+            backgroundColor: "var(--container-background)",
+            borderColor: "var(--border-default)",
           }}
         >
-          <p className="text-sm font-semibold mb-1" style={{ color: "#171717" }}>
+          <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
             {data.name}
           </p>
-          <p className="text-xs mb-0.5" style={{ color: "#6b7280" }}>
+          <p className="text-xs mb-0.5" style={{ color: "var(--text-secondary)" }}>
             평가금액: {formatCurrency(data.size)}
           </p>
-          <p className="text-xs mb-0.5" style={{ color: "#6b7280" }}>
+          <p className="text-xs mb-0.5" style={{ color: "var(--text-secondary)" }}>
             비중: {data.weight.toFixed(2)}%
           </p>
           <p
             className="text-xs font-semibold"
             style={{
-              color: data.returnRate >= 0 ? "#10b981" : "#ef4444",
+              color: data.returnRate >= 0 ? "var(--chart-profit)" : "var(--chart-loss)",
             }}
           >
             수익률: {formatPercentage(data.returnRate)}
@@ -103,7 +106,7 @@ export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
           rx={borderRadius}
           ry={borderRadius}
           style={{
-            fill: "#ffffff",
+            fill: "var(--container-background)",
             stroke: "none",
           }}
         />
@@ -126,7 +129,7 @@ export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
               x={x + width / 2}
               y={y + height / 2 - weightFontSize}
               textAnchor="middle"
-              fill="#ffffff"
+              fill="var(--lnb-active-text)"
               fontSize={nameFontSize}
               fontWeight="600"
             >
@@ -137,7 +140,7 @@ export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
                 x={x + width / 2}
                 y={y + height / 2 + weightFontSize * 0.5}
                 textAnchor="middle"
-                fill="#ffffff"
+                fill="var(--lnb-active-text)"
                 fontSize={weightFontSize}
               >
                 {actualWeight.toFixed(1)}%
@@ -147,7 +150,7 @@ export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
               x={x + width / 2}
               y={y + height / 2 + weightFontSize * 0.5 + returnFontSize * 1.5}
               textAnchor="middle"
-              fill="#ffffff"
+              fill="var(--lnb-active-text)"
               fontSize={returnFontSize}
               fontWeight="500"
             >
@@ -163,11 +166,11 @@ export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
     <div
       className="rounded-xl p-6 border treemap-container"
       style={{
-        backgroundColor: "#ffffff",
-        borderColor: "#e5e7eb",
+        backgroundColor: "var(--container-background)",
+        borderColor: "var(--border-default)",
       }}
     >
-      <div style={{ width: "100%", height: 500, backgroundColor: "#ffffff" }}>
+      <div style={{ width: "100%", height: 500, backgroundColor: "var(--container-background)" }}>
         <ResponsiveContainer width="100%" height={500}>
           <Treemap
             data={data}

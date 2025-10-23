@@ -13,6 +13,8 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
  * - 파일 첨부, 전송 버튼
  * - 자동 높이 조절 (텍스트 입력 시)
  * - LNB 너비를 고려한 중앙 정렬
+ *
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function ChatInput() {
   const [message, setMessage] = useState("");
@@ -61,17 +63,20 @@ export default function ChatInput() {
           <div
             className={`flex gap-2 px-4 py-3 rounded-2xl border transition-colors duration-150 ${isMultiLine ? "items-end" : "items-center"}`}
             style={{
-              backgroundColor: "#ffffff",
-              borderColor: message.trim() ? "#3b82f6" : "#d1d5db",
+              backgroundColor: "var(--container-background)",
+              borderColor: message.trim() ? "var(--border-input-focus)" : "var(--border-input)",
             }}
           >
             {/* Attach Button */}
             <button
               type="button"
-              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f3f4f6] transition-colors duration-150 mb-0"
+              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150 mb-0"
+              style={{ backgroundColor: "transparent" }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)"}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
               aria-label="파일 첨부"
             >
-              <Paperclip className="w-5 h-5" style={{ color: "#6b7280" }} />
+              <Paperclip className="w-5 h-5" style={{ color: "var(--text-secondary)" }} />
             </button>
 
             {/* Textarea */}
@@ -88,7 +93,8 @@ export default function ChatInput() {
               placeholder="메시지를 입력하세요..."
               className="flex-1 resize-none outline-none"
               style={{
-                color: "#171717",
+                color: "var(--text-primary)",
+                backgroundColor: "transparent",
                 fontSize: "15px",
                 lineHeight: "24px",
                 height: "24px",
@@ -104,27 +110,27 @@ export default function ChatInput() {
               disabled={!message.trim() || isOverLimit}
               className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150 mb-0"
               style={{
-                backgroundColor: message.trim() && !isOverLimit ? "#3b82f6" : "#e5e7eb",
+                backgroundColor: message.trim() && !isOverLimit ? "var(--primary-500)" : "var(--border-default)",
                 cursor: message.trim() && !isOverLimit ? "pointer" : "not-allowed",
               }}
               aria-label="전송"
             >
               <ArrowUp
                 className="w-5 h-5"
-                style={{ color: message.trim() && !isOverLimit ? "#ffffff" : "#9ca3af" }}
+                style={{ color: message.trim() && !isOverLimit ? "var(--lnb-active-text)" : "var(--text-muted)" }}
               />
             </button>
           </div>
 
           {/* Helper Text & Character Count */}
           <div className={`flex items-center mt-2 text-xs ${showCharCount ? "justify-between" : "justify-center"}`}>
-            <p style={{ color: "#9ca3af" }}>
+            <p style={{ color: "var(--text-muted)" }}>
               AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.
             </p>
             {showCharCount && (
               <p
                 style={{
-                  color: isOverLimit ? "#ef4444" : "#9ca3af",
+                  color: isOverLimit ? "var(--text-error)" : "var(--text-muted)",
                   fontWeight: isOverLimit ? 600 : 400,
                 }}
               >

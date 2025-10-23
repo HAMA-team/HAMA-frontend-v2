@@ -17,6 +17,7 @@ import SaveArtifactButton from "./SaveArtifactButton";
  * @see DesignSystem.md - Section 11 Chat Messages
  * @see references/mockup_references/대화 기록 뷰.png
  * @see references/img_references/Gemini 챗 도중..png
+ * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 
 interface ChatMessageProps {
@@ -52,8 +53,8 @@ export default function ChatMessage({
         <div
           className="max-w-[70%] px-4 py-3 rounded-2xl"
           style={{
-            backgroundColor: "#dbeafe",
-            color: "#171717",
+            backgroundColor: "var(--primary-100)",
+            color: "var(--primary-700)",
             fontSize: "15px",
             lineHeight: "22px",
           }}
@@ -71,12 +72,12 @@ export default function ChatMessage({
       <div className="flex items-center gap-2 mb-3">
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: "#3b82f6" }}
+          style={{ backgroundColor: "var(--primary-500)" }}
           aria-hidden="true"
         >
-          <span className="text-base font-bold text-white">H</span>
+          <span className="text-base font-bold" style={{ color: "var(--lnb-active-text)" }}>H</span>
         </div>
-        <span className="text-sm font-semibold" style={{ color: "#171717" }}>
+        <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
           HAMA
         </span>
       </div>
@@ -92,7 +93,7 @@ export default function ChatMessage({
         style={{
           fontSize: "15px",
           lineHeight: "24px",
-          color: "#171717",
+          color: "var(--text-primary)",
         }}
       >
         <ReactMarkdown
@@ -105,7 +106,7 @@ export default function ChatMessage({
                   fontWeight: 700,
                   marginBottom: "16px",
                   letterSpacing: "-0.02em",
-                  color: "#171717",
+                  color: "var(--text-primary)",
                 }}
                 {...props}
               />
@@ -117,7 +118,7 @@ export default function ChatMessage({
                   fontWeight: 600,
                   marginBottom: "12px",
                   letterSpacing: "-0.01em",
-                  color: "#171717",
+                  color: "var(--text-primary)",
                 }}
                 {...props}
               />
@@ -128,49 +129,49 @@ export default function ChatMessage({
                   fontSize: "18px",
                   fontWeight: 600,
                   marginBottom: "8px",
-                  color: "#171717",
+                  color: "var(--text-primary)",
                 }}
                 {...props}
               />
             ),
             // Paragraph
             p: ({ node, ...props }) => (
-              <p style={{ marginBottom: "16px", color: "#171717" }} {...props} />
+              <p style={{ marginBottom: "16px", color: "var(--text-primary)" }} {...props} />
             ),
             // Lists
             ul: ({ node, ...props }) => (
               <ul
-                style={{ marginBottom: "16px", paddingLeft: "24px", color: "#171717" }}
+                style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
                 {...props}
               />
             ),
             ol: ({ node, ...props }) => (
               <ol
-                style={{ marginBottom: "16px", paddingLeft: "24px", color: "#171717" }}
+                style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
                 {...props}
               />
             ),
             li: ({ node, ...props }) => (
-              <li style={{ marginBottom: "8px", color: "#171717" }} {...props} />
+              <li style={{ marginBottom: "8px", color: "var(--text-primary)" }} {...props} />
             ),
             // Code
             code: ({ node, inline, ...props }: any) =>
               inline ? (
                 <code
                   style={{
-                    backgroundColor: "#f3f4f6",
+                    backgroundColor: "var(--lnb-hover-bg)",
                     padding: "2px 6px",
                     borderRadius: "4px",
                     fontSize: "14px",
                     fontFamily: "'Monaco', 'Menlo', 'Courier New', monospace",
-                    color: "#171717",
+                    color: "var(--primary-600)",
                   }}
                   {...props}
                 />
               ) : (
                 <code
                   style={{
-                    color: "#e5e7eb",
+                    color: "var(--text-primary)",
                     fontFamily: "'Monaco', 'Menlo', 'Courier New', monospace",
                   }}
                   {...props}
@@ -179,12 +180,13 @@ export default function ChatMessage({
             pre: ({ node, ...props }) => (
               <pre
                 style={{
-                  backgroundColor: "#1f2937",
-                  color: "#e5e7eb",
+                  backgroundColor: "var(--lnb-background)",
+                  color: "var(--text-primary)",
                   padding: "16px",
                   borderRadius: "8px",
                   overflowX: "auto",
                   marginBottom: "16px",
+                  border: "1px solid var(--border-default)",
                 }}
                 {...props}
               />
@@ -193,7 +195,7 @@ export default function ChatMessage({
             a: ({ node, ...props }) => (
               <a
                 style={{
-                  color: "#3b82f6",
+                  color: "var(--text-link)",
                   textDecoration: "underline",
                 }}
                 target="_blank"
@@ -215,12 +217,12 @@ export default function ChatMessage({
             th: ({ node, ...props }) => (
               <th
                 style={{
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid var(--border-default)",
                   padding: "8px",
-                  backgroundColor: "#f9fafb",
+                  backgroundColor: "var(--lnb-recent-hover)",
                   textAlign: "left",
                   fontWeight: 600,
-                  color: "#171717",
+                  color: "var(--text-primary)",
                 }}
                 {...props}
               />
@@ -228,9 +230,9 @@ export default function ChatMessage({
             td: ({ node, ...props }) => (
               <td
                 style={{
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid var(--border-default)",
                   padding: "8px",
-                  color: "#171717",
+                  color: "var(--text-primary)",
                 }}
                 {...props}
               />
@@ -244,8 +246,8 @@ export default function ChatMessage({
       {/* Loading State */}
       {message.status === "sending" && (
         <div className="flex items-center gap-2 mb-4" aria-live="polite" aria-busy="true">
-          <Loader2 className="w-4 h-4 animate-spin" style={{ color: "#3b82f6" }} strokeWidth={1.5} />
-          <span className="text-sm" style={{ color: "#6b7280" }}>
+          <Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--primary-500)" }} strokeWidth={1.5} />
+          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
             응답 생성 중...
           </span>
         </div>
@@ -256,18 +258,18 @@ export default function ChatMessage({
         <div
           className="flex flex-col gap-3 mb-4 p-4 rounded-lg border-l-4"
           style={{
-            backgroundColor: "#fee2e2",
-            borderLeftColor: "#ef4444",
-            borderTop: "1px solid #fecaca",
-            borderRight: "1px solid #fecaca",
-            borderBottom: "1px solid #fecaca",
+            backgroundColor: "var(--error-50)",
+            borderLeftColor: "var(--error-500)",
+            borderTop: "1px solid var(--error-500)",
+            borderRight: "1px solid var(--error-500)",
+            borderBottom: "1px solid var(--error-500)",
           }}
           role="alert"
           aria-live="assertive"
         >
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4" style={{ color: "#ef4444" }} strokeWidth={1.5} />
-            <span className="text-sm font-semibold" style={{ color: "#dc2626" }}>
+            <AlertTriangle className="w-4 h-4" style={{ color: "var(--error-500)" }} strokeWidth={1.5} />
+            <span className="text-sm font-semibold" style={{ color: "var(--error-600)" }}>
               전송 실패
             </span>
           </div>
@@ -277,14 +279,14 @@ export default function ChatMessage({
                 onClick={onRetry}
                 className="px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-150"
                 style={{
-                  backgroundColor: "#ef4444",
-                  color: "#ffffff",
+                  backgroundColor: "var(--error-500)",
+                  color: "var(--lnb-active-text)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#dc2626";
+                  e.currentTarget.style.backgroundColor = "var(--error-600)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#ef4444";
+                  e.currentTarget.style.backgroundColor = "var(--error-500)";
                 }}
               >
                 재전송
@@ -296,11 +298,11 @@ export default function ChatMessage({
                 className="px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-150 border"
                 style={{
                   backgroundColor: "transparent",
-                  color: "#dc2626",
-                  borderColor: "#fecaca",
+                  color: "var(--error-600)",
+                  borderColor: "var(--error-500)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fef2f2";
+                  e.currentTarget.style.backgroundColor = "var(--error-50)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = "transparent";
@@ -324,16 +326,16 @@ export default function ChatMessage({
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border transition-all duration-150"
             style={{
               backgroundColor: "transparent",
-              borderColor: "#e5e7eb",
-              color: "#171717",
+              borderColor: "var(--border-default)",
+              color: "var(--text-primary)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#f9fafb";
-              e.currentTarget.style.borderColor = "#d1d5db";
+              e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)";
+              e.currentTarget.style.borderColor = "var(--border-emphasis)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.borderColor = "#e5e7eb";
+              e.currentTarget.style.borderColor = "var(--border-default)";
             }}
             aria-label={isCopied ? "복사됨" : "복사"}
           >
