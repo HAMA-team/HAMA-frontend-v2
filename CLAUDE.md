@@ -234,10 +234,10 @@ src/
 
 ## Current Status
 
-- **Phase**: Phase 1 진행 중
+- **Phase**: Phase 1 완료
 - **Completed**:
   - ✅ 프로젝트 셋업 (Next.js 15, TypeScript, Tailwind CSS v4)
-  - ✅ Shell & LNB 구현 (접기/펼치기, 라이트 테마, fade-in 애니메이션, 전역 상태 관리)
+  - ✅ Shell & LNB 구현 (접기/펼치기, 라이트/다크 테마, fade-in 애니메이션, 전역 상태 관리)
   - ✅ 반응형 레이아웃 (LNB 연동 가운데 정렬, 가로 스크롤 방지, 동적 width 계산)
   - ✅ Chat Empty State (제안 카드 4개, 반응형 그리드)
   - ✅ ChatInput 컴포넌트 (하단 고정, 자동 높이 1~5줄, 글자 수 제한 5000자)
@@ -245,12 +245,13 @@ src/
   - ✅ ChatMessage 컴포넌트 (사용자 말풍선, AI 전체 너비, 코드 블록 지원)
   - ✅ Toast 알림 시스템 (성공/실패, 링크 지원, 전역 상태 관리)
   - ✅ Save Artifact 상태 관리 (저장됨 표시, LocalStorage)
-  - ✅ Zustand 상태 관리 (chatStore, toastStore, useLNBWidth)
+  - ✅ Zustand 상태 관리 (chatStore, toastStore, themeStore, useLNBWidth)
   - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
   - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
   - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
   - ✅ i18n 구조 설정 (react-i18next, LanguageDetector, 한국어/영어 번역 파일, LNB 적용)
-- **Version**: 3.2 (i18n 구조 설정 완료)
+  - ✅ Dark Mode 완전 구현 (CSS 변수, ThemeToggle, ThemeProvider, LocalStorage 저장)
+- **Version**: 4.0 (Phase 1 완료 - Dark Mode 지원)
 - **Last Updated**: 2025-10-23
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
