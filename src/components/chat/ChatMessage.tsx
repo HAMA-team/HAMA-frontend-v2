@@ -316,7 +316,7 @@ export default function ChatMessage({
       {/* Action Buttons */}
       {message.status === "sent" && (
         <div className="flex items-center gap-2">
-          {onSaveArtifact && <SaveArtifactButton onClick={onSaveArtifact} />}
+          {onSaveArtifact && <SaveArtifactButton messageId={message.id} onClick={onSaveArtifact} />}
 
           {/* Copy Button */}
           <button

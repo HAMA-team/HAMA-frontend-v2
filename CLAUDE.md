@@ -41,13 +41,16 @@ src/
 │   ├── Layout/
 │   │   ├── Shell.tsx              # 전체 레이아웃
 │   │   ├── LNB.tsx                # 좌측 내비게이션 바
-│   │   └── ChatInput.tsx          # 하단 고정 채팅 입력창
+│   │   └── ChatInput.tsx          # 하단 고정 채팅 입력창 (자동 높이, 글자 수 제한)
 │   ├── Chat/
 │   │   ├── ChatView.tsx           # 채팅 메인 뷰
 │   │   ├── MessageBubble.tsx      # 사용자 메시지 말풍선
 │   │   ├── AIResponse.tsx         # AI 답변 (전체 너비)
 │   │   ├── AgentActivity.tsx      # 에이전트 활동 표시 (Claude 스타일)
-│   │   └── SaveArtifactButton.tsx # Artifact 저장 버튼
+│   │   └── SaveArtifactButton.tsx # Artifact 저장 버튼 (저장 상태 표시)
+│   ├── common/
+│   │   ├── Toast.tsx              # 토스트 메시지 컴포넌트
+│   │   └── ToastContainer.tsx     # 토스트 컨테이너
 │   ├── HITL/
 │   │   ├── HITLPanel.tsx          # HITL 승인 패널
 │   │   └── ApprovalActions.tsx    # 승인/거부 액션
@@ -77,6 +80,9 @@ src/
 │   ├── mypage.tsx                 # My Page
 │   ├── discover.tsx               # Discover 페이지
 │   └── onboarding.tsx             # Onboarding 페이지
+├── store/
+│   ├── chatStore.ts               # 채팅 전역 상태 관리 (Zustand)
+│   └── toastStore.ts              # 토스트 전역 상태 관리 (Zustand)
 └── lib/
     ├── api.ts                     # API 클라이언트
     └── utils.ts                   # 유틸리티 함수
@@ -93,8 +99,11 @@ src/
 ### 2. Chat Interface
 - Markdown 렌더링 지원
 - Agent Activity 통합 표시 (Claude의 Thinking처럼)
-- Save as Artifact 기능
+- Save as Artifact 기능 (저장 상태 표시, LocalStorage)
 - 빈 채팅 상태 UI (시작 제안 카드)
+- 자동 높이 조절 ChatInput (1~5줄)
+- 글자 수 제한 (5000자, 4900자부터 표시)
+- Toast 알림 시스템 (성공/실패, 링크 지원)
 
 ### 3. HITL (Human-in-the-Loop)
 - 우측 사이드 패널 표시 (Claude Artifacts 스타일)
@@ -219,14 +228,16 @@ src/
   - ✅ Shell & LNB 구현 (접기/펼치기, 라이트 테마, fade-in 애니메이션, 전역 상태 관리)
   - ✅ 반응형 레이아웃 (LNB 연동 가운데 정렬, 가로 스크롤 방지, 동적 width 계산)
   - ✅ Chat Empty State (제안 카드 4개, 반응형 그리드)
-  - ✅ ChatInput 컴포넌트 (하단 고정, LNB 너비 반응, 입력 검증, Enter 전송)
+  - ✅ ChatInput 컴포넌트 (하단 고정, 자동 높이 1~5줄, 글자 수 제한 5000자)
   - ✅ Chat Interface (Markdown 렌더링, Thinking 섹션, Save Artifact 버튼, Copy 버튼)
   - ✅ ChatMessage 컴포넌트 (사용자 말풍선, AI 전체 너비, 코드 블록 지원)
-  - ✅ Zustand 상태 관리 (chatStore, useLNBWidth)
+  - ✅ Toast 알림 시스템 (성공/실패, 링크 지원, 전역 상태 관리)
+  - ✅ Save Artifact 상태 관리 (저장됨 표시, LocalStorage)
+  - ✅ Zustand 상태 관리 (chatStore, toastStore, useLNBWidth)
   - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
   - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
   - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
-- **Version**: 3.0 (PRD 개편 완료, 문서 체계화)
+- **Version**: 3.1 (Toast 시스템 및 ChatInput 개선)
 - **Last Updated**: 2025-10-23
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
