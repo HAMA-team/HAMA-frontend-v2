@@ -26,14 +26,16 @@ export default function ChatInput() {
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && message.length <= charLimit) {
+      const userMessageContent = message.trim();
+
       // 사용자 메시지 추가
       const userMessage: Message = {
         id: `user-${Date.now()}`,
         role: "user",
-        content: message.trim(),
+        content: userMessageContent,
         timestamp: new Date().toISOString(),
         status: "sent",
       };
@@ -45,17 +47,52 @@ export default function ChatInput() {
         textareaRef.current.style.height = "auto";
       }
 
-      // AI 응답 (API 미연결 상태)
-      setTimeout(() => {
+      // API 호출
+      try {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+        const response = await fetch(`${apiBaseUrl}/api/v1/chat/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: userMessageContent,
+            automation_level: 2, // Default: Copilot
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // AI 응답 메시지 추가
         const aiMessage: Message = {
           id: `ai-${Date.now()}`,
           role: "assistant",
-          content: "⚠️ **API에 연결되지 않은 상태입니다**\n\n현재 백엔드 서버에 연결되지 않아 실제 AI 응답을 생성할 수 없습니다.\n\n**개발 중 기능:**\n- 사용자 메시지 전송 ✅\n- AI 응답 생성 (백엔드 연결 필요)\n- 매매 승인 요청 처리 (백엔드 연결 필요)\n\n백엔드 API 연동 후 정상 작동합니다.",
+          content: data.message || "응답을 받았습니다.",
           timestamp: new Date().toISOString(),
           status: "sent",
         };
         addMessage(aiMessage);
-      }, 500);
+
+        // TODO: HITL 승인 요청 처리
+        if (data.requires_approval) {
+          console.log("Approval required:", data.approval_request);
+          // openApprovalPanel(data.approval_request);
+        }
+      } catch (error) {
+        // API 연결 실패 시 에러 메시지
+        const errorMessage: Message = {
+          id: `ai-${Date.now()}`,
+          role: "assistant",
+          content: `⚠️ **백엔드 서버에 연결할 수 없습니다**\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`http://localhost:8000\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: http://localhost:8000/docs\n\n백엔드가 실행 중이면 정상적으로 AI 응답을 받을 수 있습니다.`,
+          timestamp: new Date().toISOString(),
+          status: "error",
+        };
+        addMessage(errorMessage);
+      }
     }
   };
 
