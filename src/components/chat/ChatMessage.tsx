@@ -6,6 +6,7 @@ import { Loader2, AlertTriangle, Copy, Check } from "lucide-react";
 import { Message } from "@/lib/types/chat";
 import ThinkingSection from "./ThinkingSection";
 import SaveArtifactButton from "./SaveArtifactButton";
+import { useTranslation } from "react-i18next";
 
 /**
  * ChatMessage Component
@@ -34,6 +35,7 @@ export default function ChatMessage({
   onSaveArtifact,
 }: ChatMessageProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const { t } = useTranslation();
 
   const handleCopyContent = async () => {
     try {
@@ -337,17 +339,17 @@ export default function ChatMessage({
               e.currentTarget.style.backgroundColor = "transparent";
               e.currentTarget.style.borderColor = "var(--border-default)";
             }}
-            aria-label={isCopied ? "복사됨" : "복사"}
+            aria-label={isCopied ? t("chat.copied") : t("chat.copy")}
           >
             {isCopied ? (
               <>
                 <Check className="w-4 h-4" strokeWidth={1.5} />
-                <span>복사됨</span>
+                <span>{t("chat.copied")}</span>
               </>
             ) : (
               <>
                 <Copy className="w-4 h-4" strokeWidth={1.5} />
-                <span>복사</span>
+                <span>{t("chat.copy")}</span>
               </>
             )}
           </button>

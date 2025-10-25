@@ -149,7 +149,7 @@ export default function AutomationLevelSelector() {
                     className="text-xs mt-1 font-semibold"
                     style={{ color: "#ef4444" }}
                   >
-                    👤 승인
+                    👤 {t("mypage.automation.workflow.approvalRequired")}
                   </div>
                 )}
               </div>

@@ -126,7 +126,7 @@ export default function ChatInput({
 
   return (
     <div
-      className="fixed bottom-0 right-0 z-[var(--z-chat-input)] pointer-events-none transition-[left] duration-300 ease-in-out"
+      className="fixed bottom-0 right-0 z-chat-input pointer-events-none transition-[left] duration-300 ease-in-out"
       style={{ left: `${lnbWidth}px` }}
     >
       <div className="max-w-[800px] mx-auto px-4 pb-6 pointer-events-auto">

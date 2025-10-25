@@ -29,7 +29,7 @@ export default function MyPageView() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const { userInfo } = useUserStore();
-  const { isDarkMode, toggleTheme } = useThemeStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   // TODO: Phase 3 - 실제 사용자 정보 로드
   const displayUser = userInfo || {
@@ -178,7 +178,7 @@ export default function MyPageView() {
             }}
           >
             <div className="flex items-center gap-3">
-              {isDarkMode ? (
+              {theme === "dark" ? (
                 <Moon
                   size={20}
                   strokeWidth={1.5}
@@ -202,7 +202,7 @@ export default function MyPageView() {
                   className="text-sm"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  {isDarkMode
+                  {theme === "dark"
                     ? t("mypage.preferences.theme.dark")
                     : t("mypage.preferences.theme.light")}
                 </p>
@@ -214,7 +214,7 @@ export default function MyPageView() {
               onClick={toggleTheme}
               className="relative w-14 h-8 rounded-full transition-colors duration-200"
               style={{
-                backgroundColor: isDarkMode
+                backgroundColor: theme === "dark"
                   ? "var(--primary-500)"
                   : "var(--border-default)",
               }}
@@ -222,7 +222,7 @@ export default function MyPageView() {
               <span
                 className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-200"
                 style={{
-                  transform: isDarkMode ? "translateX(24px)" : "translateX(0)",
+                  transform: theme === "dark" ? "translateX(24px)" : "translateX(0)",
                 }}
               />
             </button>
