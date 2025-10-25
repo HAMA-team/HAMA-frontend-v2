@@ -1,12 +1,19 @@
 "use client";
 
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useArtifactStore } from '@/store/artifactStore';
 import { formatDate } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, Download, Share2 } from 'lucide-react';
-import ChatInput from '@/components/layout/ChatInput';
+import { ArrowLeft, Download, Share2, Trash2 } from 'lucide-react';
+import { useDialogStore } from '@/store/dialogStore';
+
+// Dynamic import로 ChatInput 불러와 i18n hydration 에러 방지
+const ChatInput = dynamic(() => import('@/components/layout/ChatInput'), {
+  ssr: false,
+  loading: () => null,
+});
 
 /**
  * Artifact Detail Page
@@ -24,6 +31,7 @@ export default function ArtifactDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { getArtifact } = useArtifactStore();
+  const { openConfirm, openAlert } = useDialogStore();
 
   const artifactId = params.id as string;
   const artifact = getArtifact(artifactId);
@@ -72,7 +80,22 @@ export default function ArtifactDetailPage() {
 
   const handleShare = () => {
     // Phase 3: Implement share functionality
-    alert(t("artifacts.shareComingSoon"));
+    openAlert({
+      title: t('artifacts.share'),
+      message: t('artifacts.shareComingSoon'),
+    });
+  };
+
+  const handleDelete = () => {
+    openConfirm({
+      title: t('common.delete'),
+      message: t('artifacts.deleteConfirm'),
+      onConfirm: () => {
+        const { deleteArtifact } = useArtifactStore.getState();
+        deleteArtifact(artifact.id);
+        router.push('/artifacts');
+      },
+    });
   };
 
   return (
@@ -129,6 +152,14 @@ export default function ArtifactDetailPage() {
                     title={t("artifacts.share")}
                   >
                     <Share2 className="w-5 h-5" strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="p-2 rounded-lg hover:bg-opacity-80 transition-colors"
+                    style={{ backgroundColor: 'var(--container-background)' }}
+                    title={t('common.delete')}
+                  >
+                    <Trash2 className="w-5 h-5" strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
                   </button>
                 </div>
               </div>

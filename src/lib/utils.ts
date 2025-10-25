@@ -22,6 +22,118 @@ export function formatCurrency(amount: number, currency = 'USD'): string {
 }
 
 /**
+ * Format a date as a localized relative time string.
+ * Uses numeric expressions only (e.g., "2 days ago" / "2일 전").
+ * Falls back to "just now" / "방금 전" for very recent times.
+ */
+export function formatRelativeTime(
+  value: Date | string | number,
+  locale: string = 'en'
+): string {
+  const date =
+    value instanceof Date
+      ? value
+      : typeof value === 'string'
+      ? new Date(value)
+      : new Date(value);
+
+  const now = Date.now();
+  const diffSeconds = Math.max(0, Math.floor((now - date.getTime()) / 1000));
+
+  const isKo = locale.startsWith('ko');
+  if (diffSeconds < 10) {
+    return isKo ? '방금 전' : 'just now';
+  }
+
+  const MINUTE = 60;
+  const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
+  const WEEK = 7 * DAY;
+  const MONTH = 30 * DAY; // approximation for demo purposes
+  const YEAR = 365 * DAY; // approximation
+
+  const rtf = new Intl.RelativeTimeFormat(isKo ? 'ko' : 'en', {
+    numeric: 'always',
+  });
+
+  if (diffSeconds < MINUTE) {
+    const secs = Math.max(1, diffSeconds);
+    return rtf.format(-secs, 'second');
+  }
+  if (diffSeconds < HOUR) {
+    const mins = Math.max(1, Math.floor(diffSeconds / MINUTE));
+    return rtf.format(-mins, 'minute');
+  }
+  if (diffSeconds < DAY) {
+    const hours = Math.max(1, Math.floor(diffSeconds / HOUR));
+    return rtf.format(-hours, 'hour');
+  }
+  if (diffSeconds < WEEK) {
+    const days = Math.max(1, Math.floor(diffSeconds / DAY));
+    return rtf.format(-days, 'day');
+  }
+  if (diffSeconds < MONTH) {
+    const weeks = Math.max(1, Math.floor(diffSeconds / WEEK));
+    return rtf.format(-weeks, 'week');
+  }
+  if (diffSeconds < YEAR) {
+    const months = Math.max(1, Math.floor(diffSeconds / MONTH));
+    return rtf.format(-months, 'month');
+  }
+  const years = Math.max(1, Math.floor(diffSeconds / YEAR));
+  return rtf.format(-years, 'year');
+}
+
+/**
+ * Format as relative time until a threshold, then switch to absolute date.
+ * thresholdDays: after this many days, show date instead of relative.
+ */
+export function formatRelativeOrDate(
+  value: Date | string | number,
+  locale: string = 'en',
+  thresholdDays = 30
+): string {
+  const date =
+    value instanceof Date
+      ? value
+      : typeof value === 'string'
+      ? new Date(value)
+      : new Date(value);
+
+  const diffMs = Date.now() - date.getTime();
+  const diffDays = diffMs / (24 * 60 * 60 * 1000);
+
+  if (diffDays >= thresholdDays) {
+    return formatAbsoluteDate(value, locale);
+  }
+  return formatRelativeTime(value, locale);
+}
+
+/**
+ * Format an absolute date in a locale-aware way.
+ * en: e.g., "Jan 5, 2025"; ko: e.g., "2025. 1. 5." (system default style)
+ */
+export function formatAbsoluteDate(
+  value: Date | string | number,
+  locale: string = 'en'
+): string {
+  const date =
+    value instanceof Date
+      ? value
+      : typeof value === 'string'
+      ? new Date(value)
+      : new Date(value);
+
+  const isKo = locale.startsWith('ko');
+  const fmt = new Intl.DateTimeFormat(isKo ? 'ko' : locale || 'en',
+    isKo
+      ? { year: 'numeric', month: 'numeric', day: 'numeric' }
+      : { year: 'numeric', month: 'short', day: 'numeric' }
+  );
+  return fmt.format(date);
+}
+
+/**
  * Extract title from markdown content
  *
  * Strategy:

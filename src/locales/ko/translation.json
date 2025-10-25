@@ -27,8 +27,8 @@
     "sendMessage": "전송",
     "send": "전송",
     "attachFile": "파일 첨부",
-    "saveAsArtifact": "Save as Artifact",
-    "saveAsArtifactKo": "Artifact로 저장",
+    "saveAsArtifact": "분석 저장",
+    "saveAsArtifactKo": "분석 저장",
     "saved": "저장됨",
     "saving": "저장 중...",
     "copy": "복사",
@@ -116,7 +116,7 @@
     "empty": "저장된 분석이 없습니다",
     "emptyState": "저장된 아티팩트가 없습니다",
     "emptySuggestion": "채팅에서 \"Save as Artifact\" 버튼을 눌러 AI 답변을 저장하세요",
-    "viewInArtifacts": "Artifacts 페이지에서 보기",
+    "viewInArtifacts": "저장된 분석에서 보기",
     "notFound": "아티팩트를 찾을 수 없습니다",
     "notFoundDescription": "이 아티팩트는 삭제되었거나 존재하지 않습니다",
     "backToList": "아티팩트 목록으로 돌아가기",
@@ -125,11 +125,12 @@
     "download": "다운로드",
     "share": "공유",
     "shareComingSoon": "공유 기능은 Phase 3에서 구현될 예정입니다",
+    "deleteConfirm": "이 아티팩트를 삭제하시겠어요?",
     "chatPlaceholder": "이 아티팩트에 대해 질문하기..."
   },
   "toast": {
-    "artifactSaved": "Artifact가 저장되었습니다",
-    "artifactSaveFailed": "Artifact 저장에 실패했습니다"
+    "artifactSaved": "분석이 저장되었습니다",
+    "artifactSaveFailed": "분석 저장에 실패했습니다"
   },
   "language": {
     "ko": "한국어",

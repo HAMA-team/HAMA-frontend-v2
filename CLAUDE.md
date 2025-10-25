@@ -192,6 +192,12 @@ src/
 - TypeScript 사용 권장
 - ESLint + Prettier 설정 필요
 
+### Dialogs
+- 기본 브라우저 `alert/confirm` 대신 커스텀 다이얼로그 사용
+  - `src/store/dialogStore.ts` + `src/components/common/DialogContainer.tsx`
+  - 확인/취소(Confirm), 알림(Alert) 모두 지원
+  - 토스트와 레이어 충돌 방지를 위해 z-index는 테마 유틸 클래스 사용(`z-modal` 등)
+
 ## Important Documents
 
 ### Core Documents
@@ -478,11 +484,31 @@ export default function SettingsPage() {
 2. `loading` 컴포넌트로 로딩 중 UI 제공 (사용자 경험 향상)
 3. i18n을 사용하는 모든 페이지 레벨 컴포넌트에 적용 필요
 
-**적용된 페이지:**
-- ✅ `/settings` (MyPageView)
-- ✅ `/` (Chat 페이지 - ChatView dynamic import 적용됨)
+**적용된 컴포넌트:**
+- ✅ `/settings` (MyPageView dynamic import)
+- ✅ `/` (ChatEmptyState dynamic import - 빈 상태 UI)
+- ✅ `/` (ChatInput dynamic import - 모든 페이지에서 사용하는 하단 고정 입력창)
+- ✅ `/artifacts/[id]` (ChatInput dynamic import)
+- ✅ ChatView는 메시지 데이터 기반이라 hydration 문제 없음
+
+**컴포넌트 분리 전략:**
+```tsx
+// page.tsx (클라이언트 컴포넌트)
+const ChatEmptyState = dynamic(() => import("@/components/chat/ChatEmptyState"), {
+  ssr: false,
+  loading: () => <LoadingSpinner />
+});
+
+// i18n 사용하는 Empty State는 별도 컴포넌트로 분리하여 dynamic import
+{messages.length === 0 ? (
+  <ChatEmptyState onSuggestionClick={handleClick} />
+) : (
+  <ChatView messages={messages} />
+)}
+```
 
 **교훈:**
 - i18n을 사용하는 컴포넌트는 처음부터 dynamic import로 구현
 - Hydration 에러는 서버/클라이언트 렌더링 불일치를 항상 의심
 - 로딩 스피너를 추가하면 UX 저하 없이 문제 해결 가능
+- 복잡한 페이지는 i18n 사용 부분을 별도 컴포넌트로 분리하여 dynamic import 적용

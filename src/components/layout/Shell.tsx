@@ -4,6 +4,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import ToastContainer from "@/components/common/ToastContainer";
+import DialogContainer from "@/components/common/DialogContainer";
 
 // LNB를 dynamic import로 불러와서 SSR 비활성화 (i18n hydration 에러 방지)
 const LNB = dynamic(() => import("./LNB"), { ssr: false });
@@ -42,6 +43,9 @@ export default function Shell({ children }: ShellProps) {
 
       {/* Toast Container - 전역 토스트 메시지 */}
       <ToastContainer />
+
+      {/* Dialog Container - 전역 커스텀 다이얼로그 */}
+      <DialogContainer />
     </div>
   );
 }

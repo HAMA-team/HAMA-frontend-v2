@@ -49,7 +49,7 @@ export default function Toast({
 
   return (
     <div
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[var(--z-toast)] animate-slideUp"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-toast animate-toast-in"
       role="alert"
       aria-live="polite"
     >

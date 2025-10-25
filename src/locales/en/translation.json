@@ -125,6 +125,7 @@
     "download": "Download",
     "share": "Share",
     "shareComingSoon": "Share feature will be implemented in Phase 3",
+    "deleteConfirm": "Delete this artifact?",
     "chatPlaceholder": "Ask a question about this artifact..."
   },
   "toast": {

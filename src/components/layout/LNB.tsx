@@ -18,6 +18,7 @@ import { useChatStore } from "@/store/chatStore";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "@/components/common/LanguageSelector";
 import ThemeToggle from "@/components/common/ThemeToggle";
+import { formatRelativeOrDate, formatAbsoluteDate } from "@/lib/utils";
 
 /**
  * LNB (Left Navigation Bar) Component
@@ -37,7 +38,12 @@ export default function LNB() {
   const router = useRouter();
   const { isCollapsed, setCollapsed } = useLNBWidth();
   const { clearMessages } = useChatStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const formatRelative = (ts: number) => {
+    const locale = i18n?.language || "en";
+    return formatRelativeOrDate(ts, locale, 30);
+  };
 
   const mainNavItems = [
     { href: "/", icon: MessageSquare, label: t("nav.chat") },
@@ -56,10 +62,12 @@ export default function LNB() {
   };
 
   // Phase 1: Recent Chats는 하드코딩 (Phase 3에서 API 연동)
+  const now = Date.now();
+  const DAY = 24 * 60 * 60 * 1000;
   const recentChats = [
-    { id: "1", title: "삼성전자 투자 분석 요청", date: "2일 전" },
-    { id: "2", title: "포트폴리오 리밸런싱", date: "5일 전" },
-    { id: "3", title: "미국 주식 시장 전망", date: "1주 전" },
+    { id: "1", title: "삼성전자 투자 분석 요청", createdAt: now - 2 * DAY },
+    { id: "2", title: "포트폴리오 리밸런싱", createdAt: now - 5 * DAY },
+    { id: "3", title: "미국 주식 시장 전망", createdAt: now - 7 * DAY },
   ];
 
   if (isCollapsed) {
@@ -97,7 +105,7 @@ export default function LNB() {
         <div className="p-3">
           <button
             onClick={handleNewChat}
-            className="w-10 h-12 flex items-center justify-center rounded-lg transition-colors duration-150"
+            className="w-full h-12 flex items-center justify-center rounded-lg transition-colors duration-150"
             style={{ backgroundColor: "var(--lnb-active-bg)" }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-600)"}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-active-bg)"}
@@ -117,7 +125,7 @@ export default function LNB() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center justify-center w-10 h-12 rounded-lg transition-colors duration-150"
+                className="flex items-center justify-center w-full h-12 rounded-lg transition-colors duration-150"
                 style={{
                   backgroundColor: isActive ? "var(--lnb-hover-bg)" : "transparent",
                   color: isActive ? "var(--text-primary)" : "var(--text-secondary)"
@@ -242,7 +250,13 @@ export default function LNB() {
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
               >
                 <span className="text-sm truncate w-full animate-fadeInText" style={{ color: "var(--lnb-text)" }}>{chat.title}</span>
-                <span className="text-xs whitespace-nowrap animate-fadeInText" style={{ color: "var(--lnb-text-muted)" }}>{chat.date}</span>
+                <span
+                  className="text-xs whitespace-nowrap animate-fadeInText"
+                  style={{ color: "var(--lnb-text-muted)" }}
+                  title={formatAbsoluteDate(chat.createdAt, i18n?.language || 'en')}
+                >
+                  {formatRelative(chat.createdAt)}
+                </span>
               </button>
             ))}
           </div>
