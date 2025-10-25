@@ -140,6 +140,9 @@ See `references/` folder for detailed design references.
 **Completed:**
 - ✅ My Page (마이페이지) - User settings interface
 - ✅ Automation Level Settings - 3-level system (Advisor/Copilot/Pilot)
+  - ✅ 5-step workflow visualization (데이터 수집 → 분석 → 포트폴리오 → 리스크 → 매매)
+  - ✅ HITL intervention points display (red dots for approval required)
+  - ✅ Level cards with detailed features
 - ✅ User Store (userStore.ts) - Automation level state management
 - ✅ i18n support for My Page (Korean/English)
 - ✅ Investment Profile placeholder (Phase 3 구조 준비)

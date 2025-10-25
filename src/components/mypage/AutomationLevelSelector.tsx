@@ -7,15 +7,20 @@ import { useTranslation } from "react-i18next";
 /**
  * AutomationLevelSelector Component
  *
- * 자동화 레벨 선택 UI
- * - 3단계 레벨: Advisor (1) / Copilot (2) / Pilot (3)
- * - 프로그레스 바 시각화
- * - 각 레벨 설명 표시
- * - 변경 시 확인 모달 (Phase 2+)
+ * 자동화 레벨 선택 UI - 투자 워크플로우 기반
+ * - 5단계 워크플로우: 데이터 수집 → 데이터 분석 → 포트폴리오 구성 → 리스크 분석 → 매매
+ * - 레벨별 HITL 개입 지점 시각화 (빨간색 점)
+ * - 3단계 레벨: Pilot (1) / Copilot (2) / Advisor (3)
  *
  * @see PRD - US-4.1 (자동화 레벨 설정)
- * @see DesignSystem - Section 10 (MyPage Container)
+ * @see BackendPRD - Section 3.2 (레벨별 개입 지점 매트릭스)
+ * @see Mockup - My Page.png
  */
+
+interface WorkflowStep {
+  id: string;
+  label: string;
+}
 
 interface LevelOption {
   value: AutomationLevel;
@@ -23,6 +28,7 @@ interface LevelOption {
   shortName: string;
   description: string;
   features: string[];
+  hitlSteps: string[]; // HITL 개입이 필요한 단계 ID
 }
 
 export default function AutomationLevelSelector() {
@@ -30,17 +36,27 @@ export default function AutomationLevelSelector() {
   const { automationLevel, setAutomationLevel } = useUserStore();
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // 5단계 투자 워크플로우
+  const workflowSteps: WorkflowStep[] = [
+    { id: "data-collection", label: "데이터 수집" },
+    { id: "data-analysis", label: "데이터 분석" },
+    { id: "portfolio", label: "포트폴리오 구성" },
+    { id: "risk", label: "리스크 분석" },
+    { id: "trade", label: "매매" },
+  ];
+
   const levelOptions: LevelOption[] = [
     {
       value: 1,
-      name: t("mypage.automation.advisor.name"),
-      shortName: "Advisor",
-      description: t("mypage.automation.advisor.description"),
+      name: t("mypage.automation.pilot.name"),
+      shortName: "Pilot",
+      description: t("mypage.automation.pilot.description"),
       features: [
-        t("mypage.automation.advisor.feature1"),
-        t("mypage.automation.advisor.feature2"),
-        t("mypage.automation.advisor.feature3"),
+        t("mypage.automation.pilot.feature1"),
+        t("mypage.automation.pilot.feature2"),
+        t("mypage.automation.pilot.feature3"),
       ],
+      hitlSteps: ["trade"], // 매매만 HITL
     },
     {
       value: 2,
@@ -52,17 +68,19 @@ export default function AutomationLevelSelector() {
         t("mypage.automation.copilot.feature2"),
         t("mypage.automation.copilot.feature3"),
       ],
+      hitlSteps: ["portfolio", "risk", "trade"], // 포트폴리오 구성, 리스크, 매매
     },
     {
       value: 3,
-      name: t("mypage.automation.pilot.name"),
-      shortName: "Pilot",
-      description: t("mypage.automation.pilot.description"),
+      name: t("mypage.automation.advisor.name"),
+      shortName: "Advisor",
+      description: t("mypage.automation.advisor.description"),
       features: [
-        t("mypage.automation.pilot.feature1"),
-        t("mypage.automation.pilot.feature2"),
-        t("mypage.automation.pilot.feature3"),
+        t("mypage.automation.advisor.feature1"),
+        t("mypage.automation.advisor.feature2"),
+        t("mypage.automation.advisor.feature3"),
       ],
+      hitlSteps: ["portfolio", "risk", "trade"], // 모두 사용자 주도
     },
   ];
 
@@ -73,129 +91,84 @@ export default function AutomationLevelSelector() {
 
     try {
       // TODO: Phase 2+ - API 호출
-      // await fetch('/api/v1/user/automation-level', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ automation_level: newLevel }),
-      // });
-
-      // Phase 1: LocalStorage만 사용
       setAutomationLevel(newLevel);
-
-      // TODO: Phase 2+ - Toast 알림
-      // toast.success(t('mypage.automation.changeSuccess'));
     } catch (error) {
       console.error("Failed to update automation level:", error);
-      // TODO: Phase 2+ - 에러 처리
-      // toast.error(t('mypage.automation.changeFailed'));
     } finally {
       setIsUpdating(false);
     }
   };
 
-  // 프로그레스 바 위치 계산 (0% - 50% - 100%)
-  const progressPosition = {
-    1: "0%",
-    2: "50%",
-    3: "100%",
-  }[automationLevel];
+  // 현재 선택된 레벨의 HITL 단계
+  const currentHitlSteps =
+    levelOptions.find((opt) => opt.value === automationLevel)?.hitlSteps || [];
 
   return (
     <div className="space-y-6">
-      {/* 프로그레스 바 */}
-      <div className="relative pt-8">
+      {/* 워크플로우 프로그레스 바 */}
+      <div className="relative pt-8 pb-12">
         {/* 배경 라인 */}
         <div
-          className="absolute top-4 left-0 right-0 h-1 rounded-full"
+          className="absolute top-4 left-0 right-0 h-0.5 rounded-full"
           style={{ backgroundColor: "var(--border-default)" }}
         />
 
-        {/* 활성 라인 */}
-        <div
-          className="absolute top-4 left-0 h-1 rounded-full transition-all duration-300"
-          style={{
-            backgroundColor: "var(--primary-500)",
-            width: progressPosition,
-          }}
-        />
-
-        {/* 레벨 포인트들 */}
+        {/* 워크플로우 단계들 */}
         <div className="relative flex justify-between">
-          {levelOptions.map((option) => {
-            const isActive = option.value === automationLevel;
-            const isPassed = option.value <= automationLevel;
+          {workflowSteps.map((step, index) => {
+            const isHitl = currentHitlSteps.includes(step.id);
 
             return (
-              <button
-                key={option.value}
-                onClick={() => handleLevelChange(option.value)}
-                disabled={isUpdating}
-                className="flex flex-col items-center gap-2 transition-opacity disabled:opacity-50"
+              <div
+                key={step.id}
+                className="flex flex-col items-center"
+                style={{ width: "20%" }}
               >
-                {/* 포인트 */}
+                {/* 점 */}
                 <div
-                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300"
+                  className="w-4 h-4 rounded-full border-2 transition-all duration-300"
                   style={{
-                    backgroundColor: isPassed
-                      ? "var(--primary-500)"
-                      : "var(--container-background)",
-                    borderColor: isPassed
-                      ? "var(--primary-500)"
-                      : "var(--border-default)",
+                    backgroundColor: isHitl
+                      ? "#ef4444"
+                      : "var(--primary-500)",
+                    borderColor: isHitl ? "#ef4444" : "var(--primary-500)",
                   }}
-                >
-                  {isPassed && (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="white"
-                      viewBox="0 0 24 24"
-                      strokeWidth={3}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  )}
-                </div>
+                />
 
                 {/* 레이블 */}
-                <div className="text-center">
-                  <div
-                    className="text-sm font-semibold"
-                    style={{
-                      color: isActive
-                        ? "var(--text-primary)"
-                        : "var(--text-secondary)",
-                    }}
-                  >
-                    {option.shortName}
-                  </div>
-                  {isActive && (
-                    <div
-                      className="text-xs mt-1"
-                      style={{ color: "var(--primary-500)" }}
-                    >
-                      {t("mypage.automation.current")}
-                    </div>
-                  )}
+                <div
+                  className="text-xs mt-2 text-center"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {step.label}
                 </div>
-              </button>
+
+                {/* HITL 표시 */}
+                {isHitl && (
+                  <div
+                    className="text-xs mt-1 font-semibold"
+                    style={{ color: "#ef4444" }}
+                  >
+                    👤 승인
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
 
-        {/* HITL 아이콘 표시 */}
-        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 flex items-center gap-1 text-xs" style={{ color: "var(--text-secondary)" }}>
-          <span>👤</span>
-          <span>{t("mypage.automation.hitlIndicator")}</span>
+        {/* 설명 텍스트 */}
+        <div
+          className="text-center text-xs mt-6"
+          style={{ color: "var(--text-muted)" }}
+        >
+          <span style={{ color: "var(--primary-500)" }}>●</span> 자동 실행 |{" "}
+          <span style={{ color: "#ef4444" }}>●</span> 사용자 승인 필요
         </div>
       </div>
 
       {/* 레벨 카드 */}
-      <div className="grid grid-cols-1 gap-4 mt-12">
+      <div className="grid grid-cols-1 gap-4">
         {levelOptions.map((option) => {
           const isSelected = option.value === automationLevel;
 
