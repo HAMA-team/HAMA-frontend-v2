@@ -381,12 +381,16 @@ HAMA Application
 
 **Acceptance Criteria:**
 
-- [ ] 3가지 자동화 레벨 선택 가능:
+- [x] 3가지 자동화 레벨 선택 가능:
     1. **어드바이저 모드**: AI가 정보만 제공 (매매 제안 없음)
     2. **코파일럿 모드**: 모든 매매에 승인 필요 (HITL 필수)
     3. **파일럿 모드**: 일부 매매 자동 실행 (고위험만 승인)
-- [ ] 현재 레벨이 프로그레스 바로 표시됩니다
-- [ ] 각 레벨의 특징이 설명됩니다
+- [x] 현재 레벨이 프로그레스 바로 표시됩니다
+- [x] 각 레벨의 특징이 설명됩니다
+- [x] 프로그레스 바에 HITL 개입 지점 표시 (👤 아이콘)
+- [x] 상세 레벨 카드 UI (라디오 버튼 + 특징 3개 리스트)
+- [x] LocalStorage에 자동화 레벨 저장 (userStore.ts)
+- [x] 다국어 지원 (한국어/영어 번역 완료)
 
 **UI Enhancement (피드백 반영):**
 
@@ -419,13 +423,15 @@ HAMA Application
 
 **Acceptance Criteria:**
 
-- [ ] 기존 4단계 분류(안정형, 공격투자형 등) 표시
-- [ ] LLM이 생성한 서술형 프로필 표시:
+- [x] 기존 4단계 분류(안정형, 공격투자형 등) 표시 (구조 완료)
+- [x] LLM이 생성한 서술형 프로필 표시 (구조 완료, Phase 3 API 연동 예정):
     - 매매 패턴 (평균 매매 횟수, 단타/장투 성향)
     - 선호 섹터 (최근 2주 투자 집중 분야)
     - 리스크 성향 (급등주 회피 여부 등)
     - 포트폴리오 전략 (분산/집중 투자 성향)
-- [ ] 프로필은 주기적으로 업데이트됩니다
+- [x] 프로필은 주기적으로 업데이트됩니다 (구조 완료, last_updated 필드)
+- [x] Phase 3 플레이스홀더 UI 완료 (InvestmentProfile.tsx)
+- [x] userStore에 투자 성향 프로필 상태 관리 추가
 
 **Example Output:**
 
@@ -547,19 +553,28 @@ AI가 파악한 당신의 투자 스타일:
 
 ---
 
-### Phase 2: Enhanced UX
+### Phase 2: Enhanced UX (🔄 In Progress)
 
 **목표:** 사용자 경험 강화
 
 **Must Have:**
 
-- [ ] US-4.1: 자동화 레벨 설정
-- [ ] US-5.1: 초개인화 투자 성향 ⚠️ **우선순위 상향**
+- [x] US-4.1: 자동화 레벨 설정 ✅ (완료)
+  - [x] My Page 구현 (5개 섹션)
+  - [x] AutomationLevelSelector 컴포넌트 (프로그레스 바 + 카드 UI)
+  - [x] userStore.ts 상태 관리
+  - [x] 다국어 지원 (한국어/영어)
+- [x] US-5.1: 초개인화 투자 성향 (구조 완료, API 연동은 Phase 3)
+  - [x] InvestmentProfile 컴포넌트 (플레이스홀더)
+  - [x] userStore에 프로필 상태 관리 추가
 
 **Should Have:**
 
 - [x] Dark mode 토글 완성 ✅ (Phase 1 완료)
 - [ ] Artifacts 페이지 (목록)
+
+**Remaining:**
+- Portfolio 차트 옵션 향상
 
 ---
 

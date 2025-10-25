@@ -136,8 +136,16 @@ See `references/` folder for detailed design references.
 - ✅ i18n structure (Korean/English, language toggle)
 - ✅ Dynamic chart colors (useChartColors hook, dark mode adaptive)
 
-### Phase 2: Visualization & Settings
-- Portfolio chart options, My Page, automation level settings
+### Phase 2: Visualization & Settings (🔄 In Progress)
+**Completed:**
+- ✅ My Page (마이페이지) - User settings interface
+- ✅ Automation Level Settings - 3-level system (Advisor/Copilot/Pilot)
+- ✅ User Store (userStore.ts) - Automation level state management
+- ✅ i18n support for My Page (Korean/English)
+- ✅ Investment Profile placeholder (Phase 3 구조 준비)
+
+**Remaining:**
+- Portfolio chart options enhancement
 
 ### Phase 3: Content Management & Onboarding
 - Artifact persistence, Chat History, Onboarding, i18n translations

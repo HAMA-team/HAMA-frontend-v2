@@ -66,9 +66,10 @@ src/
 │   │   ├── Treemap.tsx            # 트리맵 차트
 │   │   ├── PieChart.tsx           # 원 차트
 │   │   └── StackedBar.tsx         # 누적 막대 차트
-│   ├── MyPage/
-│   │   ├── MyPageView.tsx         # 마이페이지
-│   │   └── AutomationLevelSelector.tsx # 자동화 레벨 선택
+│   ├── mypage/
+│   │   ├── MyPageView.tsx         # 마이페이지 메인 (5개 섹션)
+│   │   ├── AutomationLevelSelector.tsx # 자동화 레벨 선택 (프로그레스 바 + 카드)
+│   │   └── InvestmentProfile.tsx  # 투자 성향 프로필 (Phase 3 구조)
 │   ├── Onboarding/
 │   │   ├── OnboardingFlow.tsx     # 온보딩 플로우
 │   │   └── QuestionStep.tsx       # 온보딩 질문 단계
@@ -85,7 +86,9 @@ src/
 │   └── onboarding.tsx             # Onboarding 페이지
 ├── store/
 │   ├── chatStore.ts               # 채팅 전역 상태 관리 (Zustand)
-│   └── toastStore.ts              # 토스트 전역 상태 관리 (Zustand)
+│   ├── toastStore.ts              # 토스트 전역 상태 관리 (Zustand)
+│   ├── themeStore.ts              # 테마 전역 상태 관리 (라이트/다크)
+│   └── userStore.ts               # 사용자 설정 상태 관리 (자동화 레벨, 투자 성향)
 ├── lib/
 │   ├── api.ts                     # API 클라이언트
 │   ├── utils.ts                   # 유틸리티 함수
@@ -234,27 +237,35 @@ src/
 
 ## Current Status
 
-- **Phase**: Phase 1 완료 ✅
+- **Phase**: Phase 2 진행 중 🔄
 - **Completed**:
-  - ✅ 프로젝트 셋업 (Next.js 15, TypeScript, Tailwind CSS v4)
-  - ✅ Shell & LNB 구현 (접기/펼치기, 라이트/다크 테마, fade-in 애니메이션, 전역 상태 관리)
-  - ✅ 반응형 레이아웃 (LNB 연동 가운데 정렬, 가로 스크롤 방지, 동적 width 계산)
-  - ✅ Chat Empty State (제안 카드 4개, 반응형 그리드)
-  - ✅ ChatInput 컴포넌트 (하단 고정, 자동 높이 1~5줄, 글자 수 제한 5000자)
-  - ✅ Chat Interface (Markdown 렌더링, Thinking 섹션, Save Artifact 버튼, Copy 버튼)
-  - ✅ ChatMessage 컴포넌트 (사용자 말풍선, AI 전체 너비, 코드 블록 지원)
-  - ✅ Toast 알림 시스템 (성공/실패, 링크 지원, 전역 상태 관리)
-  - ✅ Save Artifact 상태 관리 (저장됨 표시, LocalStorage)
-  - ✅ Zustand 상태 관리 (chatStore, toastStore, themeStore, useLNBWidth)
-  - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
-  - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
-  - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
-  - ✅ i18n 구조 설정 (react-i18next, 한국어/영어, 토글 버튼)
-  - ✅ Dark Mode 완전 구현 (CSS 변수, 모든 컴포넌트 색상 전환, ThemeToggle, 차트 색상 adaptive)
-  - ✅ useChartColors 훅 (CSS 변수 기반 차트 색상, 다크 모드 자동 전환)
-  - ✅ Dynamic import로 i18n hydration 에러 해결
-- **Version**: 5.0 (Phase 1 완료 - Dark Mode & i18n 완성)
-- **Last Updated**: 2025-01-24
+  - **Phase 1 (완료 ✅)**:
+    - ✅ 프로젝트 셋업 (Next.js 15, TypeScript, Tailwind CSS v4)
+    - ✅ Shell & LNB 구현 (접기/펼치기, 라이트/다크 테마, fade-in 애니메이션, 전역 상태 관리)
+    - ✅ 반응형 레이아웃 (LNB 연동 가운데 정렬, 가로 스크롤 방지, 동적 width 계산)
+    - ✅ Chat Empty State (제안 카드 4개, 반응형 그리드)
+    - ✅ ChatInput 컴포넌트 (하단 고정, 자동 높이 1~5줄, 글자 수 제한 5000자)
+    - ✅ Chat Interface (Markdown 렌더링, Thinking 섹션, Save Artifact 버튼, Copy 버튼)
+    - ✅ ChatMessage 컴포넌트 (사용자 말풍선, AI 전체 너비, 코드 블록 지원)
+    - ✅ Toast 알림 시스템 (성공/실패, 링크 지원, 전역 상태 관리)
+    - ✅ Save Artifact 상태 관리 (저장됨 표시, LocalStorage)
+    - ✅ Zustand 상태 관리 (chatStore, toastStore, themeStore, useLNBWidth)
+    - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
+    - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
+    - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
+    - ✅ i18n 구조 설정 (react-i18next, 한국어/영어, 토글 버튼)
+    - ✅ Dark Mode 완전 구현 (CSS 변수, 모든 컴포넌트 색상 전환, ThemeToggle, 차트 색상 adaptive)
+    - ✅ useChartColors 훅 (CSS 변수 기반 차트 색상, 다크 모드 자동 전환)
+    - ✅ Dynamic import로 i18n hydration 에러 해결
+  - **Phase 2 (진행 중 🔄)**:
+    - ✅ My Page 구현 (마이페이지 5개 섹션)
+    - ✅ 자동화 레벨 설정 (3단계: Advisor/Copilot/Pilot, 프로그레스 바 + 상세 카드 UI)
+    - ✅ userStore.ts (자동화 레벨, 투자 성향 프로필 상태 관리, LocalStorage persist)
+    - ✅ InvestmentProfile 컴포넌트 (Phase 3 구조 준비, 플레이스홀더)
+    - ✅ My Page i18n 번역 (한국어/영어 완료)
+    - ✅ Dynamic import로 My Page hydration 에러 해결
+- **Version**: 6.0 (Phase 2 진행 중 - My Page & Automation Level 완성)
+- **Last Updated**: 2025-01-25
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude
@@ -403,3 +414,61 @@ src/
 2. 페이지 콘텐츠가 전체 화면 기준으로 정렬됨 → main의 marginLeft + width 조합 필요
 3. 가로 스크롤 발생 → html, body 레벨에서 overflowX 제어 필요
 4. 화면 축소 시 콘텐츠가 고집부림 → w-full, min-w-0, break-words 조합 필요
+
+### 7. i18n Hydration 에러 해결
+
+**문제:** react-i18next를 사용하는 컴포넌트에서 Hydration 불일치 에러 발생
+
+**원인:**
+- 서버 렌더링 시 i18n이 초기화되지 않아 번역 키(`mypage.title`)가 그대로 렌더링됨
+- 클라이언트에서 i18n 초기화 후 실제 번역 텍스트(`마이페이지`)가 렌더링됨
+- 서버와 클라이언트의 렌더링 결과가 달라 Hydration 불일치 발생
+
+**에러 메시지:**
+```
+Hydration failed because the server rendered text didn't match the client.
++ 마이페이지
+- mypage.title
+```
+
+**해결책: Dynamic Import with ssr: false**
+
+```tsx
+// ❌ 직접 import - Hydration 에러 발생
+import MyPageView from "@/components/mypage/MyPageView";
+
+export default function SettingsPage() {
+  return <MyPageView />;
+}
+
+// ✅ Dynamic import - Hydration 에러 해결
+import dynamic from "next/dynamic";
+
+const MyPageView = dynamic(() => import("@/components/mypage/MyPageView"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
+           style={{ borderColor: "var(--primary-500)", borderTopColor: "transparent" }} />
+    </div>
+  ),
+});
+
+export default function SettingsPage() {
+  return <MyPageView />;
+}
+```
+
+**핵심 포인트:**
+1. `ssr: false` 옵션으로 서버 사이드 렌더링 비활성화
+2. `loading` 컴포넌트로 로딩 중 UI 제공 (사용자 경험 향상)
+3. i18n을 사용하는 모든 페이지 레벨 컴포넌트에 적용 필요
+
+**적용된 페이지:**
+- ✅ `/settings` (MyPageView)
+- ✅ `/` (Chat 페이지 - ChatView dynamic import 적용됨)
+
+**교훈:**
+- i18n을 사용하는 컴포넌트는 처음부터 dynamic import로 구현
+- Hydration 에러는 서버/클라이언트 렌더링 불일치를 항상 의심
+- 로딩 스피너를 추가하면 UX 저하 없이 문제 해결 가능

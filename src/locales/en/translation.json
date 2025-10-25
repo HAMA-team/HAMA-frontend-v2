@@ -99,5 +99,66 @@
   "language": {
     "ko": "한국어",
     "en": "English"
+  },
+  "mypage": {
+    "title": "My Page",
+    "subtitle": "Account settings and preferences",
+    "user": {
+      "title": "User Information",
+      "demoName": "Demo User"
+    },
+    "automation": {
+      "title": "Automation Level",
+      "subtitle": "Choose AI autonomy level",
+      "current": "Current Level",
+      "hitlIndicator": "HITL Intervention",
+      "changeSuccess": "Automation level has been updated",
+      "changeFailed": "Failed to update automation level",
+      "advisor": {
+        "name": "Advisor Mode",
+        "description": "AI provides information only without trading suggestions",
+        "feature1": "Investment information and analysis only",
+        "feature2": "No trading suggestions",
+        "feature3": "You make all decisions"
+      },
+      "copilot": {
+        "name": "Copilot Mode",
+        "description": "User approval required for all trades (HITL mandatory)",
+        "feature1": "AI suggests trades",
+        "feature2": "Approval required for all trades",
+        "feature3": "You make final decisions"
+      },
+      "pilot": {
+        "name": "Pilot Mode",
+        "description": "Some trades execute automatically, approval needed only for high-risk trades",
+        "feature1": "Low-risk trades execute automatically",
+        "feature2": "Approval needed only for high-risk trades",
+        "feature3": "AI-driven trading"
+      }
+    },
+    "profile": {
+      "title": "Investment Profile",
+      "subtitle": "Your investment style analyzed by AI",
+      "lastUpdated": "Last Updated",
+      "comingSoon": "AI will automatically generate based on your investment activity. Coming soon."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "theme": {
+        "title": "Theme",
+        "light": "Light Mode",
+        "dark": "Dark Mode"
+      },
+      "language": {
+        "title": "Language",
+        "korean": "한국어",
+        "english": "English"
+      }
+    },
+    "onboarding": {
+      "title": "Try Investment Profiling",
+      "description": "Discover your investment style through 4 questions and get personalized AI service",
+      "button": "Start Onboarding"
+    }
   }
 }

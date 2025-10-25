@@ -99,5 +99,66 @@
   "language": {
     "ko": "한국어",
     "en": "English"
+  },
+  "mypage": {
+    "title": "마이페이지",
+    "subtitle": "계정 설정 및 환경 설정",
+    "user": {
+      "title": "사용자 정보",
+      "demoName": "데모 사용자"
+    },
+    "automation": {
+      "title": "자동화 레벨 설정",
+      "subtitle": "AI의 자율성 수준을 선택하세요",
+      "current": "현재 레벨",
+      "hitlIndicator": "HITL 개입",
+      "changeSuccess": "자동화 레벨이 변경되었습니다",
+      "changeFailed": "자동화 레벨 변경에 실패했습니다",
+      "advisor": {
+        "name": "어드바이저 모드",
+        "description": "AI가 정보만 제공하고 매매 제안은 하지 않습니다",
+        "feature1": "투자 정보 및 분석만 제공",
+        "feature2": "매매 제안 없음",
+        "feature3": "모든 결정을 사용자가 직접"
+      },
+      "copilot": {
+        "name": "코파일럿 모드",
+        "description": "모든 매매에 사용자 승인이 필요합니다 (HITL 필수)",
+        "feature1": "AI가 매매 제안",
+        "feature2": "모든 매매에 승인 필요",
+        "feature3": "사용자가 최종 결정"
+      },
+      "pilot": {
+        "name": "파일럿 모드",
+        "description": "일부 매매는 자동 실행되며 고위험 거래만 승인이 필요합니다",
+        "feature1": "저위험 매매 자동 실행",
+        "feature2": "고위험 매매만 승인 필요",
+        "feature3": "AI 주도 거래"
+      }
+    },
+    "profile": {
+      "title": "투자 성향 프로필",
+      "subtitle": "AI가 분석한 나의 투자 스타일",
+      "lastUpdated": "마지막 업데이트",
+      "comingSoon": "투자 활동을 기반으로 AI가 자동으로 생성합니다. 곧 제공될 예정입니다."
+    },
+    "preferences": {
+      "title": "환경 설정",
+      "theme": {
+        "title": "테마",
+        "light": "라이트 모드",
+        "dark": "다크 모드"
+      },
+      "language": {
+        "title": "언어",
+        "korean": "한국어",
+        "english": "English"
+      }
+    },
+    "onboarding": {
+      "title": "투자 성향 분석 체험하기",
+      "description": "4단계 질문으로 나의 투자 성향을 파악하고 맞춤형 AI 서비스를 받아보세요",
+      "button": "온보딩 체험하기"
+    }
   }
 }
