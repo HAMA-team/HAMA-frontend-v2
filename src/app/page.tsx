@@ -6,6 +6,7 @@ import ChatInput from "@/components/layout/ChatInput";
 import ChatView from "@/components/chat/ChatView";
 import HITLPanel from "@/components/hitl/HITLPanel";
 import { useChatStore } from "@/store/chatStore";
+import { useArtifactStore } from "@/store/artifactStore";
 import { Message, ThinkingStep } from "@/lib/types/chat";
 
 /**
@@ -27,6 +28,7 @@ interface SuggestionCard {
 
 export default function Home() {
   const { messages, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId } = useChatStore();
+  const { addArtifact } = useArtifactStore();
 
   const suggestions: SuggestionCard[] = [
     {
@@ -139,9 +141,18 @@ def calculate_portfolio():
   };
 
   const handleSaveArtifact = (messageId: string) => {
-    console.log("Save artifact:", messageId);
-    // TODO: Artifact 저장 로직 구현 (Phase 3)
-    // Toast는 SaveArtifactButton에서 자동으로 표시됨
+    // Find the message to save
+    const message = messages.find((msg) => msg.id === messageId);
+    if (!message || message.role !== "assistant") {
+      console.error("Message not found or not an assistant message");
+      return;
+    }
+
+    // Save as artifact
+    const artifact = addArtifact(message.content, "📄");
+    console.log("Artifact saved:", artifact);
+
+    // Note: Toast is automatically shown by SaveArtifactButton
   };
 
   const handleApprove = async (messageId: string) => {

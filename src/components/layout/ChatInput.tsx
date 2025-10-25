@@ -6,8 +6,13 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { useChatStore } from "@/store/chatStore";
 import { Message } from "@/lib/types/chat";
 
+interface ChatInputProps {
+  placeholder?: string;
+  contextArtifactId?: string; // For context-aware chat (Phase 3+)
+}
+
 /**
- * ChatInput Component
+ * ChatInput Component (also exported as PersistentChatInput)
  *
  * 하단 고정 채팅 입력창
  * - Chat, Artifact 상세, Portfolio 페이지에서 사용
@@ -18,7 +23,10 @@ import { Message } from "@/lib/types/chat";
  *
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
-export default function ChatInput() {
+export default function ChatInput({
+  placeholder = "메시지를 입력하세요...",
+  contextArtifactId,
+}: ChatInputProps = {}) {
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
   const { addMessage } = useChatStore();
@@ -150,7 +158,7 @@ export default function ChatInput() {
                   handleSubmit(e);
                 }
               }}
-              placeholder="메시지를 입력하세요..."
+              placeholder={placeholder}
               className="flex-1 resize-none outline-none"
               style={{
                 color: "var(--text-primary)",

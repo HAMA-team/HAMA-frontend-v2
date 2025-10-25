@@ -129,9 +129,10 @@ See `references/` folder for detailed design references.
 - ✅ Chat Interface (Markdown, Thinking section, Save Artifact)
 - ✅ ChatMessage component (user bubble, AI full-width, copy button)
 - ✅ Tailwind CSS v4 setup with design system
-- ✅ Zustand state management (chatStore, useLNBWidth)
+- ✅ Zustand state management (chatStore, artifactStore, useLNBWidth)
 - ✅ HITL approval panel (50vw right panel, overlay, approve/reject handlers)
 - ✅ Portfolio visualization (4 summary cards, 3 chart types: treemap/pie/bar, Recharts)
+- ✅ **Artifacts** (목록 그리드 뷰, 상세 페이지, LocalStorage 저장, Markdown 제목 추출)
 - ✅ Dark mode support (CSS variables, theme toggle, all components)
 - ✅ i18n structure (Korean/English, language toggle)
 - ✅ Dynamic chart colors (useChartColors hook, dark mode adaptive)

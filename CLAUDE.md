@@ -57,10 +57,8 @@ src/
 │   ├── HITL/
 │   │   ├── HITLPanel.tsx          # HITL 승인 패널
 │   │   └── ApprovalActions.tsx    # 승인/거부 액션
-│   ├── Artifacts/
-│   │   ├── ArtifactsList.tsx      # Artifact 목록
-│   │   ├── ArtifactCard.tsx       # Artifact 카드
-│   │   └── ArtifactDetail.tsx     # Artifact 상세
+│   ├── artifacts/
+│   │   └── ArtifactCard.tsx       # Artifact 카드 (그리드 뷰용)
 │   ├── Portfolio/
 │   │   ├── PortfolioView.tsx      # 포트폴리오 메인
 │   │   ├── Treemap.tsx            # 트리맵 차트
@@ -86,6 +84,7 @@ src/
 │   └── onboarding.tsx             # Onboarding 페이지
 ├── store/
 │   ├── chatStore.ts               # 채팅 전역 상태 관리 (Zustand)
+│   ├── artifactStore.ts           # Artifact 저장소 (Zustand + LocalStorage persist)
 │   ├── toastStore.ts              # 토스트 전역 상태 관리 (Zustand)
 │   ├── themeStore.ts              # 테마 전역 상태 관리 (라이트/다크)
 │   └── userStore.ts               # 사용자 설정 상태 관리 (자동화 레벨, 투자 성향)
@@ -122,10 +121,12 @@ src/
 - 승인/거부/수정 액션
 - Backend API 연동
 
-### 4. Artifacts
-- 목록 페이지 (그리드 형태)
-- 상세 뷰 (Markdown 렌더링)
-- Context-Aware Chat (Artifact 내용을 컨텍스트로 포함)
+### 4. Artifacts ✅
+- 목록 페이지 (그리드 뷰, 빈 상태 UI)
+- 상세 페이지 (Markdown 렌더링, 뒤로가기, 다운로드, 공유 버튼)
+- Markdown 제목 자동 추출 (# 헤더 → 제목)
+- Context-Aware Chat (Artifact 상세 페이지에서 ChatInput 지원)
+- LocalStorage 저장 (artifactStore.ts, Zustand persist)
 
 ### 5. Portfolio
 - PilePeak.ai 스타일 레이아웃
@@ -252,7 +253,8 @@ src/
     - ✅ ChatMessage 컴포넌트 (사용자 말풍선, AI 전체 너비, 코드 블록 지원)
     - ✅ Toast 알림 시스템 (성공/실패, 링크 지원, 전역 상태 관리)
     - ✅ Save Artifact 상태 관리 (저장됨 표시, LocalStorage)
-    - ✅ Zustand 상태 관리 (chatStore, toastStore, themeStore, useLNBWidth)
+    - ✅ Zustand 상태 관리 (chatStore, artifactStore, toastStore, themeStore, useLNBWidth)
+    - ✅ Artifacts 구현 (목록/상세, Markdown 제목 추출, LocalStorage 저장, Context-Aware Chat)
     - ✅ 기본 채팅 플로우 (메시지 전송, AI 답변 생성, Thinking 표시)
     - ✅ HITL 승인 패널 (50vw 우측 패널, 오버레이, 승인/거부 핸들러, 리스크 경고, 대안 제시)
     - ✅ Portfolio 시각화 (요약 카드 4개, 3가지 차트: 트리맵/원형/막대, Recharts)
