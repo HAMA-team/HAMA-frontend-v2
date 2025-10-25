@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Paperclip, ArrowUp } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { useChatStore } from "@/store/chatStore";
@@ -24,15 +25,18 @@ interface ChatInputProps {
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function ChatInput({
-  placeholder = "메시지를 입력하세요...",
+  placeholder,
   contextArtifactId,
 }: ChatInputProps = {}) {
+  const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
   const { addMessage } = useChatStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const defaultPlaceholder = placeholder || t("chat.inputPlaceholder");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +83,7 @@ export default function ChatInput({
         const aiMessage: Message = {
           id: `ai-${Date.now()}`,
           role: "assistant",
-          content: data.message || "응답을 받았습니다.",
+          content: data.message || t("chat.receivedResponse"),
           timestamp: new Date().toISOString(),
           status: "sent",
         };
@@ -95,7 +99,7 @@ export default function ChatInput({
         const errorMessage: Message = {
           id: `ai-${Date.now()}`,
           role: "assistant",
-          content: `⚠️ **백엔드 서버에 연결할 수 없습니다**\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`http://localhost:8000\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: http://localhost:8000/docs\n\n백엔드가 실행 중이면 정상적으로 AI 응답을 받을 수 있습니다.`,
+          content: `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`http://localhost:8000\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: http://localhost:8000/docs\n\n${t("chat.backendErrorDetail")}`,
           timestamp: new Date().toISOString(),
           status: "error",
         };
@@ -142,7 +146,7 @@ export default function ChatInput({
               style={{ backgroundColor: "transparent" }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)"}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-              aria-label="파일 첨부"
+              aria-label={t("chat.attachFile")}
             >
               <Paperclip className="w-5 h-5" style={{ color: "var(--text-secondary)" }} />
             </button>
@@ -158,7 +162,7 @@ export default function ChatInput({
                   handleSubmit(e);
                 }
               }}
-              placeholder={placeholder}
+              placeholder={defaultPlaceholder}
               className="flex-1 resize-none outline-none"
               style={{
                 color: "var(--text-primary)",
@@ -181,7 +185,7 @@ export default function ChatInput({
                 backgroundColor: message.trim() && !isOverLimit ? "var(--primary-500)" : "var(--border-default)",
                 cursor: message.trim() && !isOverLimit ? "pointer" : "not-allowed",
               }}
-              aria-label="전송"
+              aria-label={t("chat.send")}
             >
               <ArrowUp
                 className="w-5 h-5"
@@ -193,7 +197,7 @@ export default function ChatInput({
           {/* Helper Text & Character Count */}
           <div className={`flex items-center mt-2 text-xs ${showCharCount ? "justify-between" : "justify-center"}`}>
             <p style={{ color: "var(--text-muted)" }}>
-              AI가 실수할 수 있습니다. 중요한 정보는 확인하세요. • Shift+Enter로 줄바꿈
+              {t("chat.helperTextFull")}
             </p>
             {showCharCount && (
               <p

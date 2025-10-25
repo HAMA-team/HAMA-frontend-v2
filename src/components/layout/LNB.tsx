@@ -87,7 +87,7 @@ export default function LNB() {
             style={{ color: "var(--lnb-text-muted)" }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)"}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-            aria-label="사이드바 펼치기"
+            aria-label={t("nav.expandMenu")}
           >
             <PanelLeft className="w-5 h-5" />
           </button>
@@ -101,7 +101,7 @@ export default function LNB() {
             style={{ backgroundColor: "var(--lnb-active-bg)" }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-600)"}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-active-bg)"}
-            aria-label="새 채팅 시작"
+            aria-label={t("nav.newChat")}
           >
             <Plus className="w-4 h-4" style={{ color: "var(--lnb-active-text)" }} />
           </button>
@@ -173,7 +173,7 @@ export default function LNB() {
           style={{ color: "var(--lnb-text-muted)" }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)"}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-          aria-label="사이드바 접기"
+          aria-label={t("nav.collapseMenu")}
         >
           <PanelLeft className="w-5 h-5" />
         </button>
@@ -192,7 +192,7 @@ export default function LNB() {
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-active-bg)"}
         >
           <Plus className="w-4 h-4" />
-          <span className="whitespace-nowrap animate-fadeInText">새 채팅</span>
+          <span className="whitespace-nowrap animate-fadeInText">{t("nav.newChat")}</span>
         </button>
       </div>
 
@@ -230,7 +230,7 @@ export default function LNB() {
             className="text-xs font-semibold uppercase tracking-wide mb-2 px-3 whitespace-nowrap animate-fadeInText"
             style={{ color: "var(--lnb-text-muted)" }}
           >
-            최근 채팅
+            {t("nav.recentChats")}
           </h2>
           <div className="flex flex-col gap-0.5">
             {recentChats.map((chat) => (

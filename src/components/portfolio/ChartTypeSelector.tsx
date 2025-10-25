@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ChartType } from "@/lib/types/portfolio";
 import { LayoutGrid, PieChart, BarChart3 } from "lucide-react";
 
@@ -24,19 +25,21 @@ export default function ChartTypeSelector({
   selectedType,
   onTypeChange,
 }: ChartTypeSelectorProps) {
-  const chartTypes: { type: ChartType; label: string; icon: React.ElementType }[] = [
-    { type: "treemap", label: "트리맵", icon: LayoutGrid },
-    { type: "pie", label: "원형", icon: PieChart },
-    { type: "bar", label: "막대", icon: BarChart3 },
+  const { t } = useTranslation();
+
+  const chartTypes: { type: ChartType; labelKey: string; icon: React.ElementType }[] = [
+    { type: "treemap", labelKey: "portfolio.chartTypes.treemap", icon: LayoutGrid },
+    { type: "pie", labelKey: "portfolio.chartTypes.pie", icon: PieChart },
+    { type: "bar", labelKey: "portfolio.chartTypes.bar", icon: BarChart3 },
   ];
 
   return (
     <div className="flex items-center gap-3 mb-6">
       <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-        차트 타입:
+        {t("portfolio.chartTypeLabel")}
       </span>
       <div className="flex gap-2">
-        {chartTypes.map(({ type, label, icon: Icon }) => {
+        {chartTypes.map(({ type, labelKey, icon: Icon }) => {
           const isSelected = selectedType === type;
           return (
             <button
@@ -62,7 +65,7 @@ export default function ChartTypeSelector({
               }}
             >
               <Icon className="w-4 h-4" strokeWidth={1.5} />
-              <span>{label}</span>
+              <span>{t(labelKey)}</span>
             </button>
           );
         })}

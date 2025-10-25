@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 import { ApprovalRequest } from "@/lib/types/chat";
 
@@ -30,6 +31,8 @@ export default function HITLPanel({
   onApprove,
   onReject,
 }: HITLPanelProps) {
+  const { t } = useTranslation();
+
   const formatCurrency = (amount: number) => {
     return `₩${amount.toLocaleString()}`;
   };
@@ -39,7 +42,7 @@ export default function HITLPanel({
   };
 
   const getTradeTypeLabel = (type: "buy" | "sell") => {
-    return type === "buy" ? "매수" : "매도";
+    return type === "buy" ? t("hitl.buy") : t("hitl.sell");
   };
 
   const formatPercentage = (value: number) => {
@@ -64,7 +67,7 @@ export default function HITLPanel({
           className="text-xl font-semibold tracking-tight"
           style={{ color: "var(--text-primary)" }}
         >
-          매매 승인 요청
+          {t("hitl.title")}
         </h2>
         {/* Status Badge */}
         <span
@@ -74,7 +77,7 @@ export default function HITLPanel({
             color: "var(--warning-600)",
           }}
         >
-          승인 대기
+          {t("hitl.pending")}
         </span>
       </div>
 
@@ -98,7 +101,7 @@ export default function HITLPanel({
                 className="text-sm font-semibold mb-1"
                 style={{ color: "var(--text-primary)" }}
               >
-                거래 승인 필요
+                {t("hitl.approvalRequired")}
               </h3>
               <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
                 {request.risk_warning}
@@ -113,12 +116,12 @@ export default function HITLPanel({
             className="text-base font-semibold mb-4"
             style={{ color: "var(--text-primary)" }}
           >
-            주문 내역
+            {t("hitl.orderDetails")}
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                종목명
+                {t("hitl.stockName")}
               </span>
               <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 {request.stock_name}
@@ -126,7 +129,7 @@ export default function HITLPanel({
             </div>
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                종목코드
+                {t("hitl.stockCode")}
               </span>
               <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 {request.stock_code}
@@ -134,7 +137,7 @@ export default function HITLPanel({
             </div>
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                거래 유형
+                {t("hitl.tradeType")}
               </span>
               <span
                 className="text-sm font-medium"
@@ -147,15 +150,15 @@ export default function HITLPanel({
             </div>
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                주문 수량
+                {t("hitl.orderQuantity")}
               </span>
               <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {formatNumber(request.quantity)}주
+                {formatNumber(request.quantity)}{t("hitl.shares")}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                현재 시세가
+                {t("hitl.currentPrice")}
               </span>
               <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 {formatCurrency(request.price)}
@@ -166,7 +169,7 @@ export default function HITLPanel({
               style={{ borderColor: "var(--border-default)" }}
             >
               <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                예상 {getTradeTypeLabel(request.action)}금액
+                {t("hitl.expectedAmount")} {getTradeTypeLabel(request.action)}{t("hitl.totalAmount")}
               </span>
               <span className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
                 {formatCurrency(request.total_amount)}
@@ -181,15 +184,15 @@ export default function HITLPanel({
             className="text-base font-semibold mb-4"
             style={{ color: "var(--text-primary)" }}
           >
-            포트폴리오 비중 변화
+            {t("hitl.portfolioWeightChange")}
           </h3>
           <div className="flex items-center gap-2 text-sm">
-            <span style={{ color: "var(--text-secondary)" }}>현재 비중:</span>
+            <span style={{ color: "var(--text-secondary)" }}>{t("hitl.currentWeight")}:</span>
             <span className="font-medium" style={{ color: "var(--text-primary)" }}>
               {formatPercentage(request.current_weight)}
             </span>
             <span style={{ color: "var(--text-muted)" }}>→</span>
-            <span style={{ color: "var(--text-secondary)" }}>예상 비중:</span>
+            <span style={{ color: "var(--text-secondary)" }}>{t("hitl.expectedWeight")}:</span>
             <span
               className="font-semibold"
               style={{
@@ -213,7 +216,7 @@ export default function HITLPanel({
               className="text-base font-semibold mb-4"
               style={{ color: "var(--text-primary)" }}
             >
-              권장 대안
+              {t("hitl.alternatives")}
             </h3>
             <div className="space-y-3">
               {request.alternatives.map((alt, index) => (
@@ -229,8 +232,8 @@ export default function HITLPanel({
                     {alt.suggestion}
                   </p>
                   <div className="flex gap-4 text-xs" style={{ color: "var(--text-secondary)" }}>
-                    <span>수량: {formatNumber(alt.adjusted_quantity)}주</span>
-                    <span>금액: {formatCurrency(alt.adjusted_amount)}</span>
+                    <span>{t("hitl.quantity")}: {formatNumber(alt.adjusted_quantity)}{t("hitl.shares")}</span>
+                    <span>{t("hitl.amount")}: {formatCurrency(alt.adjusted_amount)}</span>
                   </div>
                 </div>
               ))}
@@ -260,7 +263,7 @@ export default function HITLPanel({
               e.currentTarget.style.backgroundColor = "var(--container-background)";
             }}
           >
-            거부
+            {t("hitl.reject")}
           </button>
           <button
             onClick={() => onApprove(messageId)}
@@ -276,14 +279,14 @@ export default function HITLPanel({
               e.currentTarget.style.backgroundColor = "var(--primary-500)";
             }}
           >
-            승인
+            {t("hitl.approve")}
           </button>
         </div>
         <p
           className="text-xs text-center mt-3"
           style={{ color: "var(--text-muted)" }}
         >
-          승인 시 즉시 주문이 체결됩니다
+          {t("hitl.approvalNote")}
         </p>
       </div>
     </div>

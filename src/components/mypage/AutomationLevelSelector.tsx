@@ -38,11 +38,11 @@ export default function AutomationLevelSelector() {
 
   // 5단계 투자 워크플로우
   const workflowSteps: WorkflowStep[] = [
-    { id: "data-collection", label: "데이터 수집" },
-    { id: "data-analysis", label: "데이터 분석" },
-    { id: "portfolio", label: "포트폴리오 구성" },
-    { id: "risk", label: "리스크 분석" },
-    { id: "trade", label: "매매" },
+    { id: "data-collection", label: t("mypage.automation.workflow.dataCollection") },
+    { id: "data-analysis", label: t("mypage.automation.workflow.analysis") },
+    { id: "portfolio", label: t("mypage.automation.workflow.portfolio") },
+    { id: "risk", label: t("mypage.automation.workflow.risk") },
+    { id: "trade", label: t("mypage.automation.workflow.trade") },
   ];
 
   const levelOptions: LevelOption[] = [
@@ -162,8 +162,8 @@ export default function AutomationLevelSelector() {
           className="text-center text-xs mt-6"
           style={{ color: "var(--text-muted)" }}
         >
-          <span style={{ color: "var(--primary-500)" }}>●</span> 자동 실행 |{" "}
-          <span style={{ color: "#ef4444" }}>●</span> 사용자 승인 필요
+          <span style={{ color: "var(--primary-500)" }}>●</span> {t("mypage.automation.workflow.autoExecute")}{" "}
+          <span style={{ color: "#ef4444" }}>●</span> {t("mypage.automation.workflow.approvalRequired")}
         </div>
       </div>
 

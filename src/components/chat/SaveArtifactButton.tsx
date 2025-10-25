@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
 import { useToastStore } from "@/store/toastStore";
 
@@ -22,6 +23,7 @@ interface SaveArtifactButtonProps {
 }
 
 export default function SaveArtifactButton({ messageId, onClick }: SaveArtifactButtonProps) {
+  const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const { showToast } = useToastStore();
@@ -50,15 +52,15 @@ export default function SaveArtifactButton({ messageId, onClick }: SaveArtifactB
 
       // 성공 토스트 표시
       showToast(
-        "Artifact가 저장되었습니다",
+        t("toast.artifactSaved"),
         "success",
-        "Artifacts 페이지에서 보기",
+        t("artifacts.viewInArtifacts"),
         "/artifacts"
       );
     } catch (error) {
       console.error("Failed to save artifact:", error);
       // 실패 토스트 표시
-      showToast("Artifact 저장에 실패했습니다", "error");
+      showToast(t("toast.artifactSaveFailed"), "error");
     } finally {
       setIsSaving(false);
     }
@@ -87,22 +89,22 @@ export default function SaveArtifactButton({ messageId, onClick }: SaveArtifactB
           e.currentTarget.style.borderColor = "var(--border-default)";
         }
       }}
-      aria-label={isSaved ? "저장됨" : "Artifact로 저장"}
+      aria-label={isSaved ? t("chat.saved") : t("chat.saveAsArtifactKo")}
     >
       {isSaving ? (
         <>
           <Loader2 className="w-4 h-4 animate-spin" strokeWidth={1.5} />
-          <span>저장 중...</span>
+          <span>{t("chat.saving")}</span>
         </>
       ) : isSaved ? (
         <>
           <BookmarkCheck className="w-4 h-4" strokeWidth={1.5} />
-          <span>저장됨</span>
+          <span>{t("chat.saved")}</span>
         </>
       ) : (
         <>
           <Bookmark className="w-4 h-4" strokeWidth={1.5} />
-          <span>Save as Artifact</span>
+          <span>{t("chat.saveAsArtifact")}</span>
         </>
       )}
     </button>

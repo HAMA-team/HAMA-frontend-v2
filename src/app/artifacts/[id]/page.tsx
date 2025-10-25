@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useArtifactStore } from '@/store/artifactStore';
 import { formatDate } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
@@ -19,6 +20,7 @@ import ChatInput from '@/components/layout/ChatInput';
  * - Context-Aware ChatInput (Phase 3+)
  */
 export default function ArtifactDetailPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
   const { getArtifact } = useArtifactStore();
@@ -34,10 +36,10 @@ export default function ArtifactDetailPage() {
           <div className="text-center">
             <div className="text-6xl mb-4">🔍</div>
             <h1 className="text-2xl font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
-              아티팩트를 찾을 수 없습니다
+              {t("artifacts.notFound")}
             </h1>
             <p className="text-sm mb-6" style={{ color: "var(--text-secondary)" }}>
-              이 아티팩트는 삭제되었거나 존재하지 않습니다
+              {t("artifacts.notFoundDescription")}
             </p>
             <button
               onClick={() => router.push('/artifacts')}
@@ -47,7 +49,7 @@ export default function ArtifactDetailPage() {
                 color: 'white',
               }}
             >
-              아티팩트 목록으로 돌아가기
+              {t("artifacts.backToList")}
             </button>
           </div>
         </div>
@@ -70,7 +72,7 @@ export default function ArtifactDetailPage() {
 
   const handleShare = () => {
     // Phase 3: Implement share functionality
-    alert('공유 기능은 Phase 3에서 구현될 예정입니다');
+    alert(t("artifacts.shareComingSoon"));
   };
 
   return (
@@ -91,7 +93,7 @@ export default function ArtifactDetailPage() {
                 style={{ color: 'var(--text-secondary)' }}
               >
                 <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
-                아티팩트 목록
+                {t("artifacts.backToListShort")}
               </button>
 
               {/* Title and Meta */}
@@ -106,7 +108,7 @@ export default function ArtifactDetailPage() {
                   <div className="flex items-center gap-4 text-sm" style={{ color: "var(--text-muted)" }}>
                     <span>{formatDate(artifact.createdAt)}</span>
                     <span>•</span>
-                    <span>{artifact.content.split(/\s+/).length} 단어</span>
+                    <span>{artifact.content.split(/\s+/).length} {t("artifacts.wordCount")}</span>
                   </div>
                 </div>
 
@@ -116,7 +118,7 @@ export default function ArtifactDetailPage() {
                     onClick={handleDownload}
                     className="p-2 rounded-lg hover:bg-opacity-80 transition-colors"
                     style={{ backgroundColor: 'var(--container-background)' }}
-                    title="다운로드"
+                    title={t("artifacts.download")}
                   >
                     <Download className="w-5 h-5" strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
                   </button>
@@ -124,7 +126,7 @@ export default function ArtifactDetailPage() {
                     onClick={handleShare}
                     className="p-2 rounded-lg hover:bg-opacity-80 transition-colors"
                     style={{ backgroundColor: 'var(--container-background)' }}
-                    title="공유"
+                    title={t("artifacts.share")}
                   >
                     <Share2 className="w-5 h-5" strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
                   </button>
@@ -280,7 +282,7 @@ export default function ArtifactDetailPage() {
 
       {/* Context-Aware Chat Input */}
       <ChatInput
-        placeholder="이 아티팩트에 대해 질문하기..."
+        placeholder={t("artifacts.chatPlaceholder")}
         contextArtifactId={artifact.id}
       />
     </>

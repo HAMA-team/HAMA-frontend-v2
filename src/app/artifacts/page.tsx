@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from 'react-i18next';
 import { useArtifactStore } from '@/store/artifactStore';
 import ArtifactCard from '@/components/artifacts/ArtifactCard';
 
@@ -15,6 +16,7 @@ import ArtifactCard from '@/components/artifacts/ArtifactCard';
  * - LocalStorage persistence (Phase 1-2)
  */
 export default function ArtifactsPage() {
+  const { t } = useTranslation();
   const { artifacts } = useArtifactStore();
 
   return (
@@ -25,10 +27,10 @@ export default function ArtifactsPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-semibold tracking-tight break-words" style={{ color: "var(--text-primary)" }}>
-              아티팩트
+              {t("artifacts.listTitle")}
             </h1>
             <p className="mt-2 text-base break-words" style={{ color: "var(--text-secondary)" }}>
-              저장된 리포트 및 분석 결과
+              {t("artifacts.listSubtitle")}
             </p>
           </div>
 
@@ -37,10 +39,10 @@ export default function ArtifactsPage() {
             <div className="flex flex-col items-center justify-center py-20">
               <div className="text-6xl mb-4">📄</div>
               <p className="text-lg font-medium mb-2" style={{ color: "var(--text-primary)" }}>
-                저장된 아티팩트가 없습니다
+                {t("artifacts.emptyState")}
               </p>
               <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                채팅에서 "Save as Artifact" 버튼을 눌러 AI 답변을 저장하세요
+                {t("artifacts.emptySuggestion")}
               </p>
             </div>
           ) : (

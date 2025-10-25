@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { PortfolioSummary as PortfolioSummaryType } from "@/lib/types/portfolio";
 import { TrendingUp, TrendingDown, DollarSign, Briefcase, Wallet } from "lucide-react";
 
@@ -22,6 +23,8 @@ interface PortfolioSummaryProps {
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function PortfolioSummary({ summary }: PortfolioSummaryProps) {
+  const { t } = useTranslation();
+
   const formatCurrency = (amount: number) => {
     return `₩${amount.toLocaleString()}`;
   };
@@ -46,7 +49,7 @@ export default function PortfolioSummary({ summary }: PortfolioSummaryProps) {
         <div className="flex items-center gap-2 mb-2">
           <DollarSign className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
           <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            총 평가금액
+            {t("portfolio.summary.totalValue")}
           </span>
         </div>
         <p
@@ -72,7 +75,7 @@ export default function PortfolioSummary({ summary }: PortfolioSummaryProps) {
             <TrendingDown className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
           )}
           <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            총 수익률
+            {t("portfolio.summary.totalReturn")}
           </span>
         </div>
         <p
@@ -105,14 +108,14 @@ export default function PortfolioSummary({ summary }: PortfolioSummaryProps) {
         <div className="flex items-center gap-2 mb-2">
           <Briefcase className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
           <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            보유 종목 수
+            {t("portfolio.summary.holdings")}
           </span>
         </div>
         <p
           className="text-[28px] font-bold tracking-tight"
           style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}
         >
-          {summary.stockCount}개
+          {summary.stockCount}{t("portfolio.summary.stockCount")}
         </p>
       </div>
 
@@ -127,7 +130,7 @@ export default function PortfolioSummary({ summary }: PortfolioSummaryProps) {
         <div className="flex items-center gap-2 mb-2">
           <Wallet className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
           <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            현금 보유액
+            {t("portfolio.summary.cash")}
           </span>
         </div>
         <p

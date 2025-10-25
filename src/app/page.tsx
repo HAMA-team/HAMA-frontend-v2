@@ -2,6 +2,7 @@
 
 import React from "react";
 import { PieChart, TrendingUp, Sparkles, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import ChatInput from "@/components/layout/ChatInput";
 import ChatView from "@/components/chat/ChatView";
 import HITLPanel from "@/components/hitl/HITLPanel";
@@ -27,6 +28,7 @@ interface SuggestionCard {
 }
 
 export default function Home() {
+  const { t } = useTranslation();
   const { messages, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId } = useChatStore();
   const { addArtifact } = useArtifactStore();
 
@@ -35,33 +37,33 @@ export default function Home() {
       icon: PieChart,
       iconBg: "var(--icon-blue-bg)",
       iconFg: "var(--icon-blue-fg)",
-      title: "포트폴리오 현황",
-      description: "현재 보유 자산과 수익률을 확인하세요",
-      prompt: "내 포트폴리오 현황을 보여줘",
+      title: t("chat.emptyState.suggestions.portfolio.title"),
+      description: t("chat.emptyState.suggestions.portfolio.description"),
+      prompt: t("chat.emptyState.suggestions.portfolio.prompt"),
     },
     {
       icon: TrendingUp,
       iconBg: "var(--icon-green-bg)",
       iconFg: "var(--icon-green-fg)",
-      title: "시장 분석",
-      description: "최신 시장 동향과 투자 전략",
-      prompt: "최근 시장 동향을 분석해줘",
+      title: t("chat.emptyState.suggestions.market.title"),
+      description: t("chat.emptyState.suggestions.market.description"),
+      prompt: t("chat.emptyState.suggestions.market.prompt"),
     },
     {
       icon: Sparkles,
       iconBg: "var(--icon-purple-bg)",
       iconFg: "var(--icon-purple-fg)",
-      title: "종목 추천",
-      description: "AI 기반 맞춤형 투자 아이디어",
-      prompt: "내 투자 성향에 맞는 종목을 추천해줘",
+      title: t("chat.emptyState.suggestions.recommendation.title"),
+      description: t("chat.emptyState.suggestions.recommendation.description"),
+      prompt: t("chat.emptyState.suggestions.recommendation.prompt"),
     },
     {
       icon: Shield,
       iconBg: "var(--icon-orange-bg)",
       iconFg: "var(--icon-orange-fg)",
-      title: "리스크 분석",
-      description: "포트폴리오 위험 요소 점검",
-      prompt: "내 포트폴리오의 리스크를 분석해줘",
+      title: t("chat.emptyState.suggestions.risk.title"),
+      description: t("chat.emptyState.suggestions.risk.description"),
+      prompt: t("chat.emptyState.suggestions.risk.prompt"),
     },
   ];
 
@@ -235,10 +237,10 @@ def calculate_portfolio():
 
           {/* Greeting */}
           <h1 className="text-3xl font-bold mb-2 text-center" style={{ color: "var(--text-primary)" }}>
-            안녕하세요!
+            {t("chat.emptyState.greeting")}
           </h1>
           <p className="text-base mb-12 text-center" style={{ color: "var(--text-secondary)" }}>
-            무엇을 도와드릴까요?
+            {t("chat.emptyState.subGreeting")}
           </p>
 
           {/* Suggestion Cards - 2x2 Grid */}

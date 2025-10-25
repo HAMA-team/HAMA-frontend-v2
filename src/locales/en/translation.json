@@ -14,18 +14,28 @@
     "portfolio": "Portfolio",
     "artifacts": "Artifacts",
     "mypage": "My Page",
-    "discover": "Discover"
+    "discover": "Discover",
+    "newChat": "New Chat",
+    "recentChats": "Recent Chats",
+    "collapseMenu": "Collapse sidebar",
+    "expandMenu": "Expand sidebar"
   },
   "chat": {
     "inputPlaceholder": "Type a message...",
     "helperText": "AI can make mistakes. Please verify important information.",
+    "helperTextFull": "AI can make mistakes. Please verify important information. • Shift+Enter for new line",
     "sendMessage": "Send",
+    "send": "Send",
     "attachFile": "Attach file",
     "saveAsArtifact": "Save as Artifact",
+    "saveAsArtifactKo": "Save as Artifact",
     "saved": "Saved",
     "saving": "Saving...",
     "copy": "Copy",
     "copied": "Copied",
+    "receivedResponse": "Received a response.",
+    "backendError": "⚠️ **Cannot connect to backend server**",
+    "backendErrorDetail": "You can test the UI without backend API in local environment.",
     "emptyState": {
       "greeting": "Hello!",
       "subGreeting": "How can I help you?",
@@ -55,21 +65,31 @@
   },
   "hitl": {
     "title": "Trade Approval Request",
+    "pending": "Pending Approval",
+    "approvalRequired": "Approval Required",
+    "orderDetails": "Order Details",
     "orderInfo": "Order Information",
     "stockName": "Stock Name",
     "stockCode": "Stock Code",
     "orderType": "Order Type",
+    "tradeType": "Trade Type",
     "buy": "Buy",
     "sell": "Sell",
+    "orderQuantity": "Order Quantity",
     "quantity": "Quantity",
     "amount": "Amount",
     "currentPrice": "Current Price",
-    "riskWarning": "Risk Warning",
+    "expectedAmount": "Expected",
+    "totalAmount": "Amount",
+    "portfolioWeightChange": "Portfolio Weight Change",
     "currentWeight": "Current Weight",
     "expectedWeight": "Expected Weight",
+    "riskWarning": "Risk Warning",
     "alternatives": "Recommended Alternatives",
+    "shares": "shares",
     "approve": "Approve",
     "reject": "Reject",
+    "approvalNote": "Order will be executed immediately upon approval",
     "approved": "Buy order has been executed",
     "rejected": "Buy order has been rejected"
   },
@@ -79,18 +99,33 @@
       "totalValue": "Total Value",
       "totalReturn": "Total Return",
       "holdings": "Holdings",
-      "cash": "Cash"
+      "cash": "Cash",
+      "stockCount": ""
     },
+    "chartTypeLabel": "Chart Type:",
     "chartTypes": {
       "treemap": "Treemap",
-      "pie": "Pie Chart",
-      "bar": "Bar Chart"
+      "pie": "Pie",
+      "bar": "Bar"
     }
   },
   "artifacts": {
     "title": "Artifacts",
+    "listTitle": "Artifacts",
+    "listSubtitle": "Saved reports and analysis results",
     "empty": "No saved artifacts",
-    "viewInArtifacts": "View in Artifacts"
+    "emptyState": "No saved artifacts",
+    "emptySuggestion": "Click \"Save as Artifact\" button in chat to save AI responses",
+    "viewInArtifacts": "View in Artifacts",
+    "notFound": "Artifact not found",
+    "notFoundDescription": "This artifact has been deleted or does not exist",
+    "backToList": "Back to artifact list",
+    "backToListShort": "Artifact list",
+    "wordCount": "words",
+    "download": "Download",
+    "share": "Share",
+    "shareComingSoon": "Share feature will be implemented in Phase 3",
+    "chatPlaceholder": "Ask a question about this artifact..."
   },
   "toast": {
     "artifactSaved": "Artifact has been saved",
@@ -114,6 +149,15 @@
       "hitlIndicator": "HITL Intervention",
       "changeSuccess": "Automation level has been updated",
       "changeFailed": "Failed to update automation level",
+      "workflow": {
+        "dataCollection": "Data Collection",
+        "analysis": "Analysis",
+        "portfolio": "Portfolio",
+        "risk": "Risk Analysis",
+        "trade": "Trade",
+        "autoExecute": "Auto Execute |",
+        "approvalRequired": "Approval Required"
+      },
       "advisor": {
         "name": "Advisor Mode",
         "description": "AI provides information only without trading suggestions",

@@ -14,18 +14,28 @@
     "portfolio": "포트폴리오",
     "artifacts": "저장된 분석",
     "mypage": "마이페이지",
-    "discover": "발견하기"
+    "discover": "발견하기",
+    "newChat": "새 채팅",
+    "recentChats": "최근 채팅",
+    "collapseMenu": "사이드바 접기",
+    "expandMenu": "사이드바 펼치기"
   },
   "chat": {
     "inputPlaceholder": "메시지를 입력하세요...",
     "helperText": "AI가 실수할 수 있습니다. 중요한 정보는 확인하세요.",
+    "helperTextFull": "AI가 실수할 수 있습니다. 중요한 정보는 확인하세요. • Shift+Enter로 줄바꿈",
     "sendMessage": "전송",
+    "send": "전송",
     "attachFile": "파일 첨부",
     "saveAsArtifact": "Save as Artifact",
+    "saveAsArtifactKo": "Artifact로 저장",
     "saved": "저장됨",
     "saving": "저장 중...",
     "copy": "복사",
     "copied": "복사됨",
+    "receivedResponse": "응답을 받았습니다.",
+    "backendError": "⚠️ **백엔드 서버에 연결할 수 없습니다**",
+    "backendErrorDetail": "로컬 환경에서는 백엔드 API 없이도 UI 테스트가 가능합니다.",
     "emptyState": {
       "greeting": "안녕하세요!",
       "subGreeting": "무엇을 도와드릴까요?",
@@ -55,21 +65,31 @@
   },
   "hitl": {
     "title": "매매 승인 요청",
+    "pending": "승인 대기",
+    "approvalRequired": "거래 승인 필요",
+    "orderDetails": "주문 내역",
     "orderInfo": "주문 정보",
     "stockName": "종목명",
-    "stockCode": "종목 코드",
+    "stockCode": "종목코드",
     "orderType": "주문 유형",
+    "tradeType": "거래 유형",
     "buy": "매수",
     "sell": "매도",
+    "orderQuantity": "주문 수량",
     "quantity": "수량",
     "amount": "금액",
-    "currentPrice": "현재가",
-    "riskWarning": "리스크 경고",
+    "currentPrice": "현재 시세가",
+    "expectedAmount": "예상",
+    "totalAmount": "금액",
+    "portfolioWeightChange": "포트폴리오 비중 변화",
     "currentWeight": "현재 비중",
     "expectedWeight": "예상 비중",
+    "riskWarning": "리스크 경고",
     "alternatives": "권장 대안",
+    "shares": "주",
     "approve": "승인",
     "reject": "거부",
+    "approvalNote": "승인 시 즉시 주문이 체결됩니다",
     "approved": "매수 주문이 실행되었습니다",
     "rejected": "매수 주문이 거부되었습니다"
   },
@@ -79,18 +99,33 @@
       "totalValue": "총 평가금액",
       "totalReturn": "총 수익률",
       "holdings": "보유 종목 수",
-      "cash": "현금 보유액"
+      "cash": "현금 보유액",
+      "stockCount": "개"
     },
+    "chartTypeLabel": "차트 타입:",
     "chartTypes": {
       "treemap": "트리맵",
-      "pie": "원형 차트",
-      "bar": "막대 그래프"
+      "pie": "원형",
+      "bar": "막대"
     }
   },
   "artifacts": {
     "title": "저장된 분석",
+    "listTitle": "아티팩트",
+    "listSubtitle": "저장된 리포트 및 분석 결과",
     "empty": "저장된 분석이 없습니다",
-    "viewInArtifacts": "Artifacts 페이지에서 보기"
+    "emptyState": "저장된 아티팩트가 없습니다",
+    "emptySuggestion": "채팅에서 \"Save as Artifact\" 버튼을 눌러 AI 답변을 저장하세요",
+    "viewInArtifacts": "Artifacts 페이지에서 보기",
+    "notFound": "아티팩트를 찾을 수 없습니다",
+    "notFoundDescription": "이 아티팩트는 삭제되었거나 존재하지 않습니다",
+    "backToList": "아티팩트 목록으로 돌아가기",
+    "backToListShort": "아티팩트 목록",
+    "wordCount": "단어",
+    "download": "다운로드",
+    "share": "공유",
+    "shareComingSoon": "공유 기능은 Phase 3에서 구현될 예정입니다",
+    "chatPlaceholder": "이 아티팩트에 대해 질문하기..."
   },
   "toast": {
     "artifactSaved": "Artifact가 저장되었습니다",
@@ -114,6 +149,15 @@
       "hitlIndicator": "HITL 개입",
       "changeSuccess": "자동화 레벨이 변경되었습니다",
       "changeFailed": "자동화 레벨 변경에 실패했습니다",
+      "workflow": {
+        "dataCollection": "데이터 수집",
+        "analysis": "데이터 분석",
+        "portfolio": "포트폴리오 구성",
+        "risk": "리스크 분석",
+        "trade": "매매",
+        "autoExecute": "자동 실행 |",
+        "approvalRequired": "사용자 승인 필요"
+      },
       "advisor": {
         "name": "어드바이저 모드",
         "description": "AI가 정보만 제공하고 매매 제안은 하지 않습니다",

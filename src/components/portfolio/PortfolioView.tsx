@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Portfolio, ChartType } from "@/lib/types/portfolio";
 import PortfolioSummary from "./PortfolioSummary";
 import ChartTypeSelector from "./ChartTypeSelector";
@@ -26,6 +27,7 @@ interface PortfolioViewProps {
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function PortfolioView({ portfolio }: PortfolioViewProps) {
+  const { t } = useTranslation();
   const [chartType, setChartType] = useState<ChartType>("treemap");
 
   // LocalStorage에서 차트 타입 로드
@@ -66,7 +68,7 @@ export default function PortfolioView({ portfolio }: PortfolioViewProps) {
             letterSpacing: "-0.02em",
           }}
         >
-          포트폴리오
+          {t("portfolio.title")}
         </h1>
 
         {/* 요약 카드 */}
