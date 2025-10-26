@@ -128,6 +128,10 @@ export default function ChatInput({
         });
       } finally {
         setLoading(false);
+        // 전송 후에도 입력창 포커스를 유지하여 즉시 추가 입력 가능
+        if (textareaRef.current) {
+          setTimeout(() => textareaRef.current?.focus(), 0);
+        }
       }
     }
   };
@@ -180,11 +184,10 @@ export default function ChatInput({
               ref={textareaRef}
               value={message}
               onChange={handleChange}
-              disabled={isLoading}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleSubmit(e);
+                  if (!isLoading) handleSubmit(e);
                 }
               }}
               placeholder={defaultPlaceholder}
