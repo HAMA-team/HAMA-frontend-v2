@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
