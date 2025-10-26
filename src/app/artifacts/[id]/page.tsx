@@ -32,9 +32,14 @@ export default function ArtifactDetailPage() {
   const router = useRouter();
   const { getArtifact } = useArtifactStore();
   const { openConfirm, openAlert } = useDialogStore();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
   const artifactId = params.id as string;
   const artifact = getArtifact(artifactId);
+
+  // 마운트 전에는 렌더링을 지연시켜 hydration mismatch 방지 (LocalStorage 의존)
+  if (!mounted) return null;
 
   // Handle artifact not found
   if (!artifact) {

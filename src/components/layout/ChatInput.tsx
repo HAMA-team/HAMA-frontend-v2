@@ -58,6 +58,21 @@ export default function ChatInput({
         setCurrentThreadId("");
       }
 
+      // 아티팩트 컨텍스트가 있으면 사용자 메시지 이전에 컨텍스트를 '기존 LLM 답변'처럼 표시
+      if (fromExternalPage && contextArtifactId) {
+        const art = useArtifactStore.getState().getArtifact?.(contextArtifactId);
+        if (art?.content) {
+          const contextAssistant: Message = {
+            id: `ctx-${Date.now()}`,
+            role: "assistant",
+            content: art.content,
+            timestamp: new Date().toISOString(),
+            status: "sent",
+          };
+          addMessage(contextAssistant);
+        }
+      }
+
       // 사용자 메시지 추가
       const userMessage: Message = {
         id: `user-${Date.now()}`,
