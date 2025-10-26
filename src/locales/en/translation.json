@@ -33,6 +33,7 @@
     "saving": "Saving...",
     "copy": "Copy",
     "copied": "Copied",
+    "hitlTest": "🧪 HITL Panel Test",
     "receivedResponse": "Received a response.",
     "generating": "Generating response...",
     "sendFailed": "Send failed",
@@ -146,7 +147,6 @@
       "live": "Live"
     }
   },
-  "hitlTest": "🧪 HITL Panel Test",
   "mypage": {
     "title": "My Page",
     "subtitle": "Account settings and preferences",

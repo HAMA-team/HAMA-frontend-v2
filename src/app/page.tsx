@@ -9,6 +9,7 @@ import { useArtifactStore } from "@/store/artifactStore";
 import { Message, ThinkingStep } from "@/lib/types/chat";
 import { useDialogStore } from "@/store/dialogStore";
 import { approveAction } from "@/lib/api/chat";
+import { useAppModeStore } from "@/store/appModeStore";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -38,6 +39,7 @@ const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
 
 export default function Home() {
   const { t } = useTranslation();
+  const { mode } = useAppModeStore();
   const { messages, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId } = useChatStore();
   const { addArtifact } = useArtifactStore();
   const { openAlert } = useDialogStore();
@@ -134,6 +136,11 @@ def calculate_portfolio():
 
   const handleApprove = async (messageId: string) => {
     try {
+      if (mode === "demo") {
+        openAlert({ title: t('hitl.approved') });
+        closeApprovalPanel();
+        return;
+      }
       if (!currentThreadId) {
         openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
         return;
@@ -225,6 +232,11 @@ def calculate_portfolio():
 
   const handleReject = async (messageId: string) => {
     try {
+      if (mode === "demo") {
+        openAlert({ title: t('hitl.rejected') });
+        closeApprovalPanel();
+        return;
+      }
       if (!currentThreadId) {
         openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
         return;
