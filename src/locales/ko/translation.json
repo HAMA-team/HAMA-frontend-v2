@@ -140,6 +140,12 @@
     "ko": "한국어",
     "en": "English"
   },
+  "system": {
+    "mode": {
+      "demo": "데모",
+      "live": "실시간"
+    }
+  },
   "mypage": {
     "title": "마이페이지",
     "subtitle": "계정 설정 및 환경 설정",

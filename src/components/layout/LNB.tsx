@@ -17,6 +17,7 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { useChatStore } from "@/store/chatStore";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "@/components/common/LanguageSelector";
+import DevDemoToggle from "@/components/common/DevDemoToggle";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import { formatRelativeOrDate, formatAbsoluteDate } from "@/lib/utils";
 
@@ -269,8 +270,11 @@ export default function LNB() {
         style={{ borderTop: "1px solid var(--lnb-border)" }}
       >
         {/* Theme Toggle & Language Selector */}
-        <div className="flex items-center justify-between px-3 py-2">
-          <LanguageSelector />
+        <div className="flex items-center justify-between px-3 py-2 gap-2">
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
+            <DevDemoToggle />
+          </div>
           <ThemeToggle />
         </div>
 

@@ -7,6 +7,7 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { useChatStore } from "@/store/chatStore";
 import { Message } from "@/lib/types/chat";
 import { sendChat } from "@/lib/api/chat";
+import { useAppModeStore } from "@/store/appModeStore";
 
 interface ChatInputProps {
   placeholder?: string;
@@ -33,6 +34,7 @@ export default function ChatInput({
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
   const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel } = useChatStore();
+  const { mode } = useAppModeStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -74,10 +76,19 @@ export default function ChatInput({
       // API 호출
       try {
         setLoading(true);
-        const data = await sendChat({
-          message: userMessageContent,
-          automation_level: 2,
-        });
+
+        // Demo 모드에서는 백엔드 호출 스킵하고 더미 응답 표시
+        const data =
+          mode === "demo"
+            ? {
+                message: t("chat.receivedResponse"),
+                conversation_id: `demo-${Date.now()}`,
+                requires_approval: false,
+              }
+            : await sendChat({
+                message: userMessageContent,
+                automation_level: 2,
+              });
 
         // 대기 메시지 업데이트 (콘텐츠 채우기 + 상태 전환)
         updateMessage(tempId, {

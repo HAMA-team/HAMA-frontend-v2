@@ -140,6 +140,12 @@
     "ko": "한국어",
     "en": "English"
   },
+  "system": {
+    "mode": {
+      "demo": "Demo",
+      "live": "Live"
+    }
+  },
   "mypage": {
     "title": "My Page",
     "subtitle": "Account settings and preferences",
