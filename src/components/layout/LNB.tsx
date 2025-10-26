@@ -69,6 +69,29 @@ export default function LNB() {
     };
   }, [mode]);
 
+  const openSession = async (conversationId: string) => {
+    if (mode !== "live") return;
+    try {
+      setCurrentThreadId(conversationId);
+      clearMessages();
+      const data: any = await getChatHistory(conversationId, 500);
+      if (Array.isArray(data)) {
+        data.forEach((m: any, idx: number) => {
+          const role = m.role === "user" || m.role === "assistant" ? m.role : (m.sender === "user" ? "user" : "assistant");
+          const content = m.message ?? m.content ?? "";
+          const ts = m.timestamp ?? m.created_at ?? new Date().toISOString();
+          addMessage({ id: `restored-${idx}-${Date.now()}`, role, content, timestamp: ts, status: "sent" });
+        });
+      }
+      if (pathname !== "/") {
+        router.push("/");
+      }
+    } catch (e) {
+      console.error("Failed to open session", e);
+      if (pathname !== "/") router.push("/");
+    }
+  };
+
   const formatRelative = (ts: number) => {
     const locale = i18n?.language || "en";
     return formatRelativeOrDate(ts, locale, 30);
@@ -282,6 +305,7 @@ export default function LNB() {
                 key={chat.id}
                 className="flex flex-col items-start justify-center gap-0.5 px-3 h-14 rounded-lg transition-colors duration-150 text-left w-full"
                 style={{ backgroundColor: "transparent" }}
+                onClick={() => openSession(chat.id)}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)"}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
               >
