@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PortfolioView from "@/components/portfolio/PortfolioView";
 import ChatInput from "@/components/layout/ChatInput";
-import { mockPortfolio } from "@/lib/mock/portfolioData";
+import { fetchPortfolioOverview } from "@/lib/api/portfolio";
+import { Portfolio } from "@/lib/types/portfolio";
+import { useTranslation } from "react-i18next";
 
 /**
  * Portfolio Page
@@ -16,9 +18,42 @@ import { mockPortfolio } from "@/lib/mock/portfolioData";
  * @see Userflow.md - Flow 3: 포트폴리오 조회 + 추가 질문 플로우
  */
 export default function PortfolioPage() {
+  const { t } = useTranslation();
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchPortfolioOverview();
+        if (mounted) setPortfolio(data);
+      } catch (e: any) {
+        console.error("Failed to load portfolio:", e);
+        if (mounted) setError(e?.message || "Failed to load");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <>
-      <PortfolioView portfolio={mockPortfolio} />
+      {loading && (
+        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "var(--main-background)" }}>
+          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{t("common.loading")}</span>
+        </div>
+      )}
+      {!loading && portfolio && <PortfolioView portfolio={portfolio} />}
+      {!loading && !portfolio && (
+        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "var(--main-background)" }}>
+          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{error || "Failed to load"}</span>
+        </div>
+      )}
       <ChatInput />
     </>
   );

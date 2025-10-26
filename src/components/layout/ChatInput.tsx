@@ -6,6 +6,7 @@ import { Paperclip, ArrowUp } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { useChatStore } from "@/store/chatStore";
 import { Message } from "@/lib/types/chat";
+import { sendChat } from "@/lib/api/chat";
 
 interface ChatInputProps {
   placeholder?: string;
@@ -31,7 +32,7 @@ export default function ChatInput({
   const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
-  const { addMessage, updateMessage, isLoading, setLoading } = useChatStore();
+  const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel } = useChatStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -73,29 +74,33 @@ export default function ChatInput({
       // API 호출
       try {
         setLoading(true);
-        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-        const response = await fetch(`${apiBaseUrl}/api/v1/chat/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: userMessageContent,
-            automation_level: 2, // Default: Copilot
-          }),
+        const data = await sendChat({
+          message: userMessageContent,
+          automation_level: 2,
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
 
         // 대기 메시지 업데이트 (콘텐츠 채우기 + 상태 전환)
         updateMessage(tempId, {
           content: data.message || t("chat.receivedResponse"),
           status: "sent",
         });
+
+        // 스레드 ID 저장 (승인/후속 대화용)
+        if (data.conversation_id) {
+          setCurrentThreadId(data.conversation_id);
+        }
+
+        // 승인 필요 시 패널 오픈
+        if (data.requires_approval && data.approval_request) {
+          try {
+            // 백엔드 approval_request는 유연 스키마이므로 그대로 전달
+            // 패널에서는 기대하는 필드가 없을 수 있어, 최소 가드만 두고 시도
+            openApprovalPanel(data.approval_request as any);
+          } catch (e) {
+            // 패널 스키마 불일치 시에도 채팅은 정상 동작하도록 무시
+            console.warn("Approval panel data mismatch", e);
+          }
+        }
 
         // TODO: HITL 승인 요청 처리
         if (data.requires_approval) {
