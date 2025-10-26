@@ -31,8 +31,22 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
     return () => window.removeEventListener('click', onGlobalClick);
   }, [menuOpen]);
 
+  // 다른 카드에서 컨텍스트 메뉴를 열면, 현재 열린 메뉴는 닫히도록 글로벌 이벤트 처리
+  useEffect(() => {
+    const onAnyContextOpen = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { id?: string } | undefined;
+      if (detail?.id !== artifact.id) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('artifact-contextmenu-open', onAnyContextOpen as EventListener);
+    return () => window.removeEventListener('artifact-contextmenu-open', onAnyContextOpen as EventListener);
+  }, [artifact.id]);
+
   const handleContextMenu: React.MouseEventHandler<HTMLDivElement> = (e) => {
     e.preventDefault();
+    // 다른 카드의 메뉴를 닫도록 브로드캐스트
+    window.dispatchEvent(new CustomEvent('artifact-contextmenu-open', { detail: { id: artifact.id } }));
     setMenuPos({ x: e.clientX, y: e.clientY });
     setMenuOpen(true);
   };
