@@ -8,6 +8,7 @@ import { useChatStore } from "@/store/chatStore";
 import { useArtifactStore } from "@/store/artifactStore";
 import { Message, ThinkingStep } from "@/lib/types/chat";
 import { useDialogStore } from "@/store/dialogStore";
+import { approveAction } from "@/lib/api/chat";
 import { useTranslation } from "react-i18next";
 
 /**
