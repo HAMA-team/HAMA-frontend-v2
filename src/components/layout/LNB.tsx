@@ -21,7 +21,7 @@ import DevDemoToggle from "@/components/common/DevDemoToggle";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import { formatRelativeOrDate, formatAbsoluteDate } from "@/lib/utils";
 import { useAppModeStore } from "@/store/appModeStore";
-import { getChatSessions } from "@/lib/api/chat";
+import { getChatSessions, getChatHistory } from "@/lib/api/chat";
 
 /**
  * LNB (Left Navigation Bar) Component
@@ -40,7 +40,7 @@ export default function LNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isCollapsed, setCollapsed } = useLNBWidth();
-  const { clearMessages } = useChatStore();
+  const { clearMessages, addMessage, setCurrentThreadId } = useChatStore();
   const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
   const [sessions, setSessions] = React.useState<any[]>([]);
