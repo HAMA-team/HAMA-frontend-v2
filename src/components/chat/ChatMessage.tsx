@@ -143,18 +143,37 @@ export default function ChatMessage({
             // Lists
             ul: ({ node, ...props }) => (
               <ul
-                style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
+                style={{
+                  marginBottom: "16px",
+                  paddingLeft: "24px",
+                  color: "var(--text-primary)",
+                  listStyleType: "disc",
+                  listStylePosition: "outside",
+                }}
                 {...props}
               />
             ),
             ol: ({ node, ...props }) => (
               <ol
-                style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
+                style={{
+                  marginBottom: "16px",
+                  paddingLeft: "24px",
+                  color: "var(--text-primary)",
+                  listStyleType: "decimal",
+                  listStylePosition: "outside",
+                }}
                 {...props}
               />
             ),
             li: ({ node, ...props }) => (
-              <li style={{ marginBottom: "8px", color: "var(--text-primary)" }} {...props} />
+              <li
+                style={{
+                  marginBottom: "8px",
+                  color: "var(--text-primary)",
+                  display: "list-item",
+                }}
+                {...props}
+              />
             ),
             // Code
             code: ({ node, inline, ...props }: any) =>
