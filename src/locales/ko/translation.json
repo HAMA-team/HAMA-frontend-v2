@@ -34,6 +34,7 @@
     "copy": "복사",
     "copied": "복사됨",
     "receivedResponse": "응답을 받았습니다.",
+    "artifactPromptSeparator": "여기부터 위의 글에 대한 유저의 프롬프트 시작이다.",
     "generating": "응답 생성 중...",
     "sendFailed": "전송 실패",
     "retry": "재전송",

@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Paperclip, ArrowUp } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
+import { usePathname, useRouter } from "next/navigation";
 import { useChatStore } from "@/store/chatStore";
 import { Message } from "@/lib/types/chat";
 import { sendChat } from "@/lib/api/chat";
 import { useAppModeStore } from "@/store/appModeStore";
+import { useArtifactStore } from "@/store/artifactStore";
 
 interface ChatInputProps {
   placeholder?: string;
@@ -33,11 +35,14 @@ export default function ChatInput({
   const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
-  const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel, currentThreadId } = useChatStore();
+  const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel, currentThreadId, clearMessages } = useChatStore();
   const { mode } = useAppModeStore();
+  const { getArtifact } = useArtifactStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const defaultPlaceholder = placeholder || t("chat.inputPlaceholder");
 
@@ -45,6 +50,13 @@ export default function ChatInput({
     e.preventDefault();
     if (message.trim() && message.length <= charLimit) {
       const userMessageContent = message.trim();
+      const fromExternalPage = pathname !== "/";
+
+      if (fromExternalPage) {
+        // 외부 페이지에서 입력 시 항상 새 세션으로 시작
+        clearMessages();
+        setCurrentThreadId("");
+      }
 
       // 사용자 메시지 추가
       const userMessage: Message = {
@@ -73,11 +85,25 @@ export default function ChatInput({
       };
       addMessage(pendingMessage);
 
+      if (fromExternalPage) {
+        router.push("/");
+      }
+
       // API 호출
       try {
         setLoading(true);
 
         // Demo 모드에서는 백엔드 호출 스킵하고 더미 응답 표시
+        // 아티팩트 컨텍스트가 있으면 LLM 입력에는 아티팩트 내용을 선행해 전송(화면에는 미표시)
+        let composedForLLM = userMessageContent;
+        if (fromExternalPage && contextArtifactId) {
+          const art = getArtifact?.(contextArtifactId);
+          if (art?.content) {
+            const sep = t("chat.artifactPromptSeparator");
+            composedForLLM = `${art.content}\n\n---\n${sep}\n\n${userMessageContent}`;
+          }
+        }
+
         const data =
           mode === "demo"
             ? {
@@ -86,7 +112,7 @@ export default function ChatInput({
                 requires_approval: false,
               }
             : await sendChat({
-                message: userMessageContent,
+                message: composedForLLM,
                 conversation_id: currentThreadId || undefined,
                 automation_level: 2,
               });
