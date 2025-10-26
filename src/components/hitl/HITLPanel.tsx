@@ -4,6 +4,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 import { ApprovalRequest } from "@/lib/types/chat";
+import { useAppModeStore } from "@/store/appModeStore";
 
 interface HITLPanelProps {
   request: ApprovalRequest;
@@ -32,17 +33,21 @@ export default function HITLPanel({
   onReject,
 }: HITLPanelProps) {
   const { t } = useTranslation();
+  const { mode } = useAppModeStore();
 
-  const formatCurrency = (amount: number) => {
-    return `₩${amount.toLocaleString()}`;
+  const formatCurrency = (amount?: number) => {
+    if (typeof amount !== "number" || Number.isNaN(amount)) return "-";
+    try { return `₩${amount.toLocaleString()}`; } catch { return `₩${amount}`; }
   };
 
-  const formatNumber = (num: number) => {
-    return num.toLocaleString();
+  const formatNumber = (num?: number) => {
+    if (typeof num !== "number" || Number.isNaN(num)) return "-";
+    try { return num.toLocaleString(); } catch { return String(num); }
   };
 
-  const getTradeTypeLabel = (type: "buy" | "sell") => {
-    return type === "buy" ? t("hitl.buy") : t("hitl.sell");
+  const getTradeTypeLabel = (type?: "buy" | "sell") => {
+    if (type === "sell") return t("hitl.sell");
+    return t("hitl.buy");
   };
 
   const formatPercentage = (value: number) => {
@@ -119,66 +124,64 @@ export default function HITLPanel({
             {t("hitl.orderDetails")}
           </h3>
           <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.stockName")}
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {request.stock_name}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.stockCode")}
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {request.stock_code}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.tradeType")}
-              </span>
-              <span
-                className="text-sm font-medium"
-                style={{
-                  color: request.action === "buy" ? "var(--primary-500)" : "var(--error-500)",
-                }}
-              >
-                {getTradeTypeLabel(request.action)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.orderQuantity")}
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {formatNumber(request.quantity)}{t("hitl.shares")}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.currentPrice")}
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {formatCurrency(request.price)}
-              </span>
-            </div>
-            <div
-              className="flex justify-between pt-3 border-t"
-              style={{ borderColor: "var(--border-default)" }}
-            >
-              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {t("hitl.expectedAmount")} {getTradeTypeLabel(request.action)}{t("hitl.totalAmount")}
-              </span>
-              <span className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
-                {formatCurrency(request.total_amount)}
-              </span>
-            </div>
+            {(() => {
+              const raw: any = request as any;
+              const rows: Array<{ label: string; value: React.ReactNode; present: boolean }[]> = [
+                [
+                  { label: t("hitl.stockName"), value: raw.stock_name ?? "-", present: !!raw.stock_name },
+                  { label: t("hitl.stockCode"), value: raw.stock_code ?? "-", present: !!raw.stock_code },
+                ],
+                [
+                  { label: t("hitl.tradeType"), value: (
+                    <span style={{ color: raw.action === "sell" ? "var(--error-500)" : "var(--primary-500)" }}>
+                      {getTradeTypeLabel(raw.action)}
+                    </span>
+                  ), present: !!raw.action },
+                ],
+                [
+                  { label: t("hitl.orderQuantity"), value: (<>
+                    {formatNumber(raw.quantity)}{typeof raw.quantity === 'number' ? t('hitl.shares') : ''}
+                  </>), present: typeof raw.quantity === 'number' },
+                ],
+                [
+                  { label: t("hitl.currentPrice"), value: formatCurrency(raw.price), present: typeof raw.price === 'number' },
+                ],
+              ];
+              const flat = rows.flat();
+              const filtered = mode === 'live' ? flat.filter(r => r.present) : flat;
+              return (
+                <>
+                  {filtered.map((r, i) => (
+                    <div key={i} className="flex justify-between">
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{r.label}</span>
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{r.value}</span>
+                    </div>
+                  ))}
+                  {(mode !== 'live' || typeof raw.total_amount === 'number') && (
+                    <div className="flex justify-between pt-3 border-t" style={{ borderColor: 'var(--border-default)' }}>
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                        {t('hitl.expectedAmount')} {getTradeTypeLabel(raw.action)}{t('hitl.totalAmount')}
+                      </span>
+                      <span className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
+                        {formatCurrency(raw.total_amount)}
+                      </span>
+                    </div>
+                  )}
+                  {mode === 'live' && filtered.length === 0 && typeof raw.total_amount !== 'number' && (
+                    <div className="p-3 rounded border" style={{ borderColor: 'var(--border-default)' }}>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {raw.message || t('hitl.noDetails')}
+                      </p>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
 
-        {/* Portfolio Weight Impact */}
+        {/* Portfolio Weight Impact (optional) */}
+        {(request as any).current_weight !== undefined && (request as any).expected_weight !== undefined && (
         <div className="mb-6">
           <h3
             className="text-base font-semibold mb-4"
@@ -189,7 +192,7 @@ export default function HITLPanel({
           <div className="flex items-center gap-2 text-sm">
             <span style={{ color: "var(--text-secondary)" }}>{t("hitl.currentWeight")}:</span>
             <span className="font-medium" style={{ color: "var(--text-primary)" }}>
-              {formatPercentage(request.current_weight)}
+              {formatPercentage((request as any).current_weight)}
             </span>
             <span style={{ color: "var(--text-muted)" }}>→</span>
             <span style={{ color: "var(--text-secondary)" }}>{t("hitl.expectedWeight")}:</span>
@@ -197,20 +200,21 @@ export default function HITLPanel({
               className="font-semibold"
               style={{
                 color:
-                  request.expected_weight > 40
+                  (request as any).expected_weight > 40
                     ? "var(--error-500)"
-                    : request.expected_weight > 30
+                    : (request as any).expected_weight > 30
                     ? "var(--warning-500)"
                     : "var(--success-500)",
               }}
             >
-              {formatPercentage(request.expected_weight)}
+              {formatPercentage((request as any).expected_weight)}
             </span>
           </div>
         </div>
+        )}
 
         {/* Alternatives */}
-        {request.alternatives && request.alternatives.length > 0 && (
+        {(request as any).alternatives && (request as any).alternatives.length > 0 && (
           <div className="mb-6">
             <h3
               className="text-base font-semibold mb-4"
@@ -219,7 +223,7 @@ export default function HITLPanel({
               {t("hitl.alternatives")}
             </h3>
             <div className="space-y-3">
-              {request.alternatives.map((alt, index) => (
+              {(request as any).alternatives.map((alt: any, index: number) => (
                 <div
                   key={index}
                   className="p-3 rounded-lg border"
@@ -232,7 +236,7 @@ export default function HITLPanel({
                     {alt.suggestion}
                   </p>
                   <div className="flex gap-4 text-xs" style={{ color: "var(--text-secondary)" }}>
-                    <span>{t("hitl.quantity")}: {formatNumber(alt.adjusted_quantity)}{t("hitl.shares")}</span>
+                    <span>{t("hitl.quantity")}: {formatNumber(alt.adjusted_quantity)}{typeof alt.adjusted_quantity === "number" ? t("hitl.shares") : ""}</span>
                     <span>{t("hitl.amount")}: {formatCurrency(alt.adjusted_amount)}</span>
                   </div>
                 </div>

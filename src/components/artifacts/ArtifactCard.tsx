@@ -68,7 +68,7 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
     <Link href={`/artifacts/${artifact.id}`}>
       <div
         onContextMenu={handleContextMenu}
-        className="group p-6 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer relative"
+        className="group p-6 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer relative h-full flex flex-col min-h-[240px]"
         style={{
           backgroundColor: 'var(--container-background)',
           borderColor: 'var(--border-default)',
@@ -82,24 +82,26 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
           {artifact.icon}
         </div>
 
-        {/* Title */}
-        <h3
-          className="text-lg font-semibold mb-2 line-clamp-2 group-hover:underline"
-          style={{ color: 'var(--text-primary)' }}
-        >
-          {artifact.title}
-        </h3>
+        {/* Title + Summary (flex-1 to push date to bottom) */}
+        <div className="flex-1">
+          <h3
+            className="text-lg font-semibold mb-2 line-clamp-2 group-hover:underline"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {artifact.title}
+          </h3>
 
-        {/* Summary */}
-        <p
-          className="text-sm mb-4 line-clamp-2"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          {artifact.summary}
-        </p>
+          {/* Summary */}
+          <p
+            className="text-sm mb-4 line-clamp-2"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            {artifact.summary}
+          </p>
+        </div>
 
-        {/* Date */}
-        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+        {/* Date (sticks to bottom via flex) */}
+        <p className="text-xs mt-auto" style={{ color: 'var(--text-muted)' }}>
           {formatDate(artifact.createdAt)}
         </p>
 

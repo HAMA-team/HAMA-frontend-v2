@@ -4,10 +4,12 @@
     "cancel": "취소",
     "confirm": "확인",
     "delete": "삭제",
+    "rename": "이름 바꾸기",
     "edit": "수정",
     "close": "닫기",
     "loading": "로딩 중...",
-    "error": "오류가 발생했습니다"
+    "error": "오류가 발생했습니다",
+    "loadMore": "더 보기"
   },
   "nav": {
     "chat": "채팅",
@@ -96,6 +98,7 @@
     "approve": "승인",
     "reject": "거부",
     "approvalNote": "승인 시 즉시 주문이 체결됩니다",
+    "noDetails": "승인을 위한 세부 정보가 포함되지 않았습니다",
     "approved": "매수 주문이 실행되었습니다",
     "rejected": "매수 주문이 거부되었습니다",
     "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"

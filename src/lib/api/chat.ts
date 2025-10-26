@@ -52,3 +52,8 @@ export async function deleteChatHistory(conversationId: string) {
   return data;
 }
 
+// (Optional) Rename endpoint 제공 시 사용 예
+// export async function renameChatSession(conversationId: string, title: string) {
+//   const { data } = await apiClient.patch(`/api/v1/chat/sessions/${conversationId}`, { title });
+//   return data;
+// }

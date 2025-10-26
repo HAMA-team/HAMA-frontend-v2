@@ -46,6 +46,7 @@ export default function LNB() {
   const { mode } = useAppModeStore();
   const [sessions, setSessions] = React.useState<any[]>([]);
   const [loadingSessions, setLoadingSessions] = React.useState<boolean>(false);
+  const [sessionsLimit, setSessionsLimit] = React.useState<number>(20);
   const [menuOpenId, setMenuOpenId] = React.useState<string | null>(null);
   const [menuPos, setMenuPos] = React.useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [editingId, setEditingId] = React.useState<string | null>(null);
@@ -55,7 +56,7 @@ export default function LNB() {
     let mounted = true;
     if (mode === "live") {
       setLoadingSessions(true);
-      getChatSessions(20)
+      getChatSessions(sessionsLimit)
         .then((data: any[]) => {
           if (!mounted) return;
           setSessions(Array.isArray(data) ? data : []);
@@ -72,7 +73,7 @@ export default function LNB() {
     return () => {
       mounted = false;
     };
-  }, [mode]);
+  }, [mode, sessionsLimit]);
 
   // 전역 클릭/ESC로 메뉴 닫기 및 rename 종료
   React.useEffect(() => {
@@ -101,7 +102,7 @@ export default function LNB() {
     let cancelled = false;
     (async () => {
       try {
-        const data: any[] = await getChatSessions(20);
+        const data: any[] = await getChatSessions(sessionsLimit);
         if (!cancelled) setSessions(Array.isArray(data) ? data : []);
       } catch (e) {
         if (!cancelled) console.error("Failed to refresh sessions after thread change", e);
@@ -110,7 +111,7 @@ export default function LNB() {
     return () => {
       cancelled = true;
     };
-  }, [currentThreadId, mode]);
+  }, [currentThreadId, mode, sessionsLimit]);
 
   const openSession = async (conversationId: string) => {
     if (mode !== "live") return;
@@ -178,7 +179,7 @@ export default function LNB() {
   const refreshSessions = async () => {
     if (mode !== "live") return;
     try {
-      const data: any[] = await getChatSessions(20);
+      const data: any[] = await getChatSessions(sessionsLimit);
       setSessions(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error("Failed to refresh sessions", e);
@@ -419,14 +420,19 @@ export default function LNB() {
       </nav>
 
       {/* Recent Chats - 스크롤 영역 */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin mt-4">
+      <div className="flex-1 overflow-y-auto mt-4 hover-scrollbar">
         <div className="px-3">
-          <h2
-            className="text-xs font-semibold uppercase tracking-wide mb-2 px-3 whitespace-nowrap animate-fadeInText"
-            style={{ color: "var(--lnb-text-muted)" }}
+          <div
+            className="px-3 -mx-3 pb-2"
+            style={{ position: "sticky", top: 0, zIndex: 1, backgroundColor: "var(--lnb-background)" }}
           >
-            {t("nav.recentChats")}
-          </h2>
+            <h2
+              className="text-xs font-semibold uppercase tracking-wide whitespace-nowrap animate-fadeInText"
+              style={{ color: "var(--lnb-text-muted)" }}
+            >
+              {t("nav.recentChats")}
+            </h2>
+          </div>
           <div className="flex flex-col gap-0.5">
             {recentChats.map((chat) => (
               <div key={chat.id} className="group relative">
@@ -434,7 +440,7 @@ export default function LNB() {
                   role="button"
                   tabIndex={0}
                   className="flex items-center justify-between gap-2 px-3 h-14 rounded-lg transition-colors duration-150 text-left w-full"
-                  style={{ backgroundColor: "transparent" }}
+                  style={{ backgroundColor: "transparent", cursor: "pointer", userSelect: "none" }}
                   onClick={() => openSession(chat.id)}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)"}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
@@ -465,10 +471,23 @@ export default function LNB() {
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                     <div
                       className="w-7 h-7 flex items-center justify-center rounded hover:opacity-80"
-                      style={{ backgroundColor: "var(--lnb-background)", color: "var(--lnb-text-muted)", border: "1px solid var(--border-default)" }}
+                      style={{ backgroundColor: "var(--lnb-background)", color: "var(--lnb-text-muted)", border: "1px solid var(--border-default)", cursor: "pointer", userSelect: "none" }}
                       role="button"
                       tabIndex={0}
-                      onClick={(e) => { e.stopPropagation(); const rect=(e.currentTarget as HTMLElement).getBoundingClientRect(); setMenuPos({ x: Math.max(8, rect.right - 160), y: rect.bottom + 6 }); setMenuOpenId(menuOpenId === chat.id ? null : chat.id); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        const menuW = 200; // match min-w-[200px]
+                        const margin = 8;
+                        const x = Math.min(
+                          Math.max(margin, rect.right - menuW),
+                          window.innerWidth - menuW - margin
+                        );
+                        const estH = 90; // estimated menu height
+                        const y = Math.min(rect.bottom + margin, window.innerHeight - estH - margin);
+                        setMenuPos({ x, y });
+                        setMenuOpenId(menuOpenId === chat.id ? null : chat.id);
+                      }}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setMenuOpenId(menuOpenId === chat.id ? null : chat.id); } }}
                       aria-label="menu"
                     >
@@ -477,15 +496,27 @@ export default function LNB() {
                   </div>
                 </div>
                 {menuOpenId === chat.id && (
-                  <div className="fixed z-toast min-w-[180px] rounded-md shadow-lg border py-1 pointer-events-auto"
-                       style={{ backgroundColor: "var(--container-background)", borderColor: "var(--border-default)", left: `${menuPos.x}px`, top: `${menuPos.y}px` }}
+                  <div className="fixed z-toast min-w-[200px] rounded-md shadow-lg border py-1 pointer-events-auto"
+                       style={{ backgroundColor: "var(--container-background)", borderColor: "var(--border-default)", left: `${menuPos.x}px`, top: `${menuPos.y}px`, zIndex: 9999 }}
+                       onMouseDown={(e) => e.stopPropagation()}
                        onClick={(e) => e.stopPropagation()}>
-                    <button className="w-full text-left px-3 py-2 text-sm hover:opacity-80" onClick={() => startRename(chat.id, chat.title || '')}>Rename</button>
-                    <button className="w-full text-left px-3 py-2 text-sm hover:opacity-80" style={{ color: "var(--text-error)" }} onClick={() => handleDeleteSession(chat.id)}>Delete</button>
+                    <button className="w-full text-left px-3 py-2 text-sm hover:opacity-80" onClick={() => startRename(chat.id, chat.title || '')}>{t('common.rename')}</button>
+                    <button className="w-full text-left px-3 py-2 text-sm hover:opacity-80" style={{ color: "var(--text-error)" }} onClick={() => handleDeleteSession(chat.id)}>{t('common.delete')}</button>
                   </div>
                 )}
               </div>
             ))}
+            {mode === 'live' && sessions.length >= sessionsLimit && sessionsLimit < 100 && (
+              <div className="px-3 py-2">
+                <button
+                  className="w-full h-9 rounded border text-sm font-medium hover:opacity-80"
+                  style={{ borderColor: 'var(--border-default)', color: 'var(--text-primary)', background: 'transparent' }}
+                  onClick={(e) => { e.stopPropagation(); setSessionsLimit(Math.min(100, sessionsLimit + 20)); }}
+                >
+                  {t('common.loadMore')}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

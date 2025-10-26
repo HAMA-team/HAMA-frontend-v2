@@ -4,10 +4,12 @@
                    "cancel":  "Cancel",
                    "confirm":  "Confirm",
                    "delete":  "Delete",
+                   "rename":  "Rename",
                    "edit":  "Edit",
                    "close":  "Close",
                    "loading":  "Loading...",
-                   "error":  "An error occurred"
+                   "error":  "An error occurred",
+                   "loadMore": "Load more"
                },
     "nav":  {
                 "chat":  "Chat",
@@ -95,6 +97,7 @@
                  "approve":  "Approve",
                  "reject":  "Reject",
                  "approvalNote":  "Order will be executed immediately upon approval",
+                 "noDetails":  "No detailed order information was provided",
                  "approved":  "Buy order has been executed",
                  "rejected":  "Buy order has been rejected",
                  "noActiveThread":  "No active conversation. Please send a message first"
