@@ -34,6 +34,9 @@
     "copy": "Copy",
     "copied": "Copied",
     "receivedResponse": "Received a response.",
+    "generating": "Generating response...",
+    "sendFailed": "Send failed",
+    "retry": "Retry",
     "backendError": "⚠️ **Cannot connect to backend server**",
     "backendErrorDetail": "You can test the UI without backend API in local environment.",
     "emptyState": {

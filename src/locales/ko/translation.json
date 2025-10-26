@@ -34,6 +34,9 @@
     "copy": "복사",
     "copied": "복사됨",
     "receivedResponse": "응답을 받았습니다.",
+    "generating": "응답 생성 중...",
+    "sendFailed": "전송 실패",
+    "retry": "재전송",
     "backendError": "⚠️ **백엔드 서버에 연결할 수 없습니다**",
     "backendErrorDetail": "로컬 환경에서는 백엔드 API 없이도 UI 테스트가 가능합니다.",
     "emptyState": {

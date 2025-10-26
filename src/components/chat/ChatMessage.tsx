@@ -247,11 +247,19 @@ export default function ChatMessage({
 
       {/* Loading State */}
       {message.status === "sending" && (
-        <div className="flex items-center gap-2 mb-4" aria-live="polite" aria-busy="true">
-          <Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--primary-500)" }} strokeWidth={1.5} />
-          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            응답 생성 중...
-          </span>
+        <div className="mb-4" aria-live="polite" aria-busy="true">
+          <div className="flex items-center gap-2 mb-3">
+            <Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--primary-500)" }} strokeWidth={1.5} />
+            <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              {t("chat.generating")}
+            </span>
+          </div>
+          {/* Subtle skeleton lines */}
+          <div className="space-y-2 animate-pulse">
+            <div className="h-4 rounded" style={{ backgroundColor: "var(--lnb-hover-bg)", width: "85%" }} />
+            <div className="h-4 rounded" style={{ backgroundColor: "var(--lnb-hover-bg)", width: "72%" }} />
+            <div className="h-4 rounded" style={{ backgroundColor: "var(--lnb-hover-bg)", width: "60%" }} />
+          </div>
         </div>
       )}
 
@@ -272,7 +280,7 @@ export default function ChatMessage({
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4" style={{ color: "var(--error-500)" }} strokeWidth={1.5} />
             <span className="text-sm font-semibold" style={{ color: "var(--error-600)" }}>
-              전송 실패
+              {t("chat.sendFailed")}
             </span>
           </div>
           <div className="flex gap-2">
@@ -291,7 +299,7 @@ export default function ChatMessage({
                   e.currentTarget.style.backgroundColor = "var(--error-500)";
                 }}
               >
-                재전송
+                {t("chat.retry")}
               </button>
             )}
             {onDelete && (
@@ -310,7 +318,7 @@ export default function ChatMessage({
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
-                삭제
+                {t("common.delete")}
               </button>
             )}
           </div>

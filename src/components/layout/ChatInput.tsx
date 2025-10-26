@@ -31,7 +31,7 @@ export default function ChatInput({
   const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
-  const { addMessage } = useChatStore();
+  const { addMessage, updateMessage, isLoading, setLoading } = useChatStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -59,8 +59,20 @@ export default function ChatInput({
         textareaRef.current.style.height = "auto";
       }
 
+      // API 호출 전: 대기용 assistant 메시지 추가 (로딩 표시)
+      const tempId = `ai-${Date.now()}`;
+      const pendingMessage: Message = {
+        id: tempId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date().toISOString(),
+        status: "sending",
+      };
+      addMessage(pendingMessage);
+
       // API 호출
       try {
+        setLoading(true);
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
         const response = await fetch(`${apiBaseUrl}/api/v1/chat/`, {
           method: "POST",
@@ -79,15 +91,11 @@ export default function ChatInput({
 
         const data = await response.json();
 
-        // AI 응답 메시지 추가
-        const aiMessage: Message = {
-          id: `ai-${Date.now()}`,
-          role: "assistant",
+        // 대기 메시지 업데이트 (콘텐츠 채우기 + 상태 전환)
+        updateMessage(tempId, {
           content: data.message || t("chat.receivedResponse"),
-          timestamp: new Date().toISOString(),
           status: "sent",
-        };
-        addMessage(aiMessage);
+        });
 
         // TODO: HITL 승인 요청 처리
         if (data.requires_approval) {
@@ -95,15 +103,14 @@ export default function ChatInput({
           // openApprovalPanel(data.approval_request);
         }
       } catch (error) {
-        // API 연결 실패 시 에러 메시지
-        const errorMessage: Message = {
-          id: `ai-${Date.now()}`,
-          role: "assistant",
-          content: `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`http://localhost:8000\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: http://localhost:8000/docs\n\n${t("chat.backendErrorDetail")}`,
-          timestamp: new Date().toISOString(),
+        // API 연결 실패 시: 대기 메시지를 에러로 업데이트
+        const errorText = `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`http://localhost:8000\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: http://localhost:8000/docs\n\n${t("chat.backendErrorDetail")}`;
+        updateMessage(tempId, {
+          content: errorText,
           status: "error",
-        };
-        addMessage(errorMessage);
+        });
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -156,6 +163,7 @@ export default function ChatInput({
               ref={textareaRef}
               value={message}
               onChange={handleChange}
+              disabled={isLoading}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -179,17 +187,17 @@ export default function ChatInput({
             {/* Send Button */}
             <button
               type="submit"
-              disabled={!message.trim() || isOverLimit}
+              disabled={isLoading || !message.trim() || isOverLimit}
               className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150 mb-0"
               style={{
-                backgroundColor: message.trim() && !isOverLimit ? "var(--primary-500)" : "var(--border-default)",
-                cursor: message.trim() && !isOverLimit ? "pointer" : "not-allowed",
+                backgroundColor: !isLoading && message.trim() && !isOverLimit ? "var(--primary-500)" : "var(--border-default)",
+                cursor: !isLoading && message.trim() && !isOverLimit ? "pointer" : "not-allowed",
               }}
               aria-label={t("chat.send")}
             >
               <ArrowUp
                 className="w-5 h-5"
-                style={{ color: message.trim() && !isOverLimit ? "var(--lnb-active-text)" : "var(--text-muted)" }}
+                style={{ color: !isLoading && message.trim() && !isOverLimit ? "var(--lnb-active-text)" : "var(--text-muted)" }}
               />
             </button>
           </div>
