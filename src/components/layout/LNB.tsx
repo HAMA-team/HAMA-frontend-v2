@@ -75,14 +75,23 @@ export default function LNB() {
       setCurrentThreadId(conversationId);
       clearMessages();
       const data: any = await getChatHistory(conversationId, 500);
-      if (Array.isArray(data)) {
-        data.forEach((m: any, idx: number) => {
-          const role = m.role === "user" || m.role === "assistant" ? m.role : (m.sender === "user" ? "user" : "assistant");
-          const content = m.message ?? m.content ?? "";
-          const ts = m.timestamp ?? m.created_at ?? new Date().toISOString();
-          addMessage({ id: `restored-${idx}-${Date.now()}`, role, content, timestamp: ts, status: "sent" });
-        });
-      }
+      const list: any[] = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.messages)
+        ? data.messages
+        : Array.isArray(data?.data)
+        ? data.data
+        : Array.isArray(data?.items)
+        ? data.items
+        : [];
+
+      list.forEach((m: any, idx: number) => {
+        const rawRole = m.role ?? m.sender ?? m.author ?? "assistant";
+        const role = String(rawRole).toLowerCase().includes("user") ? "user" : "assistant";
+        const content = m.message ?? m.content ?? m.text ?? "";
+        const ts = m.timestamp ?? m.created_at ?? m.time ?? new Date().toISOString();
+        addMessage({ id: `restored-${idx}-${Date.now()}`, role, content, timestamp: ts, status: "sent" });
+      });
       if (pathname !== "/") {
         router.push("/");
       }
