@@ -41,6 +41,7 @@ export default function LNB() {
   const router = useRouter();
   const { isCollapsed, setCollapsed } = useLNBWidth();
   const { clearMessages, addMessage, setCurrentThreadId } = useChatStore();
+  const currentThreadId = useChatStore((s) => s.currentThreadId);
   const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
   const [sessions, setSessions] = React.useState<any[]>([]);
@@ -68,6 +69,24 @@ export default function LNB() {
       mounted = false;
     };
   }, [mode]);
+
+  // 새로운 세션(conversation_id) 생성 직후 LNB 최근 목록을 즉시 갱신
+  React.useEffect(() => {
+    if (mode !== "live") return;
+    if (!currentThreadId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data: any[] = await getChatSessions(20);
+        if (!cancelled) setSessions(Array.isArray(data) ? data : []);
+      } catch (e) {
+        if (!cancelled) console.error("Failed to refresh sessions after thread change", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentThreadId, mode]);
 
   const openSession = async (conversationId: string) => {
     if (mode !== "live") return;
