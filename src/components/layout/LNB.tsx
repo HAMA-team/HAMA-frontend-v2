@@ -117,6 +117,7 @@ export default function LNB() {
   // 새 채팅 시작
   const handleNewChat = () => {
     clearMessages();
+    setCurrentThreadId("");
     if (pathname !== "/") {
       router.push("/");
     }

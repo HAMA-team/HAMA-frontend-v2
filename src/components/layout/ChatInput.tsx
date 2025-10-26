@@ -33,7 +33,7 @@ export default function ChatInput({
   const { t } = useTranslation();
   const [message, setMessage] = useState("");
   const { width: lnbWidth } = useLNBWidth();
-  const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel } = useChatStore();
+  const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel, currentThreadId } = useChatStore();
   const { mode } = useAppModeStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
@@ -87,6 +87,7 @@ export default function ChatInput({
               }
             : await sendChat({
                 message: userMessageContent,
+                conversation_id: currentThreadId || undefined,
                 automation_level: 2,
               });
 
