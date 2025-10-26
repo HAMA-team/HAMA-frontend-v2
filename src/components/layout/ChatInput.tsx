@@ -118,12 +118,19 @@ export default function ChatInput({
             const sep = t("chat.artifactPromptSeparator");
             const preamble = t("chat.artifactContextPreamble");
             const maxLen = 6000;
-            const ctx = art.content.length > maxLen ? art.content.slice(0, maxLen) + "\n\n…(truncated)" : art.content;
-            composedForLLM = `${preamble}\n\n\`\`\`context\n${ctx}\n\`\`\`\n\n---\n${sep}\n\n${userMessageContent}`;
+            const rawCtx = art.content.length > maxLen ? art.content.slice(0, maxLen) + "\n\n…(truncated)" : art.content;
+            // 숫자식 종목코드(6자리)와 A+6자리 패턴은 공백 삽입으로 마스킹하여 도구 파이프라인 추출 회피
+            const maskedCtx = rawCtx
+              .replace(/\b(\d{6})\b/g, (_m: string, g1: string) => g1.split("").join(" "))
+              .replace(/\bA(\d{6})\b/g, (_m: string, g1: string) => `A ${g1.split("").join(" ")}`);
+            composedForLLM = `${preamble}\n\n\`\`\`context\n${maskedCtx}\n\`\`\`\n\n---\n${sep}\n\n${userMessageContent}`;
             // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해 Advisor 모드로 유도
             desiredLevel = 3;
           }
         }
+
+        // 새 세션 강제 시작 시, 이번 요청의 conversation_id는 무조건 undefined로 보냄
+        const conversationIdForRequest = fromExternalPage ? undefined : (currentThreadId || undefined);
 
         const data =
           mode === "demo"
@@ -134,7 +141,7 @@ export default function ChatInput({
               }
             : await sendChat({
                 message: composedForLLM,
-                conversation_id: currentThreadId || undefined,
+                conversation_id: conversationIdForRequest,
                 automation_level: desiredLevel,
               });
 
