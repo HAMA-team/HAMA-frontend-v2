@@ -119,7 +119,7 @@ export default function ChatInput({
             const preamble = t("chat.artifactContextPreamble");
             const maxLen = 6000;
             const ctx = art.content.length > maxLen ? art.content.slice(0, maxLen) + "\n\n…(truncated)" : art.content;
-            composedForLLM = `${preamble}\n\n${ctx}\n\n---\n${sep}\n\n${userMessageContent}`;
+            composedForLLM = `${preamble}\n\n\`\`\`context\n${ctx}\n\`\`\`\n\n---\n${sep}\n\n${userMessageContent}`;
             // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해 Advisor 모드로 유도
             desiredLevel = 3;
           }

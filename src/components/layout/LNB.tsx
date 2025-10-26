@@ -107,7 +107,14 @@ export default function LNB() {
       list.forEach((m: any, idx: number) => {
         const rawRole = m.role ?? m.sender ?? m.author ?? "assistant";
         const role = String(rawRole).toLowerCase().includes("user") ? "user" : "assistant";
-        const content = m.message ?? m.content ?? m.text ?? "";
+        let content = m.message ?? m.content ?? m.text ?? "";
+        if (role === "user" && typeof content === "string") {
+          content = content.replace(/```context[\s\S]*?```/g, "").trim();
+          const sepIndex = content.indexOf("---");
+          if (sepIndex !== -1) {
+            content = content.slice(sepIndex + 3).trim();
+          }
+        }
         const ts = m.timestamp ?? m.created_at ?? m.time ?? new Date().toISOString();
         addMessage({ id: `restored-${idx}-${Date.now()}`, role, content, timestamp: ts, status: "sent" });
       });
