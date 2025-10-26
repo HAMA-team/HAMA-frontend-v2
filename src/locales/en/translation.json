@@ -94,7 +94,8 @@
     "reject": "Reject",
     "approvalNote": "Order will be executed immediately upon approval",
     "approved": "Buy order has been executed",
-    "rejected": "Buy order has been rejected"
+    "rejected": "Buy order has been rejected",
+    "noActiveThread": "No active conversation. Please send a message first"
   },
   "portfolio": {
     "title": "Portfolio",

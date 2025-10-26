@@ -94,7 +94,8 @@
     "reject": "거부",
     "approvalNote": "승인 시 즉시 주문이 체결됩니다",
     "approved": "매수 주문이 실행되었습니다",
-    "rejected": "매수 주문이 거부되었습니다"
+    "rejected": "매수 주문이 거부되었습니다",
+    "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"
   },
   "portfolio": {
     "title": "포트폴리오",

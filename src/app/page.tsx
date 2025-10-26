@@ -134,6 +134,10 @@ def calculate_portfolio():
 
   const handleApprove = async (messageId: string) => {
     try {
+      if (!currentThreadId) {
+        openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
+        return;
+      }
       // TODO: 실제 API 호출로 대체 필요
       await approveAction({ thread_id: currentThreadId, decision: "approved", automation_level: 2 });
       // const response = await axios.post("/api/v1/chat/approve", {
@@ -221,6 +225,10 @@ def calculate_portfolio():
 
   const handleReject = async (messageId: string) => {
     try {
+      if (!currentThreadId) {
+        openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
+        return;
+      }
       // TODO: 실제 API 호출로 대체 필요
       await approveAction({ thread_id: currentThreadId, decision: "rejected", automation_level: 2 });
       // const response = await axios.post("/api/v1/chat/approve", {
