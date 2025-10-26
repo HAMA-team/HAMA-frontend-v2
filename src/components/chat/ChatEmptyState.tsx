@@ -3,6 +3,7 @@
 import React from "react";
 import { PieChart, TrendingUp, Sparkles, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useAppModeStore } from "@/store/appModeStore";
 
 interface SuggestionCard {
   icon: React.ElementType;
@@ -27,6 +28,7 @@ interface ChatEmptyStateProps {
  */
 export default function ChatEmptyState({ onSuggestionClick, onTestHITL }: ChatEmptyStateProps) {
   const { t } = useTranslation();
+  const { mode } = useAppModeStore();
 
   const suggestions: SuggestionCard[] = [
     {
@@ -126,19 +128,21 @@ export default function ChatEmptyState({ onSuggestionClick, onTestHITL }: ChatEm
           })}
         </div>
 
-        {/* TEST: HITL 패널 테스트 버튼 (개발 완료 후 제거) */}
-        <button
-          onClick={onTestHITL}
-          className="mt-8 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
-          style={{
-            backgroundColor: "var(--warning-500)",
-            color: "var(--lnb-active-text)",
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--warning-600)"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--warning-500)"}
-        >
-          🧪 HITL 패널 테스트
-        </button>
+        {/* TEST: HITL 패널 테스트 버튼 (Demo 모드에서만 표시) */}
+        {mode === "demo" && (
+          <button
+            onClick={onTestHITL}
+            className="mt-8 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
+            style={{
+              backgroundColor: "var(--warning-500)",
+              color: "var(--lnb-active-text)",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--warning-600)"}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--warning-500)"}
+          >
+            {t("chat.hitlTest")}
+          </button>
+        )}
       </div>
     </div>
   );

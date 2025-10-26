@@ -6,6 +6,8 @@ import ChatInput from "@/components/layout/ChatInput";
 import { fetchPortfolioOverview } from "@/lib/api/portfolio";
 import { Portfolio } from "@/lib/types/portfolio";
 import { useTranslation } from "react-i18next";
+import { useAppModeStore } from "@/store/appModeStore";
+import { mockPortfolio } from "@/lib/mock/portfolioData";
 
 /**
  * Portfolio Page
@@ -22,13 +24,18 @@ export default function PortfolioPage() {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { mode } = useAppModeStore();
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const data = await fetchPortfolioOverview();
-        if (mounted) setPortfolio(data);
+        if (mode === "demo") {
+          if (mounted) setPortfolio(mockPortfolio);
+        } else {
+          const data = await fetchPortfolioOverview();
+          if (mounted) setPortfolio(data);
+        }
       } catch (e: any) {
         console.error("Failed to load portfolio:", e);
         if (mounted) setError(e?.message || "Failed to load");
@@ -39,7 +46,7 @@ export default function PortfolioPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [mode]);
 
   return (
     <>

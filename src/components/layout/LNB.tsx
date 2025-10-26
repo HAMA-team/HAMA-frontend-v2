@@ -20,6 +20,8 @@ import LanguageSelector from "@/components/common/LanguageSelector";
 import DevDemoToggle from "@/components/common/DevDemoToggle";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import { formatRelativeOrDate, formatAbsoluteDate } from "@/lib/utils";
+import { useAppModeStore } from "@/store/appModeStore";
+import { getChatSessions } from "@/lib/api/chat";
 
 /**
  * LNB (Left Navigation Bar) Component
@@ -40,6 +42,32 @@ export default function LNB() {
   const { isCollapsed, setCollapsed } = useLNBWidth();
   const { clearMessages } = useChatStore();
   const { t, i18n } = useTranslation();
+  const { mode } = useAppModeStore();
+  const [sessions, setSessions] = React.useState<any[]>([]);
+  const [loadingSessions, setLoadingSessions] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    let mounted = true;
+    if (mode === "live") {
+      setLoadingSessions(true);
+      getChatSessions(20)
+        .then((data: any[]) => {
+          if (!mounted) return;
+          setSessions(Array.isArray(data) ? data : []);
+        })
+        .catch((e) => {
+          if (!mounted) return;
+          console.error("Failed to load chat sessions", e);
+          setSessions([]);
+        })
+        .finally(() => mounted && setLoadingSessions(false));
+    } else {
+      setSessions([]);
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [mode]);
 
   const formatRelative = (ts: number) => {
     const locale = i18n?.language || "en";
@@ -62,14 +90,21 @@ export default function LNB() {
     }
   };
 
-  // Phase 1: Recent Chats는 하드코딩 (Phase 3에서 API 연동)
+  // Recent Chats: Demo는 하드코딩, Live는 API 연동
   const now = Date.now();
   const DAY = 24 * 60 * 60 * 1000;
-  const recentChats = [
-    { id: "1", title: "삼성전자 투자 분석 요청", createdAt: now - 2 * DAY },
-    { id: "2", title: "포트폴리오 리밸런싱", createdAt: now - 5 * DAY },
-    { id: "3", title: "미국 주식 시장 전망", createdAt: now - 7 * DAY },
-  ];
+  const recentChats =
+    mode === "live"
+      ? sessions.map((s: any) => ({
+          id: s.conversation_id,
+          title: s.title || "Untitled",
+          createdAt: s.last_message_at ? Date.parse(s.last_message_at) : (s.created_at ? Date.parse(s.created_at) : now),
+        }))
+      : [
+          { id: "1", title: "삼성전자 투자 분석 요청", createdAt: now - 2 * DAY },
+          { id: "2", title: "포트폴리오 리밸런싱", createdAt: now - 5 * DAY },
+          { id: "3", title: "미국 주식 시장 전망", createdAt: now - 7 * DAY },
+        ];
 
   if (isCollapsed) {
     return (
