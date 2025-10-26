@@ -109,13 +109,19 @@ export default function ChatInput({
         setLoading(true);
 
         // Demo 모드에서는 백엔드 호출 스킵하고 더미 응답 표시
-        // 아티팩트 컨텍스트가 있으면 LLM 입력에는 아티팩트 내용을 선행해 전송(화면에는 미표시)
+        // 아티팩트 컨텍스트가 있으면 LLM 입력에는 아티팩트 내용을 안전하게 선행해 전송(화면에는 미표시)
         let composedForLLM = userMessageContent;
+        let desiredLevel: 1 | 2 | 3 = 2; // 기본: Copilot
         if (fromExternalPage && contextArtifactId) {
           const art = getArtifact?.(contextArtifactId);
           if (art?.content) {
             const sep = t("chat.artifactPromptSeparator");
-            composedForLLM = `${art.content}\n\n---\n${sep}\n\n${userMessageContent}`;
+            const preamble = t("chat.artifactContextPreamble");
+            const maxLen = 6000;
+            const ctx = art.content.length > maxLen ? art.content.slice(0, maxLen) + "\n\n…(truncated)" : art.content;
+            composedForLLM = `${preamble}\n\n${ctx}\n\n---\n${sep}\n\n${userMessageContent}`;
+            // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해 Advisor 모드로 유도
+            desiredLevel = 3;
           }
         }
 
@@ -129,7 +135,7 @@ export default function ChatInput({
             : await sendChat({
                 message: composedForLLM,
                 conversation_id: currentThreadId || undefined,
-                automation_level: 2,
+                automation_level: desiredLevel,
               });
 
         // 대기 메시지 업데이트 (콘텐츠 채우기 + 상태 전환)

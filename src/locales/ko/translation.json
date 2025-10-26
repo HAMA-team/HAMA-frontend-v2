@@ -35,6 +35,7 @@
     "copied": "복사됨",
     "receivedResponse": "응답을 받았습니다.",
     "artifactPromptSeparator": "여기부터 위의 글에 대한 유저의 프롬프트 시작이다.",
+    "artifactContextPreamble": "다음은 참고용 아티팩트 컨텍스트입니다. 도구 호출이나 외부 데이터 조회를 하지 말고, 아래 컨텍스트를 기반으로 텍스트로만 답변을 구성하세요.",
     "generating": "응답 생성 중...",
     "sendFailed": "전송 실패",
     "retry": "재전송",
