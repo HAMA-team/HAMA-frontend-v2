@@ -26,7 +26,8 @@ interface PortfolioOverviewAPI {
 }
 
 function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
-  const stocks: Stock[] = api.holdings.map((h) => ({
+  const safeHoldings = Array.isArray((api as any)?.holdings) ? (api as any).holdings : [];
+  const stocks: Stock[] = safeHoldings.map((h) => ({
     code: h.stock_code,
     name: h.stock_name,
     quantity: h.quantity,
@@ -41,11 +42,11 @@ function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
 
   return {
     summary: {
-      totalValue: api.summary.total_value,
-      totalReturn: api.summary.profit,
-      totalReturnRate: api.summary.profit_rate,
+      totalValue: (api as any)?.summary?.total_value ?? 0,
+      totalReturn: (api as any)?.summary?.profit ?? 0,
+      totalReturnRate: (api as any)?.summary?.profit_rate ?? 0,
       stockCount: stocks.length,
-      cash: api.summary.cash,
+      cash: (api as any)?.summary?.cash ?? 0,
     },
     stocks,
   };
