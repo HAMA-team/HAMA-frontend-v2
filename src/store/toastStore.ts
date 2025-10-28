@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 /**
  * Toast Store (Zustand)
@@ -13,12 +13,12 @@ import { create } from "zustand";
 interface ToastState {
   isVisible: boolean;
   message: string;
-  type: "success" | "error" | "info";
+  type: 'success' | 'error' | 'info';
   linkText?: string;
   linkHref?: string;
   showToast: (
     message: string,
-    type?: "success" | "error" | "info",
+    type?: 'success' | 'error' | 'info',
     linkText?: string,
     linkHref?: string
   ) => void;
@@ -27,11 +27,11 @@ interface ToastState {
 
 export const useToastStore = create<ToastState>((set) => ({
   isVisible: false,
-  message: "",
-  type: "success",
+  message: '',
+  type: 'success',
   linkText: undefined,
   linkHref: undefined,
-  showToast: (message, type = "success", linkText, linkHref) =>
+  showToast: (message, type = 'success', linkText, linkHref) =>
     set({
       isVisible: true,
       message,
@@ -42,7 +42,7 @@ export const useToastStore = create<ToastState>((set) => ({
   hideToast: () =>
     set({
       isVisible: false,
-      message: "",
+      message: '',
       linkText: undefined,
       linkHref: undefined,
     }),

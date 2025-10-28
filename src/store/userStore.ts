@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 /**
  * User Store (Zustand + Persist)
@@ -15,7 +15,7 @@ import { persist } from "zustand/middleware";
 export type AutomationLevel = 1 | 2 | 3;
 
 export interface InvestmentProfile {
-  type: "안정형" | "안정추구형" | "위험중립형" | "공격투자형";
+  type: '안정형' | '안정추구형' | '위험중립형' | '공격투자형';
   description: string; // LLM 생성 서술형 프로필
   last_updated: string;
 }
@@ -80,7 +80,7 @@ export const useUserStore = create<UserStore>()(
         }),
     }),
     {
-      name: "hama-user-storage", // LocalStorage key
+      name: 'hama-user-storage', // LocalStorage key
       partialize: (state) => ({
         // 저장할 state만 선택 (userInfo는 제외 - 보안)
         automationLevel: state.automationLevel,

@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-type Theme = "light" | "dark";
+type Theme = 'light' | 'dark';
 
 interface ThemeState {
   theme: Theme;
@@ -12,30 +12,30 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: "light",
+      theme: 'light',
       setTheme: (theme) => {
         set({ theme });
         // Apply theme class to html element
-        if (typeof window !== "undefined") {
+        if (typeof window !== 'undefined') {
           const root = document.documentElement;
-          root.classList.remove("light", "dark");
+          root.classList.remove('light', 'dark');
           root.classList.add(theme);
         }
       },
       toggleTheme: () =>
         set((state) => {
-          const newTheme = state.theme === "light" ? "dark" : "light";
+          const newTheme = state.theme === 'light' ? 'dark' : 'light';
           // Apply theme class to html element
-          if (typeof window !== "undefined") {
+          if (typeof window !== 'undefined') {
             const root = document.documentElement;
-            root.classList.remove("light", "dark");
+            root.classList.remove('light', 'dark');
             root.classList.add(newTheme);
           }
           return { theme: newTheme };
         }),
     }),
     {
-      name: "hama-theme", // LocalStorage key
+      name: 'hama-theme', // LocalStorage key
     }
   )
 );

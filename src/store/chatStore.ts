@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { Message, ApprovalRequest } from "@/lib/types/chat";
+import { create } from 'zustand';
+import { Message, ApprovalRequest, ThinkingStep } from '@/lib/types/chat';
 
 /**
  * Chat Store (Zustand)
@@ -44,7 +44,7 @@ interface ChatStore {
 export const useChatStore = create<ChatStore>((set) => ({
   // Initial State
   messages: [],
-  currentThreadId: "",
+  currentThreadId: '',
   isLoading: false,
   isHistoryLoading: false,
   approvalPanel: {
@@ -96,11 +96,11 @@ export const useChatStore = create<ChatStore>((set) => ({
         ...state.messages,
         {
           id: tempId,
-          role: "assistant",
-          content: "",
+          role: 'assistant',
+          content: '',
           thinking: [],
           timestamp: new Date().toISOString(),
-          status: "sending",
+          status: 'sending',
         },
       ],
     })),
@@ -108,7 +108,7 @@ export const useChatStore = create<ChatStore>((set) => ({
   appendAssistantContent: (messageId, delta) =>
     set((state) => ({
       messages: state.messages.map((m) =>
-        m.id === messageId ? { ...m, content: (m.content || "") + delta } : m
+        m.id === messageId ? { ...m, content: (m.content || '') + delta } : m
       ),
     })),
 
@@ -124,7 +124,7 @@ export const useChatStore = create<ChatStore>((set) => ({
   finishAssistantMessage: (messageId, final) =>
     set((state) => ({
       messages: state.messages.map((m) =>
-        m.id === messageId ? { ...m, ...final, status: final?.status ?? "sent" } : m
+        m.id === messageId ? { ...m, ...final, status: final?.status ?? 'sent' } : m
       ),
     })),
 

@@ -1,9 +1,9 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
-import translationKO from "@/locales/ko/translation.json";
-import translationEN from "@/locales/en/translation.json";
+import translationKO from '@/locales/ko/translation.json';
+import translationEN from '@/locales/en/translation.json';
 
 /**
  * i18n Configuration
@@ -26,20 +26,20 @@ const resources = {
 };
 
 // 클라이언트 사이드에서만 초기화
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
       resources,
-      fallbackLng: "ko",
+      fallbackLng: 'ko',
       debug: false,
       interpolation: {
         escapeValue: false,
       },
       detection: {
-        order: ["localStorage", "navigator"],
-        caches: ["localStorage"],
+        order: ['localStorage', 'navigator'],
+        caches: ['localStorage'],
       },
       react: {
         useSuspense: false, // SSR 지원 비활성화
