@@ -28,6 +28,10 @@ export async function startMultiAgentStream({
     "Content-Type": "application/json",
     Accept: "text/event-stream",
   };
+  // ngrok free plan warning bypass
+  if (/ngrok/.test(baseURL)) {
+    headers["ngrok-skip-browser-warning"] = "true";
+  }
   // Carry auth header if present in axios client
   const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
   if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -92,4 +96,3 @@ export async function startMultiAgentStream({
   // Flush any trailing buffer
   if (buffer.trim().length > 0) flushSSE("\n\n");
 }
-
