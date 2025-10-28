@@ -47,13 +47,13 @@ export default function PortfolioView({ portfolio }: PortfolioViewProps) {
   const renderChart = () => {
     switch (chartType) {
       case "treemap":
-        return <PortfolioTreemap stocks={portfolio.stocks} />;
+        return <PortfolioTreemap stocks={portfolio.stocks || []} />;
       case "pie":
-        return <PortfolioPieChart stocks={portfolio.stocks} />;
+        return <PortfolioPieChart stocks={portfolio.stocks || []} />;
       case "bar":
-        return <PortfolioBarChart stocks={portfolio.stocks} />;
+        return <PortfolioBarChart stocks={portfolio.stocks || []} />;
       default:
-        return <PortfolioTreemap stocks={portfolio.stocks} />;
+        return <PortfolioTreemap stocks={portfolio.stocks || []} />;
     }
   };
 

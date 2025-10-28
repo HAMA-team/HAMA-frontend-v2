@@ -32,7 +32,7 @@ interface PortfolioBarChartProps {
  * @see ProductRequirements.md - US-3.1 포트폴리오 즉시 시각화
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
-export default function PortfolioBarChart({ stocks }: PortfolioBarChartProps) {
+export default function PortfolioBarChart({ stocks = [] }: PortfolioBarChartProps) {
   const { getReturnColor } = useChartColors();
 
   // 수익률 높은 순으로 정렬

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import dynamic from "next/dynamic";
@@ -6,6 +6,7 @@ import ChatView from "@/components/chat/ChatView";
 import HITLPanel from "@/components/hitl/HITLPanel";
 import { useChatStore } from "@/store/chatStore";
 import { useArtifactStore } from "@/store/artifactStore";
+import { createArtifact } from "@/lib/api/artifacts";
 import { Message, ThinkingStep } from "@/lib/types/chat";
 import { useDialogStore } from "@/store/dialogStore";
 import { approveAction } from "@/lib/api/chat";
@@ -119,7 +120,7 @@ def calculate_portfolio():
     deleteMessage(messageId);
   };
 
-  const handleSaveArtifact = (messageId: string) => {
+  const handleSaveArtifact = async (messageId: string) => {
     // Find the message to save
     const message = messages.find((msg) => msg.id === messageId);
     if (!message || message.role !== "assistant") {
@@ -128,8 +129,26 @@ def calculate_portfolio():
     }
 
     // Save as artifact
-    const artifact = addArtifact(message.content, "📄");
-    console.log("Artifact saved:", artifact);
+    if (mode === "live") {
+      try {
+        const firstLine = (message.content || "").split("\n")[0]?.replace(/^#\s*/, "").trim() || "Artifact";
+        const res = await createArtifact({
+          title: firstLine,
+          content: message.content,
+          artifact_type: "analysis",
+          metadata: { created_from_message_id: messageId },
+        });
+        const artifact = addArtifact(message.content, "📄");
+        console.log("Artifact saved (server+local):", res?.artifact_id || res?.id, artifact.id);
+      } catch (e) {
+        console.error("Server artifact save failed; using local store only:", e);
+        const artifact = addArtifact(message.content, "📄");
+        console.log("Artifact saved (local):", artifact.id);
+      }
+    } else {
+      const artifact = addArtifact(message.content, "📄");
+      console.log("Artifact saved:", artifact);
+    }
 
     // Note: Toast is automatically shown by SaveArtifactButton
   };
@@ -262,3 +281,6 @@ def calculate_portfolio():
     </div>
   );
 }
+
+
+

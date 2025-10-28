@@ -21,7 +21,7 @@ interface PortfolioPieChartProps {
  * @see ProductRequirements.md - US-3.1 포트폴리오 즉시 시각화
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
-export default function PortfolioPieChart({ stocks }: PortfolioPieChartProps) {
+export default function PortfolioPieChart({ stocks = [] }: PortfolioPieChartProps) {
   const { chartColors } = useChartColors();
 
   // 종목별로 직접 표시 (섹터 그룹화 제거)
