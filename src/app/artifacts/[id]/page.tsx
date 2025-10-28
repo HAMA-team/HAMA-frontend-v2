@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useArtifactStore } from '@/store/artifactStore';
 import { formatDate } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ArrowLeft, Download, Share2, Trash2 } from 'lucide-react';
 import { useDialogStore } from '@/store/dialogStore';
 
@@ -181,6 +182,7 @@ export default function ArtifactDetailPage() {
               }}
             >
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   // Headings
                   h1: ({ node, ...props }) => (
@@ -306,6 +308,42 @@ export default function ArtifactDetailPage() {
                       }}
                       target="_blank"
                       rel="noopener noreferrer"
+                      {...props}
+                    />
+                  ),
+                  // Tables (GFM)
+                  table: ({ node, ...props }) => (
+                    <table
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        marginBottom: "16px",
+                        tableLayout: "auto",
+                        wordBreak: "break-word",
+                      }}
+                      {...props}
+                    />
+                  ),
+                  th: ({ node, ...props }) => (
+                    <th
+                      style={{
+                        border: "1px solid var(--border-default)",
+                        padding: "8px",
+                        backgroundColor: "var(--lnb-recent-hover)",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        color: "var(--text-primary)",
+                      }}
+                      {...props}
+                    />
+                  ),
+                  td: ({ node, ...props }) => (
+                    <td
+                      style={{
+                        border: "1px solid var(--border-default)",
+                        padding: "8px",
+                        color: "var(--text-primary)",
+                      }}
                       {...props}
                     />
                   ),

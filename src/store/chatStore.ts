@@ -18,6 +18,7 @@ interface ChatStore {
   messages: Message[];
   currentThreadId: string;
   isLoading: boolean;
+  isHistoryLoading: boolean; // 세션 히스토리 전환/복원 로딩 전용
   approvalPanel: {
     isOpen: boolean;
     data: ApprovalRequest | null;
@@ -29,7 +30,13 @@ interface ChatStore {
   deleteMessage: (messageId: string) => void;
   clearMessages: () => void;
   setLoading: (loading: boolean) => void;
+  setHistoryLoading: (loading: boolean) => void;
   setCurrentThreadId: (threadId: string) => void;
+  // Streaming helpers
+  beginAssistantMessage: (tempId: string) => void;
+  appendAssistantContent: (messageId: string, delta: string) => void;
+  addThinkingStep: (messageId: string, step: ThinkingStep) => void;
+  finishAssistantMessage: (messageId: string, final?: Partial<Message>) => void;
   openApprovalPanel: (data: ApprovalRequest) => void;
   closeApprovalPanel: () => void;
 }
@@ -39,6 +46,7 @@ export const useChatStore = create<ChatStore>((set) => ({
   messages: [],
   currentThreadId: "",
   isLoading: false,
+  isHistoryLoading: false,
   approvalPanel: {
     isOpen: false,
     data: null,
@@ -72,10 +80,53 @@ export const useChatStore = create<ChatStore>((set) => ({
       isLoading: loading,
     }),
 
+  setHistoryLoading: (loading) =>
+    set({
+      isHistoryLoading: loading,
+    }),
+
   setCurrentThreadId: (threadId) =>
     set({
       currentThreadId: threadId,
     }),
+
+  beginAssistantMessage: (tempId) =>
+    set((state) => ({
+      messages: [
+        ...state.messages,
+        {
+          id: tempId,
+          role: "assistant",
+          content: "",
+          thinking: [],
+          timestamp: new Date().toISOString(),
+          status: "sending",
+        },
+      ],
+    })),
+
+  appendAssistantContent: (messageId, delta) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === messageId ? { ...m, content: (m.content || "") + delta } : m
+      ),
+    })),
+
+  addThinkingStep: (messageId, step) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === messageId
+          ? { ...m, thinking: [...(m.thinking || []), step] }
+          : m
+      ),
+    })),
+
+  finishAssistantMessage: (messageId, final) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === messageId ? { ...m, ...final, status: final?.status ?? "sent" } : m
+      ),
+    })),
 
   openApprovalPanel: (data) =>
     set({

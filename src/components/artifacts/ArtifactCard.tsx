@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { Artifact, useArtifactStore } from '@/store/artifactStore';
-import { formatDate } from '@/lib/utils';
+import { formatRelativeOrDate, formatAbsoluteDate } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useDialogStore } from '@/store/dialogStore';
 
@@ -19,7 +19,7 @@ interface ArtifactCardProps {
  */
 export default function ArtifactCard({ artifact }: ArtifactCardProps) {
   const { deleteArtifact } = useArtifactStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const { openConfirm } = useDialogStore();
@@ -101,8 +101,12 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
         </div>
 
         {/* Date (sticks to bottom via flex) */}
-        <p className="text-xs mt-auto" style={{ color: 'var(--text-muted)' }}>
-          {formatDate(artifact.createdAt)}
+        <p
+          className="text-xs mt-auto"
+          style={{ color: 'var(--text-muted)' }}
+          title={formatAbsoluteDate(artifact.createdAt, i18n?.language || 'en')}
+        >
+          {formatRelativeOrDate(artifact.createdAt, i18n?.language || 'en', 30)}
         </p>
 
         {/* Context Menu */}

@@ -154,6 +154,28 @@
     "mypage":  {
                    "title":  "My Page",
                    "subtitle":  "Account settings and preferences",
+                   "apiStatus": {
+                      "header": "API Status (Temporary)",
+                      "title": "Endpoint Connectivity",
+                      "subtitleLive": "Checks connectivity for endpoints below.",
+                      "subtitleDemo": "Demo mode: network calls are skipped.",
+                      "checkNow": "Check now",
+                      "lastChecked": "Last checked just now",
+                      "notCheckedYet": "Not checked yet",
+                      "items": {
+                        "artifacts": "Artifacts",
+                        "approvals": "Approvals (History)",
+                        "automationLevel": "Automation Level (current)",
+                        "automationLevels": "Automation Levels (options)",
+                        "portfolioChart": "Portfolio Chart Data"
+                      },
+                      "status": {
+                        "idle": "Idle",
+                        "success": "OK",
+                        "error": "Error",
+                        "skipped": "Skipped"
+                      }
+                   },
                    "user":  {
                                 "title":  "User Information",
                                 "demoName":  "Demo User"

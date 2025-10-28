@@ -155,6 +155,28 @@
   "mypage": {
     "title": "마이페이지",
     "subtitle": "계정 설정 및 환경 설정",
+    "apiStatus": {
+      "header": "API 상태 확인(임시)",
+      "title": "엔드포인트 연결 상태",
+      "subtitleLive": "아래 엔드포인트의 연결을 점검합니다.",
+      "subtitleDemo": "데모 모드: 네트워크 호출은 생략됩니다.",
+      "checkNow": "지금 점검",
+      "lastChecked": "방금 전 점검됨",
+      "notCheckedYet": "아직 점검하지 않았습니다",
+      "items": {
+        "artifacts": "아티팩트",
+        "approvals": "승인 이력",
+        "automationLevel": "자동화 레벨(현재)",
+        "automationLevels": "자동화 레벨(옵션)",
+        "portfolioChart": "포트폴리오 차트 데이터"
+      },
+      "status": {
+        "idle": "대기",
+        "success": "정상",
+        "error": "오류",
+        "skipped": "생략"
+      }
+    },
     "user": {
       "title": "사용자 정보",
       "demoName": "데모 사용자"

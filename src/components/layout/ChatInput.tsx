@@ -7,9 +7,11 @@ import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { usePathname, useRouter } from "next/navigation";
 import { useChatStore } from "@/store/chatStore";
 import { Message } from "@/lib/types/chat";
-import { sendChat } from "@/lib/api/chat";
+import { sendChat, getChatSessions } from "@/lib/api/chat";
+import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useAppModeStore } from "@/store/appModeStore";
 import { useArtifactStore } from "@/store/artifactStore";
+import { ThinkingStep } from "@/lib/types/chat";
 
 interface ChatInputProps {
   placeholder?: string;
@@ -132,50 +134,223 @@ export default function ChatInput({
         // 새 세션 강제 시작 시, 이번 요청의 conversation_id는 무조건 undefined로 보냄
         const conversationIdForRequest = fromExternalPage ? undefined : (currentThreadId || undefined);
 
-        const data =
-          mode === "demo"
-            ? {
-                message: t("chat.receivedResponse"),
-                conversation_id: `demo-${Date.now()}`,
-                requires_approval: false,
-              }
-            : await sendChat({
-                message: composedForLLM,
-                conversation_id: conversationIdForRequest,
-                automation_level: desiredLevel,
-              });
-
-        // 대기 메시지 업데이트 (콘텐츠 채우기 + 상태 전환)
-        updateMessage(tempId, {
-          content: data.message || t("chat.receivedResponse"),
-          status: "sent",
-        });
-
-        // 스레드 ID 저장 (승인/후속 대화용)
-        if (data.conversation_id) {
-          setCurrentThreadId(data.conversation_id);
-        }
-
-        // 승인 필요 시 패널 오픈
-        if (data.requires_approval && data.approval_request) {
+        // 헬퍼: 스트림 최종 페이로드를 Markdown으로 정리
+        const formatFinalMarkdown = (data: any): string => {
           try {
-            // 백엔드 approval_request는 유연 스키마이므로 그대로 전달
-            // 패널에서는 기대하는 필드가 없을 수 있어, 최소 가드만 두고 시도
-            openApprovalPanel(data.approval_request as any);
-          } catch (e) {
-            // 패널 스키마 불일치 시에도 채팅은 정상 동작하도록 무시
-            console.warn("Approval panel data mismatch", e);
+            if (!data) return t("chat.receivedResponse");
+            if (typeof data === "string") return data;
+            if (typeof data?.message === "string" && data.message.trim()) return data.message;
+            // Consensus 기반 요약 구성
+            const c = data?.consensus;
+            if (c) {
+              const rec = c.recommendation ?? "";
+              const tp = c.target_price ?? c.targetPrice ?? "";
+              const cp = c.current_price ?? c.currentPrice ?? "";
+              const up = c.upside_potential ?? c.upsidePotential ?? "";
+              const conf = c.confidence ?? "";
+              const summary = c.summary ?? "";
+              const bulls: string[] = Array.isArray(c.bull_case) ? c.bull_case.slice(0, 5) : [];
+              const bears: string[] = Array.isArray(c.bear_case) ? c.bear_case.slice(0, 5) : [];
+              let md = `# 추천: ${rec}\n\n- 목표가: ${tp}\n- 현재가: ${cp}\n- 상승여력: ${up}\n- 신뢰도: ${conf}/5`;
+              if (summary) md += `\n\n## 요약\n${summary}`;
+              if (bulls.length) md += `\n\n## Bull Case\n${bulls.map((b) => `- ${b}`).join("\n")}`;
+              if (bears.length) md += `\n\n## Bear Case\n${bears.map((b) => `- ${b}`).join("\n")}`;
+              return md;
+            }
+            // Research 메시지의 마지막 ai 응답 사용
+            const msgs = data?.research?.messages;
+            if (Array.isArray(msgs)) {
+              const lastAI = [...msgs].reverse().find((m: any) => (m?.type || m?.role) === "ai");
+              if (lastAI?.content) return String(lastAI.content);
+            }
+            // 알 수 없는 경우: JSON 을 코드블럭으로 정리하여 덤프 (가로 스크롤 방지)
+            return "```json\n" + JSON.stringify(data, null, 2) + "\n```";
+          } catch {
+            return t("chat.receivedResponse");
           }
-        }
+        };
 
-        // TODO: HITL 승인 요청 처리
-        if (data.requires_approval) {
-          console.log("Approval required:", data.approval_request);
-          // openApprovalPanel(data.approval_request);
+        if (mode === "demo") {
+          const data = {
+            message: t("chat.receivedResponse"),
+            conversation_id: `demo-${Date.now()}`,
+            requires_approval: false,
+          };
+          updateMessage(tempId, {
+            content: data.message,
+            status: "sent",
+          });
+          setCurrentThreadId(data.conversation_id);
+        } else {
+          // Live: 우선 스트림 시도, 실패 시 REST 폴백
+          try {
+            // 스트림 시작 전, pending 메시지는 이미 추가됨 (tempId)
+            let lastCid: string | null = null;
+            await startMultiAgentStream({
+              message: composedForLLM,
+              conversation_id: conversationIdForRequest,
+              automation_level: desiredLevel,
+              onEvent: (ev) => {
+                const now = new Date().toISOString();
+                // 스트림 중 서버가 thread/conversation id를 제공하면 즉시 저장하여 LNB 갱신 유도
+                try {
+                  const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+                  if (providedId && !useChatStore.getState().currentThreadId) {
+                    setCurrentThreadId(String(providedId));
+                  }
+                } catch {}
+                switch (ev.event) {
+                  case "master_start":
+                    updateMessage(tempId, { status: "sending" });
+                    break;
+                  case "master_routing": {
+                    const agents = ev.data?.agents?.join?.(", ") || "agents";
+                    useChatStore.getState().addThinkingStep(tempId, {
+                      agent: "planner",
+                      description: `Routing: ${agents}`,
+                      timestamp: now,
+                    });
+                    break; }
+                  case "agent_start": {
+                    const agent = String(ev.data?.agent || "researcher").toLowerCase().includes("strategy") ? "strategy" : (String(ev.data?.agent||"").toLowerCase().includes("research") ? "researcher" : "planner");
+                    useChatStore.getState().addThinkingStep(tempId, {
+                      agent: agent as any,
+                      description: `${ev.data?.agent || "Agent"} start`,
+                      timestamp: now,
+                    });
+                    break; }
+                  case "agent_node": {
+                    const label = ev.data?.node ? `${ev.data.agent}: ${ev.data.node} ${ev.data.status || "running"}` : `${ev.data?.agent}: running`;
+                    useChatStore.getState().addThinkingStep(tempId, {
+                      agent: "researcher",
+                      description: label,
+                      timestamp: now,
+                    });
+                    break; }
+                  case "agent_llm_start":
+                  case "agent_llm_end": {
+                    useChatStore.getState().addThinkingStep(tempId, {
+                      agent: "researcher",
+                      description: `${ev.data?.agent || "LLM"} ${ev.event.replace("agent_llm_", "LLM ")}`,
+                      timestamp: now,
+                    });
+                    break; }
+                  case "agent_complete": {
+                    const summary = ev.data?.result ? String(ev.data.result).slice(0, 120) : "complete";
+                    useChatStore.getState().addThinkingStep(tempId, {
+                      agent: "researcher",
+                      description: `${ev.data?.agent || "Agent"} complete: ${summary}`,
+                      timestamp: now,
+                    });
+                    break; }
+                  case "message_delta":
+                  case "delta": {
+                    let delta: any = ev.data?.delta ?? ev.data?.contentDelta ?? ev.data;
+                    if (typeof delta === "string") {
+                      if (delta) useChatStore.getState().appendAssistantContent(tempId, delta);
+                    } else if (delta && typeof delta?.text === "string") {
+                      useChatStore.getState().appendAssistantContent(tempId, delta.text);
+                    }
+                    break; }
+                  case "master_aggregating": {
+                    useChatStore.getState().addThinkingStep(tempId, {
+                      agent: "planner",
+                      description: "Aggregating results…",
+                      timestamp: now,
+                    });
+                    break; }
+                  case "master_complete": {
+                    const text = formatFinalMarkdown(ev.data);
+                    updateMessage(tempId, { content: text, status: "sent" });
+                    const cid = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+                    if (cid) { lastCid = String(cid); setCurrentThreadId(String(cid)); }
+                    // LNB 세션 목록 새로고침 알림
+                    try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
+                    break; }
+                  case "done": {
+                    // 최종 텍스트가 JSON 그대로 누적된 경우 Markdown으로 정리
+                    const m = useChatStore.getState().messages.find(m => m.id === tempId);
+                  if (m && m.content && m.content.trim().startsWith('{')) {
+                    try {
+                      const obj = JSON.parse(m.content);
+                      const text = formatFinalMarkdown(obj);
+                      updateMessage(tempId, { content: text, status: m.status === 'error' ? 'error' : 'sent' });
+                    } catch { /* ignore */ }
+                  }
+                  // 스트림 종료 시 CID가 없으면 최신 세션으로 보정 시도
+                  (async () => {
+                    try {
+                      const cur = useChatStore.getState().currentThreadId;
+                      if (!cur && !lastCid && mode === 'live') {
+                        const list: any[] = await getChatSessions(1);
+                        const top = Array.isArray(list) ? list[0] : null;
+                        const alt = top?.conversation_id || top?.id || top?.thread_id || top?.uuid;
+                        if (alt) {
+                          setCurrentThreadId(String(alt));
+                          try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
+                        }
+                      }
+                    } catch { /* noop */ }
+                  })();
+                  // 세션 목록 새로고침 트리거
+                  try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
+                  break; }
+                  case "hitl.request": {
+                    if (ev.data) {
+                      try { openApprovalPanel(ev.data as any); } catch { /* noop */ }
+                    }
+                    break; }
+                  case "error": {
+                    const msg = ev.data?.message || "Stream error";
+                    updateMessage(tempId, { content: msg, status: "error" });
+                    break; }
+                  case "done":
+                  default: {
+                    // no-op
+                  }
+                }
+              },
+            });
+            // 만약 master_complete에서 content가 안 왔다면 안전하게 sent로 전환
+            const m = useChatStore.getState().messages.find(m => m.id === tempId);
+            if (m && m.status === "sending") {
+              updateMessage(tempId, { status: "sent" });
+            }
+          } catch (streamErr) {
+            // 폴백: 단발 응답 REST
+            const data = await sendChat({
+              message: composedForLLM,
+              conversation_id: conversationIdForRequest,
+              automation_level: desiredLevel,
+            });
+            updateMessage(tempId, { content: data.message || t("chat.receivedResponse"), status: "sent" });
+            const cid = (data as any)?.conversation_id || (data as any)?.thread_id || (data as any)?.id || (data as any)?.metadata?.conversation_id;
+            if (cid) {
+              setCurrentThreadId(String(cid));
+              // LNB 세션 목록 새로고침 알림 (REST 폴백 경로에서도 보장)
+              try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
+            } else if (mode === 'live') {
+              // 응답에 CID가 없으면 최신 세션으로 보정 시도
+              try {
+                const list: any[] = await getChatSessions(1);
+                const top = Array.isArray(list) ? list[0] : null;
+                const alt = top?.conversation_id || top?.id || top?.thread_id || top?.uuid;
+                if (alt) {
+                  setCurrentThreadId(String(alt));
+                  try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
+                }
+              } catch { /* noop */ }
+            }
+            if (data.requires_approval && data.approval_request) {
+              try { openApprovalPanel(data.approval_request as any); } catch {}
+            }
+          }
         }
       } catch (error) {
         // API 연결 실패 시: 대기 메시지를 에러로 업데이트
-        const errorText = `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`http://localhost:8000\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: http://localhost:8000/docs\n\n${t("chat.backendErrorDetail")}`;
+        const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
+        const docsUrl = `${apiBase}/docs`;
+        const errorText = `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`${apiBase}\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: ${docsUrl}\n\n${t("chat.backendErrorDetail")}`;
         updateMessage(tempId, {
           content: errorText,
           status: "error",

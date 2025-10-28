@@ -56,3 +56,16 @@ export async function fetchPortfolioOverview(): Promise<Portfolio> {
   return mapOverviewToPortfolio(data);
 }
 
+// Chart data (minimal shape for health check)
+export interface PortfolioChartDataResponse {
+  treemap?: Array<{ name: string; value: number; code?: string }>;
+  pie?: Array<{ name: string; value: number }>;
+  updated_at?: string;
+}
+
+export async function fetchPortfolioChartData() {
+  const { data } = await apiClient.get<PortfolioChartDataResponse>(
+    "/api/v1/portfolio/chart-data"
+  );
+  return data;
+}

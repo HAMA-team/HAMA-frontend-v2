@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { formatRelativeTime, formatAbsoluteDate } from "@/lib/utils";
 import { ChevronDown, FileText, Search, Lightbulb } from "lucide-react";
 import { ThinkingStep, AgentType } from "@/lib/types/chat";
 
@@ -55,22 +57,10 @@ const getAgentName = (agent: AgentType): string => {
   }
 };
 
-/**
- * 시간 포맷팅 (예: "2초 전")
- * TODO: i18n 적용 시 번역 필요
- */
-const formatTime = (timestamp: string): string => {
-  const now = new Date();
-  const time = new Date(timestamp);
-  const diff = Math.floor((now.getTime() - time.getTime()) / 1000);
-
-  if (diff < 60) return `${diff}초 전`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
-  return `${Math.floor(diff / 3600)}시간 전`;
-};
 
 export default function ThinkingSection({ steps }: ThinkingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { i18n } = useTranslation();
 
   if (!steps || steps.length === 0) {
     return null;
@@ -89,7 +79,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
       {/* Header - Clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between transition-colors duration-150"
+        className="w-full px-3 py-2.5 flex items-center justify-between transition-colors duration-150"
         style={{
           cursor: "pointer",
           backgroundColor: "transparent"
@@ -123,11 +113,9 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
       {/* Content - Accordion */}
       <div
         id="thinking-content"
-        className={`overflow-hidden transition-all duration-200 ${
-          isExpanded ? "max-h-[1000px]" : "max-h-0"
-        }`}
+        className={`${isExpanded ? "" : "max-h-0 overflow-hidden"}`}
       >
-        <div className="px-4 pb-4 pt-2">
+        <div className="px-3 pb-3 pt-1">
           {steps.map((step, index) => {
             const Icon = getAgentIcon(step.agent);
             const agentName = getAgentName(step.agent);
@@ -135,39 +123,26 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
             return (
               <div
                 key={index}
-                className="flex items-start gap-2 py-2"
+                className="flex items-center gap-2 py-1.5"
                 style={{
                   borderBottom:
                     index < steps.length - 1 ? "1px solid var(--border-default)" : "none",
                 }}
               >
-                {/* Icon */}
-                <div className="flex-shrink-0 mt-1">
-                  <Icon
-                    className="w-5 h-5"
-                    style={{ color: "var(--text-secondary)" }}
-                    strokeWidth={1.5}
-                  />
+                <div className="flex-shrink-0">
+                  <Icon className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
                 </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  {/* Title */}
-                  <div className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
-                    {agentName}
+                <div className="flex-1 min-w-0 flex items-center justify-between">
+                  <div className="text-xs" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
+                    <span className="font-medium" style={{ color: "var(--text-secondary)" }}>{agentName}</span>
+                    <span> · {step.description}</span>
                   </div>
-
-                  {/* Description */}
                   <div
-                    className="text-xs mb-1"
-                    style={{ color: "var(--text-secondary)", lineHeight: "18px" }}
+                    className="text-[11px] ml-3 whitespace-nowrap"
+                    style={{ color: "var(--text-muted)" }}
+                    title={formatAbsoluteDate(step.timestamp, i18n?.language || 'en')}
                   >
-                    {step.description}
-                  </div>
-
-                  {/* Time */}
-                  <div className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    {formatTime(step.timestamp)}
+                    {formatRelativeTime(step.timestamp, i18n?.language || 'en')}
                   </div>
                 </div>
               </div>

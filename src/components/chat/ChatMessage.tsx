@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Loader2, AlertTriangle, Copy, Check } from "lucide-react";
 import { Message } from "@/lib/types/chat";
 import ThinkingSection from "./ThinkingSection";
@@ -99,6 +100,7 @@ export default function ChatMessage({
         }}
       >
         <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
           components={{
             // Headings
             h1: ({ node, ...props }) => (
@@ -231,6 +233,8 @@ export default function ChatMessage({
                   width: "100%",
                   borderCollapse: "collapse",
                   marginBottom: "16px",
+                  tableLayout: "auto",
+                  wordBreak: "break-word",
                 }}
                 {...props}
               />

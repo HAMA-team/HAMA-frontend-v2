@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import AutomationLevelSelector from "./AutomationLevelSelector";
 import InvestmentProfile from "./InvestmentProfile";
 import { Sun, Moon, Globe } from "lucide-react";
+import APICheckPanel from "./APICheckPanel";
 
 /**
  * MyPageView Component
@@ -280,7 +281,7 @@ export default function MyPageView() {
                       : "1px solid var(--border-default)",
                 }}
               >
-                한국어
+                {t("language.ko")}
               </button>
               <button
                 onClick={() => handleLanguageChange("en")}
@@ -300,14 +301,25 @@ export default function MyPageView() {
                       : "1px solid var(--border-default)",
                 }}
               >
-                English
+                {t("language.en")}
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 섹션 5: 온보딩 체험하기 (선택적) */}
+      {/* 섹션 5: API 상태 확인 (임시) */}
+      <section>
+        <h2
+          className="text-xl font-semibold mb-4"
+          style={{ color: "var(--text-primary)" }}
+        >
+          {t("mypage.apiStatus.header")}
+        </h2>
+        <APICheckPanel />
+      </section>
+
+      {/* 섹션 6: 온보딩 체험하기 (선택적) */}
       <section>
         <div
           className="p-6 rounded-xl border text-center"

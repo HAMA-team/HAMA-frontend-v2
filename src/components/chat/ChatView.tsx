@@ -52,37 +52,28 @@ export default function ChatView({
     >
       {/* Chat Container - Centered with max-width */}
       <div className="max-w-[800px] mx-auto px-4 w-full min-w-0">
-        {messages.length === 0 ? (
-          // Empty State는 page.tsx에서 처리
-          <div className="flex items-center justify-center h-full">
-            <p className="text-base" style={{ color: "var(--text-secondary)" }}>
-              대화를 시작해보세요
-            </p>
-          </div>
-        ) : (
-          // Messages List
-          <div>
-            {messages.map((message) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                onRetry={
-                  onRetryMessage ? () => onRetryMessage(message.id) : undefined
-                }
-                onDelete={
-                  onDeleteMessage ? () => onDeleteMessage(message.id) : undefined
-                }
-                onSaveArtifact={
-                  onSaveArtifact && message.role === "assistant"
-                    ? () => onSaveArtifact(message.id)
-                    : undefined
-                }
-              />
-            ))}
-            {/* Auto-scroll anchor */}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
+        {/* Messages List */}
+        <div>
+          {messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message}
+              onRetry={
+                onRetryMessage ? () => onRetryMessage(message.id) : undefined
+              }
+              onDelete={
+                onDeleteMessage ? () => onDeleteMessage(message.id) : undefined
+              }
+              onSaveArtifact={
+                onSaveArtifact && message.role === "assistant"
+                  ? () => onSaveArtifact(message.id)
+                  : undefined
+              }
+            />
+          ))}
+          {/* Auto-scroll anchor */}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
     </div>
   );

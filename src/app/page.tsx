@@ -40,7 +40,7 @@ const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
 export default function Home() {
   const { t } = useTranslation();
   const { mode } = useAppModeStore();
-  const { messages, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId } = useChatStore();
+  const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId } = useChatStore();
   const { addArtifact } = useArtifactStore();
   const { openAlert } = useDialogStore();
 
@@ -156,74 +156,7 @@ def calculate_portfolio():
       console.log("Approve:", messageId, currentThreadId);
       openAlert({ title: t("hitl.approved") });
       closeApprovalPanel();
-      return;
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: "", message: "" });
-      openAlert({ title: t('hitl.approved') });
-      closeApprovalPanel();
+      
     } catch (error) {
       console.error("Approval error:", error);
       openAlert({ title: t('common.error') });
@@ -287,12 +220,17 @@ def calculate_portfolio():
 
   return (
     <div className="flex flex-col h-full w-full overflow-x-hidden" style={{ backgroundColor: "var(--main-background)" }}>
-      {/* Conditional Rendering: Empty State or Chat View */}
-      {messages.length === 0 ? (
-        // Empty State
+      {/* Conditional Rendering: Session Loading / Empty / Chat View */}
+      {isHistoryLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div
+            className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
+            style={{ borderColor: "var(--primary-500)", borderTopColor: "transparent" }}
+          />
+        </div>
+      ) : messages.length === 0 ? (
         <ChatEmptyState onSuggestionClick={handleSuggestionClick} onTestHITL={handleTestHITL} />
       ) : (
-        // Chat View
         <ChatView
           messages={messages}
           onRetryMessage={handleRetryMessage}

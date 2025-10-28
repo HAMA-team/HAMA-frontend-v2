@@ -40,7 +40,7 @@ export default function LNB() {
   const pathname = usePathname();
   const router = useRouter();
   const { isCollapsed, setCollapsed } = useLNBWidth();
-  const { clearMessages, addMessage, setCurrentThreadId } = useChatStore();
+  const { clearMessages, addMessage, setCurrentThreadId, setHistoryLoading } = useChatStore();
   const currentThreadId = useChatStore((s) => s.currentThreadId);
   const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
@@ -59,7 +59,17 @@ export default function LNB() {
       getChatSessions(sessionsLimit)
         .then((data: any[]) => {
           if (!mounted) return;
-          setSessions(Array.isArray(data) ? data : []);
+          let list = Array.isArray(data) ? data : [];
+          const curId = useChatStore.getState().currentThreadId;
+          if (curId && !list.some((s: any) => s?.conversation_id === curId || s?.id === curId || s?.thread_id === curId || s?.uuid === curId)) {
+            const firstUser = useChatStore.getState().messages.find(m => m.role === 'user');
+            const title = firstUser?.content?.slice(0, 40) || 'Untitled';
+            list = [
+              { conversation_id: curId, title, last_message_at: new Date().toISOString() },
+              ...list,
+            ];
+          }
+          setSessions(list);
         })
         .catch((e) => {
           if (!mounted) return;
@@ -115,7 +125,14 @@ export default function LNB() {
 
   const openSession = async (conversationId: string) => {
     if (mode !== "live") return;
+    if (!conversationId) return; // 안전 가드: 잘못된 id 방지
+    // 이미 현재 스레드라면 불필요한 히스토리 호출/정리 방지
+    if (conversationId === currentThreadId) {
+      if (pathname !== "/") router.push("/");
+      return;
+    }
     try {
+      setHistoryLoading(true);
       setCurrentThreadId(conversationId);
       clearMessages();
       const data: any = await getChatHistory(conversationId, 500);
@@ -173,6 +190,10 @@ export default function LNB() {
     } catch (e) {
       console.error("Failed to open session", e);
       if (pathname !== "/") router.push("/");
+      // 실패 시에도 목록 정합 유지를 위해 즉시 재조회 (낙관 항목 재삽입 보장)
+      try { await refreshSessions(); } catch {}
+    } finally {
+      setHistoryLoading(false);
     }
   };
 
@@ -180,11 +201,31 @@ export default function LNB() {
     if (mode !== "live") return;
     try {
       const data: any[] = await getChatSessions(sessionsLimit);
-      setSessions(Array.isArray(data) ? data : []);
+      let list = Array.isArray(data) ? data : [];
+      // 보장: 현재 스레드가 목록에 없으면 낙관적으로 추가
+      const curId = useChatStore.getState().currentThreadId;
+      if (curId && !list.some((s: any) => s?.conversation_id === curId || s?.id === curId || s?.thread_id === curId || s?.uuid === curId)) {
+        const firstUser = useChatStore.getState().messages.find(m => m.role === 'user');
+        const title = firstUser?.content?.slice(0, 40) || 'Untitled';
+        list = [
+          { conversation_id: curId, title, last_message_at: new Date().toISOString() },
+          ...list,
+        ];
+      }
+      setSessions(list);
     } catch (e) {
       console.error("Failed to refresh sessions", e);
     }
   };
+
+  // 외부에서 세션 업데이트 알림 수신 시 목록 새로고침
+  React.useEffect(() => {
+    const handler = () => {
+      refreshSessions();
+    };
+    window.addEventListener('chat-session-updated', handler);
+    return () => window.removeEventListener('chat-session-updated', handler);
+  }, [mode, sessionsLimit]);
 
   const handleDeleteSession = async (conversationId: string) => {
     try {
@@ -245,9 +286,11 @@ export default function LNB() {
   const recentChats =
     mode === "live"
       ? sessions.map((s: any) => ({
-          id: s.conversation_id,
+          id: s.conversation_id || s.id || s.thread_id || s.uuid,
           title: s.title || "Untitled",
-          createdAt: s.last_message_at ? Date.parse(s.last_message_at) : (s.created_at ? Date.parse(s.created_at) : now),
+          createdAt: s.last_message_at
+            ? Date.parse(s.last_message_at)
+            : (s.created_at ? Date.parse(s.created_at) : now),
         }))
       : [
           { id: "1", title: "삼성전자 투자 분석 요청", createdAt: now - 2 * DAY },
