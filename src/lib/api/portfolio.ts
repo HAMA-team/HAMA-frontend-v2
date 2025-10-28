@@ -27,16 +27,16 @@ interface PortfolioOverviewAPI {
 
 function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
   const safeHoldings = Array.isArray((api as any)?.holdings) ? (api as any).holdings : [];
-  const stocks: Stock[] = safeHoldings.map((h) => ({
-    code: h.stock_code,
-    name: h.stock_name,
-    quantity: h.quantity,
-    averagePrice: h.avg_price,
-    currentPrice: h.current_price,
-    value: h.market_value,
-    return: h.profit,
-    returnRate: h.profit_rate,
-    weight: h.weight,
+  const stocks: Stock[] = safeHoldings.map((h: any) => ({
+    code: h.stock_code ?? h.code ?? h.ticker ?? h.symbol ?? '',
+    name: h.stock_name ?? h.name ?? h.ticker_name ?? h.display_name ?? (h.stock_code ?? ''),
+    quantity: h.quantity ?? 0,
+    averagePrice: h.avg_price ?? h.average_price ?? 0,
+    currentPrice: h.current_price ?? 0,
+    value: h.market_value ?? h.value ?? 0,
+    return: h.profit ?? h.pnl ?? 0,
+    returnRate: h.profit_rate ?? h.return_rate ?? 0,
+    weight: h.weight ?? 0,
     sector: "", // not provided by API
   }));
 
