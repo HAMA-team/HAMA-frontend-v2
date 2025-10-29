@@ -143,3 +143,54 @@ This runbook is intentionally concise. When in doubt, defer to `CLAUDE.md` and a
 - `docs/HITLFrontendContract.md` — HITL 프론트 계약 문서 추가
 
 작업 전반은 `CLAUDE.md`의 디자인 가이드, 레이어링 정책, i18n 원칙을 준수했습니다.
+
+---
+
+## AGENTS.md 이후 추가 반영 사항 (최근 작업 정리)
+
+아래 항목은 위 세션 요약 이후 진행된 보강/도구/설정 변경입니다. Claude가 즉시 파악할 수 있도록 실행 포인트와 파일 경로를 함께 남깁니다.
+
+### 테스트/운영 도구 추가
+- LLM 테스트 프롬프트 가이드 추가: 카테고리별(General/Research/Strategy/Risk/Portfolio/Trading/HITL) 시나리오와 승인 유도 프롬프트 포함. 실제 백엔드와 연결해 응답 품질을 빠르게 점검 가능.
+  - 파일: docs/llm_test_prompts.md
+- OpenAPI 기반 Notion 커버리지 시트 생성 스크립트 추가: OpenAPI와 API 리포트 요약을 읽어 그룹/엔드포인트/메서드/사용현황/예상 동작/실제 동작/결과/블로커를 표로 생성.
+  - 파일: scripts/build_notion_api_sheet.ps1
+  - 실행(예): PowerShell에서 `./scripts/build_notion_api_sheet.ps1 -BaseUrl http://localhost:8000 -OpenApiPath docs/backend/openapi.json -ApiReportPath docs/backend/API_Test_Report.md -OutPath docs/qa/API_Full_Coverage_Filled.md`
+  - 출력: docs/qa/API_Full_Coverage_Filled.md
+
+### 스트리밍/SSE 연동
+- 멀티에이전트 스트리밍 엔드포인트 연동: `POST /api/v1/chat/multi-stream`에 `text/event-stream`로 접속해 이벤트 파싱. `event:`/`data:` 라인 분리, `done` 및 `[DONE]` 처리 포함. ngrok 환경 경고 우회 헤더(`ngrok-skip-browser-warning`) 자동 첨부.
+  - 파일: src/lib/api/chatStream.ts
+  - 폴백: 스트림 실패 시 단발 `/api/v1/chat/` 경로 사용 로직 유지(src/lib/api/chat.ts)
+
+### 빌드/환경 설정
+- Next 빌드에서 ESLint 경고로 인한 실패 방지 설정 반영(`ignoreDuringBuilds: true`).
+  - 파일: next.config.ts
+- 전역 수평 스크롤 방지 재확인: `html/body`에 `overflow-x: hidden` 적용.
+  - 파일: src/app/layout.tsx
+- 환경 변수 예시/로컬 값 정리: 기본 `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000`로 안내, ngrok 샘플은 주석으로 보관.
+  - 파일: .env.example, .env.local
+
+### i18n/프로바이더
+- i18n 초기화/감지/로컬스토리지 캐시 구성 고정: 브라우저 환경에서만 초기화하며 `useSuspense: false`로 SSR 의존 해제.
+  - 파일: src/lib/i18n.ts, src/components/providers/I18nProvider.tsx
+- 번역 리소스 경로: 런타임은 `src/locales/*/translation.json`을 사용. `src/lib/i18n/locales/*.json`는 중복으로 보이며 정리 후보.
+
+### QA/헬스체크 연동
+- 마이페이지 APICheckPanel에서 Healthcheck 전용 엔드포인트 사용(예: `settings/automation-level(s)`, `portfolio/chart-data`) — 프론트 라우팅 없이 연동 상태만 확인.
+  - 파일: src/components/mypage/APICheckPanel.tsx, src/lib/api/*
+
+### 운영 팁(모드/네트워크)
+- Demo/Live 전환: LNB 상단 `DevDemoToggle`로 토글. Demo는 네트워크 콜 없이 UI만 검증, Live에서만 백엔드 호출.
+  - 파일: src/components/common/DevDemoToggle.tsx, src/store/appModeStore.ts
+- ngrok 사용 시: 스트리밍에서 브라우저 경고 배너 우회를 위해 `ngrok-skip-browser-warning` 헤더 자동 첨부(chatStream.ts 참고).
+
+### 알려진 개선/정리 포인트(추가)
+- 이중 번역 파일 정리: `src/locales`와 `src/lib/i18n/locales` 중 실제 사용은 전자 — 후자 폴더 정리 필요.
+- I18nProvider의 초기화 콘솔 로그 제거 후보: 개발 중 디버깅 로그(`"i18n initialized"`) 정리 검토.
+
+### 참고 파일(추가)
+- 스트리밍: src/lib/api/chatStream.ts
+- 테스트 프롬프트: docs/llm_test_prompts.md
+- Notion 시트 생성: scripts/build_notion_api_sheet.ps1
+- 환경 변수 예시: .env.example, .env.local
