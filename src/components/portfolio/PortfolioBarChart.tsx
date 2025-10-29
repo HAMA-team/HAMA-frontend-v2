@@ -12,6 +12,7 @@ import {
   Cell,
   ReferenceLine,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { Stock } from "@/lib/types/portfolio";
 import { useChartColors } from "@/lib/hooks/useChartColors";
 
@@ -33,6 +34,7 @@ interface PortfolioBarChartProps {
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function PortfolioBarChart({ stocks = [] }: PortfolioBarChartProps) {
+  const { t } = useTranslation();
   const { getReturnColor } = useChartColors();
 
   // 수익률 높은 순으로 정렬
@@ -96,6 +98,15 @@ export default function PortfolioBarChart({ stocks = [] }: PortfolioBarChartProp
         borderColor: "var(--border-default)",
       }}
     >
+      {/* 차트 제목 */}
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+          {t("portfolio.charts.bar.title")}
+        </h3>
+        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          {t("portfolio.charts.bar.description")}
+        </p>
+      </div>
       <ResponsiveContainer width="100%" height={500}>
         <BarChart
           data={data}

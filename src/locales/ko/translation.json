@@ -117,6 +117,22 @@
       "treemap": "트리맵",
       "pie": "원형",
       "bar": "막대"
+    },
+    "charts": {
+      "treemap": {
+        "title": "종목별 비중",
+        "description": "보유 종목의 평가금액을 면적으로 표시합니다",
+        "colorMode": "종목별",
+        "returnMode": "수익률별"
+      },
+      "pie": {
+        "title": "섹터별 비중",
+        "description": "보유 종목을 섹터별로 그룹화하여 표시합니다"
+      },
+      "bar": {
+        "title": "종목별 수익률",
+        "description": "수익률이 높은 종목부터 순서대로 표시합니다"
+      }
     }
   },
   "artifacts": {

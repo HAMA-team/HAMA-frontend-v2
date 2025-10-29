@@ -52,13 +52,13 @@ export default function PortfolioPage() {
     <>
       {loading && (
         <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "var(--main-background)" }}>
-          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{t("common.loading")}</span>
+          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>Loading...</span>
         </div>
       )}
       {!loading && portfolio && <PortfolioView portfolio={portfolio} />}
       {!loading && !portfolio && (
         <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "var(--main-background)" }}>
-          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{error || "Failed to load"}</span>
+          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>{error || t("common.error")}</span>
         </div>
       )}
       <ChatInput />

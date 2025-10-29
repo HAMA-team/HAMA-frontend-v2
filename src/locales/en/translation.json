@@ -116,7 +116,23 @@
                                          "treemap":  "Treemap",
                                          "pie":  "Pie",
                                          "bar":  "Bar"
-                                     }
+                                     },
+                      "charts":  {
+                                     "treemap":  {
+                                                     "title":  "Holdings by Stock",
+                                                     "description":  "Shows portfolio value by stock as area",
+                                                     "colorMode":  "By Stock",
+                                                     "returnMode":  "By Return"
+                                                 },
+                                     "pie":  {
+                                                 "title":  "Allocation by Sector",
+                                                 "description":  "Shows holdings grouped by sector"
+                                             },
+                                     "bar":  {
+                                                 "title":  "Return by Stock",
+                                                 "description":  "Shows stocks ordered by return rate"
+                                             }
+                                 }
                   },
     "artifacts":  {
                       "title":  "Artifacts",

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { useTranslation } from "react-i18next";
 import { Stock } from "@/lib/types/portfolio";
 import { useChartColors } from "@/lib/hooks/useChartColors";
 
@@ -22,6 +23,7 @@ interface PortfolioPieChartProps {
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 export default function PortfolioPieChart({ stocks = [] }: PortfolioPieChartProps) {
+  const { t } = useTranslation();
   const { chartColors } = useChartColors();
 
   // 섹터별 그룹화: 같은 섹터의 종목들을 합산
@@ -39,10 +41,22 @@ export default function PortfolioPieChart({ stocks = [] }: PortfolioPieChartProp
   });
 
   // Map을 배열로 변환하여 차트 데이터 생성
-  const data = Array.from(sectorMap.entries()).map(([name, { value, weight }], index) => ({
+  const dataArray = Array.from(sectorMap.entries()).map(([name, { value, weight }]) => ({
     name,
     value,
     weight,
+  }));
+
+  // 정렬: 큰 것부터 (기타는 맨 마지막)
+  dataArray.sort((a, b) => {
+    if (a.name === "기타") return 1;
+    if (b.name === "기타") return -1;
+    return b.value - a.value; // 큰 것부터
+  });
+
+  // 색상 할당
+  const data = dataArray.map((item, index) => ({
+    ...item,
     color: chartColors[index % chartColors.length] || "#3b82f6", // fallback
   }));
 
@@ -88,6 +102,15 @@ export default function PortfolioPieChart({ stocks = [] }: PortfolioPieChartProp
         borderColor: "var(--border-default)",
       }}
     >
+      {/* 차트 제목 */}
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+          {t("portfolio.charts.pie.title")}
+        </h3>
+        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          {t("portfolio.charts.pie.description")}
+        </p>
+      </div>
       <ResponsiveContainer width="100%" height={500}>
         <PieChart>
           <Pie
