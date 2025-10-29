@@ -32,11 +32,21 @@ export interface Stock {
 }
 
 /**
+ * 섹터별 배분 정보
+ */
+export interface SectorAllocation {
+  name: string; // 섹터명 (예: "반도체", "자동차")
+  value: number; // 평가금액
+  percentage: number; // 비중 (%)
+}
+
+/**
  * 전체 포트폴리오 데이터
  */
 export interface Portfolio {
   summary: PortfolioSummary;
   stocks: Stock[];
+  sectors?: Map<string, number>; // 섹터별 총 가치 (섹터명 → 금액)
 }
 
 /**

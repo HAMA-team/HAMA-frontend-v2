@@ -24,11 +24,25 @@ interface PortfolioPieChartProps {
 export default function PortfolioPieChart({ stocks = [] }: PortfolioPieChartProps) {
   const { chartColors } = useChartColors();
 
-  // 종목별로 직접 표시 (섹터 그룹화 제거)
-  const data = stocks.map((stock, index) => ({
-    name: stock.name,
-    value: stock.value,
-    weight: stock.weight,
+  // 섹터별 그룹화: 같은 섹터의 종목들을 합산
+  const sectorMap = new Map<string, { value: number; weight: number }>();
+  const totalValue = stocks.reduce((sum, stock) => sum + stock.value, 0);
+
+  stocks.forEach((stock) => {
+    // 섹터가 없으면 "기타"로 분류
+    const sectorName = stock.sector && stock.sector.trim() !== "" ? stock.sector : "기타";
+
+    const existing = sectorMap.get(sectorName) || { value: 0, weight: 0 };
+    existing.value += stock.value;
+    existing.weight += stock.weight;
+    sectorMap.set(sectorName, existing);
+  });
+
+  // Map을 배열로 변환하여 차트 데이터 생성
+  const data = Array.from(sectorMap.entries()).map(([name, { value, weight }], index) => ({
+    name,
+    value,
+    weight,
     color: chartColors[index % chartColors.length] || "#3b82f6", // fallback
   }));
 
