@@ -56,7 +56,7 @@ export default function AutomationLevelSelector() {
         t("mypage.automation.pilot.feature2"),
         t("mypage.automation.pilot.feature3"),
       ],
-      hitlSteps: ["trade"], // 매매만 HITL
+      hitlSteps: ["trade"], // 매매만 HITL (저위험 시 자동)
     },
     {
       value: 2,
@@ -68,7 +68,7 @@ export default function AutomationLevelSelector() {
         t("mypage.automation.copilot.feature2"),
         t("mypage.automation.copilot.feature3"),
       ],
-      hitlSteps: ["portfolio", "risk", "trade"], // 포트폴리오 구성, 리스크, 매매
+      hitlSteps: ["portfolio", "trade"], // 포트폴리오, 매매
     },
     {
       value: 3,
@@ -80,7 +80,7 @@ export default function AutomationLevelSelector() {
         t("mypage.automation.advisor.feature2"),
         t("mypage.automation.advisor.feature3"),
       ],
-      hitlSteps: ["portfolio", "risk", "trade"], // 모두 사용자 주도
+      hitlSteps: ["data-analysis", "portfolio", "trade"], // 분석, 포트폴리오, 매매
     },
   ];
 

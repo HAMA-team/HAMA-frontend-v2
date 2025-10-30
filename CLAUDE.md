@@ -207,6 +207,12 @@ src/
 - `docs/ErrorHandling.md`: 에러 시나리오 및 복구 전략
 - `docs/InformationArchitecture.md`: IA 다이어그램 및 페이지 구조
 - `docs/Userflow.md`: 사용자 플로우 다이어그램
+- `docs/AutomationLevelIntegration.md`: 자동화 레벨 시스템 백엔드 연동 가이드 ⭐ (2025-10-30 추가)
+- `docs/AutomationLevelAPIChanges.md`: automation_level → hitl_config 마이그레이션 가이드 ⭐ (2025-10-30 추가)
+  - 영향받는 API 6개 상세 분석
+  - 스키마 변경 사항 (before/after)
+  - 백엔드/프론트엔드 마이그레이션 체크리스트
+  - 테스트 계획 및 롤아웃 전략
 
 ### Reference Documents
 - `references/BackendPRD.md`: 백엔드 기능 요구사항
@@ -274,6 +280,17 @@ src/
       - ✅ 5단계 워크플로우 프로그레스 바 (데이터 수집 → 분석 → 포트폴리오 → 리스크 → 매매)
       - ✅ HITL 개입 지점 시각화 (빨간 점 + 승인 아이콘)
       - ✅ 레벨별 상세 카드 UI (특징 3개 리스트)
+      - ✅ **백엔드 연동 기준 HITL 지점 재정의** (2025-10-30)
+        - ✅ 5단계 워크플로우 → 6개 에이전트 매핑 정의
+        - ✅ 레벨별 HITL 지점 명확화 (Pilot: 저위험 자동, Copilot: 포트폴리오+매매, Advisor: 분석+포트폴리오+매매)
+        - ✅ AutomationLevelSelector 컴포넌트 업데이트
+        - ✅ **automation_level → hitl_config 마이그레이션 정의** (2025-10-30)
+          - ✅ 영향받는 API 엔드포인트 6개 식별 (Chat, Approval, Multi-stream, Sessions, Settings)
+          - ✅ 영향받는 스키마 7개 식별 (ChatRequest, ApprovalRequest, MultiAgentStreamRequest, ChatSessionSummary, AutomationSettings, AutomationLevelResponse, AutomationLevelUpdateRequest)
+          - ✅ HITLConfig/HITLPhases 스키마 정의 (preset + phases 구조)
+          - ✅ Custom Mode 지원 (phase별 개별 HITL 제어)
+          - ✅ 백엔드/프론트엔드 마이그레이션 가이드 작성
+          - ✅ 테스트 체크리스트 및 롤아웃 계획 수립
     - ✅ userStore.ts (자동화 레벨, 투자 성향 프로필 상태 관리, LocalStorage persist)
     - ✅ InvestmentProfile 컴포넌트 (Phase 3 구조 준비, 플레이스홀더)
     - ✅ My Page i18n 번역 (한국어/영어 완료)
@@ -284,8 +301,8 @@ src/
       - ✅ PortfolioSummary, ChartTypeSelector 번역 추가
       - ✅ HITL Panel 모든 UI 요소 번역 (28 keys)
       - ✅ LNB 네비게이션 및 버튼 번역 (4 keys)
-- **Version**: 7.0 (Phase 2 완료 - i18n 전체 번역 완성)
-- **Last Updated**: 2025-01-26
+- **Version**: 7.2 (Phase 2 완료 - automation_level → hitl_config 마이그레이션 정의 완성)
+- **Last Updated**: 2025-10-30
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude

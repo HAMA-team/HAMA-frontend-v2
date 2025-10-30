@@ -382,29 +382,40 @@ HAMA Application
 **Acceptance Criteria:**
 
 - [x] 3가지 자동화 레벨 선택 가능:
-    1. **어드바이저 모드**: AI가 정보만 제공 (매매 제안 없음)
-    2. **코파일럿 모드**: 모든 매매에 승인 필요 (HITL 필수)
-    3. **파일럿 모드**: 일부 매매 자동 실행 (고위험만 승인)
-- [x] 현재 레벨이 프로그레스 바로 표시됩니다
-- [x] 각 레벨의 특징이 설명됩니다
-- [x] 프로그레스 바에 HITL 개입 지점 표시 (👤 아이콘)
+    1. **Advisor (Lv3)**: 사용자 주도 - AI는 정보/제안만 제공
+    2. **Copilot (Lv2)**: AI 제안 + 사용자 승인 (기본값 ⭐)
+    3. **Pilot (Lv1)**: AI 자동 실행 + 저위험 매매 자동화
+- [x] 5단계 워크플로우 프로그레스 바 표시:
+    - Phase 1: 데이터 수집 → Phase 2: 분석 → Phase 3: 포트폴리오 → Phase 4: 리스크 → Phase 5: 매매
+- [x] HITL 개입 지점 시각화 (빨간 점 + 👤 아이콘)
 - [x] 상세 레벨 카드 UI (라디오 버튼 + 특징 3개 리스트)
 - [x] LocalStorage에 자동화 레벨 저장 (userStore.ts)
 - [x] 다국어 지원 (한국어/영어 번역 완료)
 
-**UI Enhancement (피드백 반영):**
+**레벨별 HITL 개입 지점 (백엔드 연동 기준):**
 
-- 프로그레스 바에 HITL 개입 지점을 시각적으로 표시합니다
+| Phase | Pilot (Lv1) | Copilot (Lv2) | Advisor (Lv3) |
+|-------|------------|--------------|--------------|
+| **Phase 1: 데이터 수집** (Research) | ✅ 자동 | ✅ 자동 | ✅ 자동 |
+| **Phase 2: 분석** (Strategy + Risk) | ✅ 자동 | ✅ 자동 | 🔴 **승인 필요** |
+| **Phase 3: 포트폴리오** (Portfolio) | ✅ 자동 (월 1회 리뷰) | 🔴 **승인 필요** | 🔴 **승인 필수** |
+| **Phase 4: 리스크 평가** (Risk) | ✅ 자동 (경고만) | ✅ 자동 (경고만) | ✅ 자동 (경고만) |
+| **Phase 5: 매매** (Trading) | 🟡 **저위험 시 자동** | 🔴 **승인 필요** | 🔴 **승인 필수** |
 
-```
-[Advisor] ────── [Copilot] ────── [Pilot]
-           No Auto  👤 HITL    Some Auto
+**아이콘 설명:**
+- ✅ 자동 실행 (HITL 없음)
+- 🔴 HITL 승인 필요
+- 🟡 조건부 자동 실행 (리스크 레벨 기반)
 
-```
+**백엔드 구현 상태:**
+- [x] Trading Agent: HITL 구현 완료 (Pilot 모드 저위험 자동 실행 포함)
+- [ ] Portfolio Agent: HITL 추가 필요
+- [ ] Strategy Agent: HITL 추가 필요 (Advisor 모드 전용)
 
 **References:**
 
-- Backend: `references/BackendPRD.md` 자동화 레벨 시스템
+- Backend: `../HAMA-backend/src/schemas/workflow.py` (Phase → Agent 매핑)
+- Frontend: `src/components/mypage/AutomationLevelSelector.tsx`
 - Mockup: `references/mockup_references/My Page.png`
 
 ---
