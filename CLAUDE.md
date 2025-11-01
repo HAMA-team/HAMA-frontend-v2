@@ -213,6 +213,15 @@ src/
   - 스키마 변경 사항 (before/after)
   - 백엔드/프론트엔드 마이그레이션 체크리스트
   - 테스트 계획 및 롤아웃 전략
+- `docs/Research_Agent_Dynamic_Routing.md`: Research Agent 동적 Worker 선택 ⭐ (2025-10-31 추가)
+  - Worker 역할 정의 (data/bull/bear/macro/insight)
+  - planner_node의 LLM 기반 동적 라우팅
+  - 사용자 질문 유형별 Worker 매핑
+  - HITL 적용 위치 (Agent 레벨 vs Worker 레벨)
+- `docs/HITL_Panel_Specifications.md`: HITL 패널 UI 설계 (5개 Agent별) ⭐ (2025-10-31 업데이트)
+  - 각 Agent별 승인 대상 및 UI 구조
+  - Master 레벨 interrupt 구현 가이드
+  - Worker 레벨 HITL 비권장 이유 (동적 라우팅)
 
 ### Reference Documents
 - `references/BackendPRD.md`: 백엔드 기능 요구사항
@@ -291,6 +300,16 @@ src/
           - ✅ Custom Mode 지원 (phase별 개별 HITL 제어)
           - ✅ 백엔드/프론트엔드 마이그레이션 가이드 작성
           - ✅ 테스트 체크리스트 및 롤아웃 계획 수립
+        - ✅ **Research Agent 동적 라우팅 분석 및 문서화** (2025-10-31)
+          - ✅ 백엔드 코드 분석 (planner_node, Worker 5개)
+          - ✅ Worker 역할 정의 (data/bull/bear/macro/insight)
+          - ✅ 사용자 질문 유형별 Worker 매핑
+          - ✅ HITL 설계 문서 업데이트 (Master 레벨 interrupt)
+          - ✅ Worker 레벨 HITL 비권장 이유 문서화 (동적 라우팅)
+          - ✅ **복잡도 기반 HITL 로직 설계** (2025-10-31)
+            - ✅ Router의 query_complexity/depth_level 활용
+            - ✅ Advisor 레벨: expert/comprehensive만 승인
+            - ✅ 단순 질문 자동 실행으로 UX 개선
     - ✅ userStore.ts (자동화 레벨, 투자 성향 프로필 상태 관리, LocalStorage persist)
     - ✅ InvestmentProfile 컴포넌트 (Phase 3 구조 준비, 플레이스홀더)
     - ✅ My Page i18n 번역 (한국어/영어 완료)
@@ -301,8 +320,8 @@ src/
       - ✅ PortfolioSummary, ChartTypeSelector 번역 추가
       - ✅ HITL Panel 모든 UI 요소 번역 (28 keys)
       - ✅ LNB 네비게이션 및 버튼 번역 (4 keys)
-- **Version**: 7.2 (Phase 2 완료 - automation_level → hitl_config 마이그레이션 정의 완성)
-- **Last Updated**: 2025-10-30
+- **Version**: 7.3 (Phase 2 완료 - Research Agent 동적 라우팅 문서화 및 HITL 설계 완료)
+- **Last Updated**: 2025-10-31
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude

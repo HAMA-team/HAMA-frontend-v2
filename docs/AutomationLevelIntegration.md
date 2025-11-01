@@ -40,7 +40,7 @@ Phase 1: 데이터 수집 → Phase 2: 분석 → Phase 3: 포트폴리오 → P
 | Phase | Pilot | Copilot ⭐ | Advisor | Custom |
 |-------|-------|-----------|---------|--------|
 | **Phase 1: 데이터 수집** | ✅ 자동 | ✅ 자동 | ✅ 자동 | 🎛️ 설정 가능 |
-| **Phase 2: 분석** | ✅ 자동 | ✅ 자동 | 🔴 승인 필요 | 🎛️ 설정 가능 |
+| **Phase 2: 분석** | ✅ 자동 | ✅ 자동 | 🔵 조건부 승인 | 🎛️ 설정 가능 |
 | **Phase 3: 포트폴리오** | ✅ 자동 (월 1회) | 🔴 승인 필요 | 🔴 승인 필수 | 🎛️ 설정 가능 |
 | **Phase 4: 리스크 평가** | ✅ 자동 (경고만) | ✅ 자동 (경고만) | ✅ 자동 (경고만) | 🎛️ 설정 가능 |
 | **Phase 5: 매매** | 🟡 저위험 시 자동 | 🔴 승인 필요 | 🔴 승인 필수 | 🎛️ 설정 가능 |
@@ -48,8 +48,24 @@ Phase 1: 데이터 수집 → Phase 2: 분석 → Phase 3: 포트폴리오 → P
 **아이콘 설명:**
 - ✅ 자동 실행 (HITL 없음)
 - 🔴 HITL interrupt 발생
+- 🔵 조건부 승인 (복잡도 기반) ⭐ 신규
 - 🟡 조건부 자동 실행 (리스크 레벨 기반)
 - 🎛️ 사용자가 Phase별로 개별 설정
+
+**🔵 조건부 승인 (Phase 2: 분석 - Advisor 레벨):**
+- **Router가 질문 복잡도 판단:**
+  - `query_complexity`: "simple" | "moderate" | "expert"
+  - `depth_level`: "brief" | "detailed" | "comprehensive"
+- **HITL 조건:**
+  - `expert` 또는 `comprehensive` → 🔴 승인 필요
+  - `simple`, `moderate`, `brief`, `detailed` → ✅ 자동 실행
+
+**예시:**
+| 질문 | complexity | depth | Advisor HITL? |
+|------|-----------|-------|--------------|
+| "시장 전망은?" | simple | brief | ✅ 자동 |
+| "삼성전자 목표가?" | moderate | detailed | ✅ 자동 |
+| "삼성전자 종합 분석" | expert | comprehensive | 🔴 승인 필요 |
 
 ---
 
