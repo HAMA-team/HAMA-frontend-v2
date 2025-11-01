@@ -283,34 +283,41 @@ src/
     - ✅ Dark Mode 완전 구현 (CSS 변수, 모든 컴포넌트 색상 전환, ThemeToggle, 차트 색상 adaptive)
     - ✅ useChartColors 훅 (CSS 변수 기반 차트 색상, 다크 모드 자동 전환)
     - ✅ Dynamic import로 i18n hydration 에러 해결
-  - **Phase 2 (완료 ✅)**:
+  - **Phase 2 (완료 ✅)** - 2025-11-02 완료:
     - ✅ My Page 구현 (마이페이지 5개 섹션)
-    - ✅ 자동화 레벨 설정 (3단계: Advisor/Copilot/Pilot)
+    - ✅ **자동화 레벨 설정 (4단계: Advisor/Copilot/Pilot/Custom)**
       - ✅ 5단계 워크플로우 프로그레스 바 (데이터 수집 → 분석 → 포트폴리오 → 리스크 → 매매)
+      - ✅ **Interactive Workflow Bar** (각 단계 클릭하여 HITL on/off 토글)
+      - ✅ **Custom Mode 구현** (phase별 개별 HITL 제어, 설정 기억 기능)
       - ✅ HITL 개입 지점 시각화 (빨간 점 + 승인 아이콘)
       - ✅ 레벨별 상세 카드 UI (특징 3개 리스트)
+      - ✅ **automation_level → hitl_config 마이그레이션 완료** (2025-10-30~11-02)
+        - ✅ HITLConfig/HITLPhases 타입 정의 완료 (`src/types/hitl.ts`)
+        - ✅ Preset 상수 정의 (PRESET_PILOT, PRESET_COPILOT, PRESET_ADVISOR)
+        - ✅ userStore 버전 2 마이그레이션 구현 (LocalStorage 자동 변환)
+        - ✅ matchPreset 헬퍼 함수 (자동 프리셋 감지)
+        - ✅ CustomHITLSettings 컴포넌트 (Custom mode 상세 설정)
+        - ✅ Settings API 클라이언트 구현 (`src/lib/api/settings.ts`)
+        - ✅ Chat/Approval API에서 hitl_config 사용 (`src/lib/api/chat.ts`, `src/lib/api/approvals.ts`)
+        - ✅ 프론트엔드 마이그레이션 100% 완료
+      - ✅ **5개 Agent별 HITL 패널 구현 완료** (2025-11-01)
+        - ✅ ResearchApprovalPanel.tsx (분석 실행 승인)
+        - ✅ StrategyApprovalPanel.tsx (투자 전략 승인)
+        - ✅ PortfolioApprovalPanel.tsx (포트폴리오 리밸런싱 승인)
+        - ✅ RiskApprovalPanel.tsx (리스크 경고 확인)
+        - ✅ TradingApprovalPanel.tsx (매매 주문 승인)
+        - ✅ HITLPanel.tsx 라우터 구현 (request.type 기반 분기)
       - ✅ **백엔드 연동 기준 HITL 지점 재정의** (2025-10-30)
         - ✅ 5단계 워크플로우 → 6개 에이전트 매핑 정의
         - ✅ 레벨별 HITL 지점 명확화 (Pilot: 저위험 자동, Copilot: 포트폴리오+매매, Advisor: 분석+포트폴리오+매매)
-        - ✅ AutomationLevelSelector 컴포넌트 업데이트
-        - ✅ **automation_level → hitl_config 마이그레이션 정의** (2025-10-30)
-          - ✅ 영향받는 API 엔드포인트 6개 식별 (Chat, Approval, Multi-stream, Sessions, Settings)
-          - ✅ 영향받는 스키마 7개 식별 (ChatRequest, ApprovalRequest, MultiAgentStreamRequest, ChatSessionSummary, AutomationSettings, AutomationLevelResponse, AutomationLevelUpdateRequest)
-          - ✅ HITLConfig/HITLPhases 스키마 정의 (preset + phases 구조)
-          - ✅ Custom Mode 지원 (phase별 개별 HITL 제어)
-          - ✅ 백엔드/프론트엔드 마이그레이션 가이드 작성
-          - ✅ 테스트 체크리스트 및 롤아웃 계획 수립
-        - ✅ **Research Agent 동적 라우팅 분석 및 문서화** (2025-10-31)
-          - ✅ 백엔드 코드 분석 (planner_node, Worker 5개)
-          - ✅ Worker 역할 정의 (data/bull/bear/macro/insight)
-          - ✅ 사용자 질문 유형별 Worker 매핑
-          - ✅ HITL 설계 문서 업데이트 (Master 레벨 interrupt)
-          - ✅ Worker 레벨 HITL 비권장 이유 문서화 (동적 라우팅)
-          - ✅ **복잡도 기반 HITL 로직 설계** (2025-10-31)
-            - ✅ Router의 query_complexity/depth_level 활용
-            - ✅ Advisor 레벨: expert/comprehensive만 승인
-            - ✅ 단순 질문 자동 실행으로 UX 개선
-    - ✅ userStore.ts (자동화 레벨, 투자 성향 프로필 상태 관리, LocalStorage persist)
+      - ✅ **Research Agent 동적 라우팅 분석 및 문서화** (2025-10-31)
+        - ✅ 백엔드 코드 분석 (planner_node, Worker 5개)
+        - ✅ Worker 역할 정의 (data/bull/bear/macro/insight)
+        - ✅ 사용자 질문 유형별 Worker 매핑
+        - ✅ HITL 설계 문서 업데이트 (Master 레벨 interrupt)
+        - ✅ Worker 레벨 HITL 비권장 이유 문서화 (동적 라우팅)
+        - ✅ 복잡도 기반 HITL 로직 설계 (Router의 query_complexity/depth_level 활용)
+    - ✅ userStore.ts (자동화 레벨, 투자 성향 프로필 상태 관리, LocalStorage persist v2)
     - ✅ InvestmentProfile 컴포넌트 (Phase 3 구조 준비, 플레이스홀더)
     - ✅ My Page i18n 번역 (한국어/영어 완료)
     - ✅ Dynamic import로 My Page hydration 에러 해결
@@ -318,10 +325,11 @@ src/
       - ✅ 모든 주요 컴포넌트에 i18n 적용 완료
       - ✅ Chat, HITL, Portfolio, Artifacts, LNB, My Page 완전 번역
       - ✅ PortfolioSummary, ChartTypeSelector 번역 추가
-      - ✅ HITL Panel 모든 UI 요소 번역 (28 keys)
+      - ✅ HITL Panel 모든 UI 요소 번역 (28 keys, 5개 Agent별)
       - ✅ LNB 네비게이션 및 버튼 번역 (4 keys)
-- **Version**: 7.3 (Phase 2 완료 - Research Agent 동적 라우팅 문서화 및 HITL 설계 완료)
-- **Last Updated**: 2025-10-31
+      - ✅ 번역 키 충돌 해결 (complexity/depth label vs object)
+- **Version**: 7.4 (Phase 2 완료 - hitl_config 마이그레이션 및 5개 Agent HITL 패널 구현 완료)
+- **Last Updated**: 2025-11-02
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude

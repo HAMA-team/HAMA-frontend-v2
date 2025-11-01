@@ -205,3 +205,45 @@ export function getInterruptPoints(config: HITLConfig): string[] {
 
   return points;
 }
+
+/**
+ * HITLPhases가 어떤 프리셋과 일치하는지 확인
+ * 인터랙티브 워크플로우 바에서 사용
+ */
+export function matchPreset(phases: HITLPhases): HITLPreset | null {
+  // Pilot 체크
+  if (
+    !phases.data_collection &&
+    !phases.analysis &&
+    !phases.portfolio &&
+    !phases.risk &&
+    phases.trade === "conditional"
+  ) {
+    return "pilot";
+  }
+
+  // Copilot 체크
+  if (
+    !phases.data_collection &&
+    !phases.analysis &&
+    phases.portfolio &&
+    !phases.risk &&
+    phases.trade === true
+  ) {
+    return "copilot";
+  }
+
+  // Advisor 체크
+  if (
+    !phases.data_collection &&
+    phases.analysis &&
+    phases.portfolio &&
+    !phases.risk &&
+    phases.trade === true
+  ) {
+    return "advisor";
+  }
+
+  // 일치하는 프리셋 없음 → Custom
+  return null;
+}

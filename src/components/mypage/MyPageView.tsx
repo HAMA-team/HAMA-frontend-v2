@@ -5,6 +5,7 @@ import { useUserStore } from "@/store/userStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import { useHITLConfigSync } from "@/hooks/useHITLConfigSync";
 import AutomationLevelSelector from "./AutomationLevelSelector";
 import InvestmentProfile from "./InvestmentProfile";
 import { Sun, Moon, Globe } from "lucide-react";
@@ -31,6 +32,9 @@ export default function MyPageView() {
   const router = useRouter();
   const { userInfo } = useUserStore();
   const { theme, toggleTheme } = useThemeStore();
+
+  // HITL Config 동기화 (앱 시작, 모드 전환, 멀티탭)
+  useHITLConfigSync();
 
   // TODO: Phase 3 - 실제 사용자 정보 로드
   const displayUser = userInfo || {
@@ -122,21 +126,6 @@ export default function MyPageView() {
 
       {/* 섹션 2: 자동화 레벨 설정 ⭐ Phase 2 */}
       <section>
-        <div className="mb-4">
-          <h2
-            className="text-xl font-semibold mb-2"
-            style={{ color: "var(--text-primary)" }}
-          >
-            {t("mypage.automation.title")}
-          </h2>
-          <p
-            className="text-sm"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {t("mypage.automation.subtitle")}
-          </p>
-        </div>
-
         <AutomationLevelSelector />
       </section>
 

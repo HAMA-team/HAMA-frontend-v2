@@ -137,22 +137,42 @@ See `references/` folder for detailed design references.
 - ✅ i18n structure (Korean/English, language toggle)
 - ✅ Dynamic chart colors (useChartColors hook, dark mode adaptive)
 
-### Phase 2: Visualization & Settings (🔄 In Progress)
+### Phase 2: Visualization & Settings (✅ Completed)
 **Completed:**
 - ✅ My Page (마이페이지) - User settings interface
-- ✅ Automation Level Settings - 3-level system (Advisor/Copilot/Pilot)
+- ✅ **Automation Level Settings - 4-mode system (Advisor/Copilot/Pilot/Custom)**
   - ✅ 5-step workflow visualization (데이터 수집 → 분석 → 포트폴리오 → 리스크 → 매매)
+  - ✅ **Interactive Workflow Bar** - Clickable dots to toggle HITL per phase
+  - ✅ **Custom Mode Support** - Granular control over each phase
   - ✅ HITL intervention points display (red dots for approval required)
   - ✅ Level cards with detailed features
-- ✅ User Store (userStore.ts) - Automation level state management
-- ✅ i18n support for My Page (Korean/English)
+  - ✅ **hitl_config Migration Complete** (automation_level → hitl_config)
+    - ✅ LocalStorage version 2 migration with auto-conversion
+    - ✅ Custom mode settings persistence (customModePhases)
+    - ✅ Preset auto-detection (matchPreset helper)
+- ✅ User Store (userStore.ts) - Automation level state management (v2 migration)
+- ✅ **i18n Full Translation Complete** (Korean/English, 160+ keys, 99% coverage)
+  - ✅ All major components translated (Chat, HITL, Portfolio, Artifacts, LNB, My Page)
+  - ✅ Translation key conflicts resolved
+- ✅ **5 Agent-specific HITL Panels Implementation**
+  - ✅ ResearchApprovalPanel.tsx
+  - ✅ StrategyApprovalPanel.tsx
+  - ✅ PortfolioApprovalPanel.tsx
+  - ✅ RiskApprovalPanel.tsx
+  - ✅ TradingApprovalPanel.tsx
 - ✅ Investment Profile placeholder (Phase 3 구조 준비)
 
-**Remaining:**
+**Moved to Phase 3:**
 - Portfolio chart options enhancement
+- Backend HITL integration
+- Chat History persistence
 
-### Phase 3: Content Management & Onboarding
-- Artifact persistence, Chat History, Onboarding, i18n translations
+### Phase 3: Backend Integration & Content Management
+- Backend HITL integration (LangGraph interrupt mechanism)
+- Chat History persistence
+- Onboarding flow
+- Investment Profile API integration
+- Portfolio chart enhancements
 
 ### Phase 4: UX Enhancement
 - Discover, search, filtering, sorting

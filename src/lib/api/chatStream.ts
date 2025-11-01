@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api";
+import type { HITLConfig } from "@/types/hitl";
 
 export type StreamEvent = {
   event: string;
@@ -8,7 +9,7 @@ export type StreamEvent = {
 interface MultiStreamParams {
   message: string;
   conversation_id?: string;
-  automation_level?: 1 | 2 | 3;
+  hitl_config: HITLConfig;
   signal?: AbortSignal;
   onEvent?: (ev: StreamEvent) => void;
 }
@@ -17,7 +18,7 @@ interface MultiStreamParams {
 export async function startMultiAgentStream({
   message,
   conversation_id,
-  automation_level,
+  hitl_config,
   signal,
   onEvent,
 }: MultiStreamParams): Promise<void> {
@@ -42,7 +43,7 @@ export async function startMultiAgentStream({
     body: JSON.stringify({
       message,
       conversation_id,
-      automation_level,
+      hitl_config,
     }),
     signal,
   });

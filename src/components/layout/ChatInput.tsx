@@ -6,12 +6,14 @@ import { Paperclip, ArrowUp } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { usePathname, useRouter } from "next/navigation";
 import { useChatStore } from "@/store/chatStore";
+import { useUserStore } from "@/store/userStore";
 import { Message } from "@/lib/types/chat";
 import { sendChat, getChatSessions } from "@/lib/api/chat";
 import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useAppModeStore } from "@/store/appModeStore";
 import { useArtifactStore } from "@/store/artifactStore";
 import { ThinkingStep } from "@/lib/types/chat";
+import { PRESET_ADVISOR } from "@/types/hitl";
 
 interface ChatInputProps {
   placeholder?: string;
@@ -40,6 +42,7 @@ export default function ChatInput({
   const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel, currentThreadId, clearMessages } = useChatStore();
   const { mode } = useAppModeStore();
   const { getArtifact } = useArtifactStore();
+  const { hitlConfig } = useUserStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -113,7 +116,7 @@ export default function ChatInput({
         // Demo 모드에서는 백엔드 호출 스킵하고 더미 응답 표시
         // 아티팩트 컨텍스트가 있으면 LLM 입력에는 아티팩트 내용을 안전하게 선행해 전송(화면에는 미표시)
         let composedForLLM = userMessageContent;
-        let desiredLevel: 1 | 2 | 3 = 2; // 기본: Copilot
+        let desiredConfig = hitlConfig; // 기본: userStore의 hitlConfig
         if (fromExternalPage && contextArtifactId) {
           const art = getArtifact?.(contextArtifactId);
           if (art?.content) {
@@ -127,7 +130,7 @@ export default function ChatInput({
               .replace(/\bA(\d{6})\b/g, (_m: string, g1: string) => `A ${g1.split("").join(" ")}`);
             composedForLLM = `${preamble}\n\n\`\`\`context\n${maskedCtx}\n\`\`\`\n\n---\n${sep}\n\n${userMessageContent}`;
             // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해 Advisor 모드로 유도
-            desiredLevel = 3;
+            desiredConfig = PRESET_ADVISOR;
           }
         }
 
@@ -189,7 +192,7 @@ export default function ChatInput({
             await startMultiAgentStream({
               message: composedForLLM,
               conversation_id: conversationIdForRequest,
-              automation_level: desiredLevel,
+              hitl_config: desiredConfig,
               onEvent: (ev) => {
                 const now = new Date().toISOString();
                 // 스트림 중 서버가 thread/conversation id를 제공하면 즉시 저장하여 LNB 갱신 유도
@@ -321,7 +324,7 @@ export default function ChatInput({
             const data = await sendChat({
               message: composedForLLM,
               conversation_id: conversationIdForRequest,
-              automation_level: desiredLevel,
+              hitl_config: desiredConfig,
             });
             updateMessage(tempId, { content: data.message || t("chat.receivedResponse"), status: "sent" });
             const cid = (data as any)?.conversation_id || (data as any)?.thread_id || (data as any)?.id || (data as any)?.metadata?.conversation_id;

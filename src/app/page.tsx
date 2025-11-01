@@ -9,7 +9,7 @@ import { useArtifactStore } from "@/store/artifactStore";
 import { createArtifact } from "@/lib/api/artifacts";
 import { Message, ThinkingStep } from "@/lib/types/chat";
 import { useDialogStore } from "@/store/dialogStore";
-import { approveAction } from "@/lib/api/chat";
+import { approveAction } from "@/lib/api/approvals";
 import { useAppModeStore } from "@/store/appModeStore";
 import { useTranslation } from "react-i18next";
 
@@ -164,18 +164,16 @@ def calculate_portfolio():
         openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
         return;
       }
-      // TODO: 실제 API 호출로 대체 필요
-      await approveAction({ thread_id: currentThreadId, decision: "approved", automation_level: 2 });
-      // const response = await axios.post("/api/v1/chat/approve", {
-      //   thread_id: currentThreadId,
-      //   decision: "approved",
-      //   automation_level: 2,
-      // });
+      // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
+      await approveAction({
+        thread_id: currentThreadId,
+        decision: "approved"
+      });
 
       console.log("Approve:", messageId, currentThreadId);
       openAlert({ title: t("hitl.approved") });
       closeApprovalPanel();
-      
+
     } catch (error) {
       console.error("Approval error:", error);
       openAlert({ title: t('common.error') });
@@ -193,8 +191,11 @@ def calculate_portfolio():
         openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
         return;
       }
-      // TODO: 실제 API 호출로 대체 필요
-      await approveAction({ thread_id: currentThreadId, decision: "rejected", automation_level: 2 });
+      // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
+      await approveAction({
+        thread_id: currentThreadId,
+        decision: "rejected"
+      });
       // const response = await axios.post("/api/v1/chat/approve", {
       //   thread_id: currentThreadId,
       //   decision: "rejected",
@@ -211,30 +212,158 @@ def calculate_portfolio():
   };
 
   // TEST: HITL 패널 테스트용 함수 (개발 완료 후 제거)
-  const handleTestHITL = () => {
-    openApprovalPanel({
-      action: "buy",
-      stock_code: "005930",
-      stock_name: "삼성전자",
-      quantity: 100,
-      price: 70000,
-      total_amount: 7000000,
-      current_weight: 25.0,
-      expected_weight: 43.2,
-      risk_warning: "이 거래는 포트폴리오의 43.2%를 차지하게 되어 과도한 집중 리스크가 발생할 수 있습니다.",
-      alternatives: [
-        {
-          suggestion: "매수 수량을 50주로 조정하여 포트폴리오 비중을 34%로 유지",
-          adjusted_quantity: 50,
-          adjusted_amount: 3500000,
+  const handleTestHITL = (agentType: string) => {
+    const testData: Record<string, any> = {
+      research: {
+        type: "research",
+        agent: "Research",
+        stock_code: "005930",
+        stock_name: "삼성전자",
+        query: "삼성전자의 최근 실적과 향후 전망을 분석해주세요",
+        routing_reason: "기업 재무 분석 및 산업 동향 파악 필요",
+        query_complexity: "expert",
+        depth_level: "comprehensive",
+        expected_workers: ["data_collector", "bull_analyst", "bear_analyst"],
+        rationale: "HBM3 양산 본격화와 AI 반도체 수요 증가로 실적 개선 예상. 메모리 업황 회복 사이클 진입 중",
+        alternatives: [
+          {
+            suggestion: "간단한 정보 조회만 실행 (depth_level: brief)",
+            query_complexity: "simple",
+            depth_level: "brief",
+          },
+        ],
+      },
+      strategy: {
+        type: "strategy",
+        agent: "Strategy",
+        strategy_type: "GROWTH",
+        market_outlook: {
+          cycle: "expansion",
+          sentiment: "bullish",
         },
-        {
-          suggestion: "매수 수량을 30주로 조정하여 포트폴리오 비중을 28%로 유지",
-          adjusted_quantity: 30,
-          adjusted_amount: 2100000,
+        sector_strategy: {
+          overweight: ["반도체", "AI", "클라우드"],
+          underweight: ["건설", "조선"],
         },
-      ],
-    });
+        target_allocation: {
+          stocks: 85,
+          cash: 15,
+        },
+        expected_return: 15.8,
+        expected_risk: "medium",
+        rationale: "AI 반도체 업황 회복과 성장 전망이 밝아 성장주 중심 전략 추천",
+        alternatives: [
+          {
+            suggestion: "보수적 전략: 배당주 비중 확대 (주식 70%, 현금 30%)",
+            expected_return: 10.2,
+            expected_risk: "low",
+          },
+          {
+            suggestion: "공격적 전략: 성장주 집중 (주식 95%, 현금 5%)",
+            expected_return: 22.5,
+            expected_risk: "high",
+          },
+        ],
+      },
+      portfolio: {
+        type: "portfolio",
+        agent: "Portfolio",
+        rebalancing_needed: true,
+        current_holdings: [
+          { stock_code: "005930", stock_name: "삼성전자", quantity: 100, current_weight: 30 },
+          { stock_code: "000660", stock_name: "SK하이닉스", quantity: 50, current_weight: 15 },
+          { stock_code: "035420", stock_name: "NAVER", quantity: 80, current_weight: 20 },
+        ],
+        proposed_allocation: [
+          { stock_code: "005930", stock_name: "삼성전자", target_weight: 25, action: "SELL", quantity_change: -20 },
+          { stock_code: "000660", stock_name: "SK하이닉스", target_weight: 20, action: "BUY", quantity_change: 15 },
+          { stock_code: "035420", stock_name: "NAVER", target_weight: 15, action: "SELL", quantity_change: -25 },
+        ],
+        trades_required: [
+          { stock_code: "005930", order_type: "sell", quantity: 20, estimated_amount: 1400000 },
+          { stock_code: "000660", order_type: "buy", quantity: 15, estimated_amount: 2100000 },
+          { stock_code: "035420", order_type: "sell", quantity: 25, estimated_amount: 5000000 },
+        ],
+        portfolio_metrics: {
+          expected_return: 12.5,
+          expected_risk: 8.2,
+          turnover_ratio: 5.2,
+        },
+        rationale: "반도체 업황 회복 기대감으로 SK하이닉스 비중 확대, 테크주 과열 우려로 NAVER 축소",
+        alternatives: [
+          {
+            suggestion: "점진적 리밸런싱: 3회로 나누어 실행하여 시장 충격 최소화",
+            turnover_ratio: 1.8,
+          },
+        ],
+      },
+      risk: {
+        type: "risk",
+        agent: "Risk",
+        risk_level: "medium",
+        risk_factors: [
+          {
+            category: "집중 리스크",
+            severity: "warning",
+            description: "반도체 업종 비중 45%로 산업 사이클 리스크 존재",
+            mitigation: "방어적 자산 10% 이상 편입 권장",
+          },
+          {
+            category: "시장 리스크",
+            severity: "critical",
+            description: "포트폴리오의 섹터 집중도가 높아 체계적 위험 증가",
+            mitigation: "글로벌 분산 투자를 통한 지역 리스크 완화",
+          },
+        ],
+        portfolio_metrics: {
+          concentration: 45.0,
+          volatility: 18.5,
+          max_drawdown: 15.8,
+        },
+        recommended_actions: [
+          "방어적 자산(배당주, 채권) 10% 이상 편입",
+          "글로벌 분산 투자 확대",
+          "헤지 전략 검토",
+        ],
+        rationale: "현재 포트폴리오는 반도체 섹터에 과도하게 집중되어 있어 산업 사이클 변동 시 큰 손실 가능성 있음",
+        alternatives: [
+          {
+            suggestion: "리스크 완화 포트폴리오: 채권 20% 편입, 반도체 비중 30%로 축소",
+            risk_level: "low",
+          },
+        ],
+      },
+      trading: {
+        type: "trading",
+        agent: "Trading",
+        action: "buy",
+        stock_code: "005930",
+        stock_name: "삼성전자",
+        quantity: 100,
+        price: 70000,
+        total_amount: 7000000,
+        current_weight: 25.0,
+        expected_weight: 43.2,
+        risk_warning: "이 거래는 포트폴리오의 43.2%를 차지하게 되어 과도한 집중 리스크가 발생할 수 있습니다.",
+        alternatives: [
+          {
+            suggestion: "매수 수량을 50주로 조정하여 포트폴리오 비중을 34%로 유지",
+            adjusted_quantity: 50,
+            adjusted_amount: 3500000,
+          },
+          {
+            suggestion: "매수 수량을 30주로 조정하여 포트폴리오 비중을 28%로 유지",
+            adjusted_quantity: 30,
+            adjusted_amount: 2100000,
+          },
+        ],
+      },
+    };
+
+    const data = testData[agentType];
+    if (data) {
+      openApprovalPanel(data);
+    }
   };
 
   return (

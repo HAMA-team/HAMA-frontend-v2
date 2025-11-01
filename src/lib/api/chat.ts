@@ -1,9 +1,18 @@
-import apiClient from "@/lib/api";
+/**
+ * Chat API Client
+ *
+ * 채팅 및 대화 세션 관련 API 호출
+ *
+ * @see docs/qa/Settings_Approvals_API_Complete_Design.md - Section 1, 3
+ */
+
+import apiClient from '@/lib/api';
+import type { HITLConfig } from '@/types/hitl';
 
 export interface SendChatPayload {
   message: string;
   conversation_id?: string | null;
-  automation_level?: 1 | 2 | 3;
+  hitl_config: HITLConfig; // automation_level → hitl_config 변경
 }
 
 export interface ChatAPIResponse {
@@ -15,25 +24,7 @@ export interface ChatAPIResponse {
 }
 
 export async function sendChat(payload: SendChatPayload) {
-  const { data } = await apiClient.post<ChatAPIResponse>("/api/v1/chat/", payload);
-  return data;
-}
-
-export interface ApproveActionPayload {
-  thread_id: string; // conversation_id와 동일 의미
-  decision: "approved" | "rejected" | "modified";
-  automation_level?: 1 | 2 | 3;
-  modifications?: Record<string, any> | null;
-  user_notes?: string | null;
-}
-
-export interface ApprovalResponse {
-  message: string;
-  conversation_id: string;
-}
-
-export async function approveAction(payload: ApproveActionPayload) {
-  const { data } = await apiClient.post<ApprovalResponse>("/api/v1/chat/approve", payload);
+  const { data } = await apiClient.post<ChatAPIResponse>('/api/v1/chat/', payload);
   return data;
 }
 

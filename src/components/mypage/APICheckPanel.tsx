@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useAppModeStore } from "@/store/appModeStore";
 import { fetchArtifactsList } from "@/lib/api/artifacts";
 import { fetchApprovalsList } from "@/lib/api/approvals";
-import { fetchAutomationLevel, fetchAutomationLevels } from "@/lib/api/settings";
+import { getAutomationLevel } from "@/lib/api/settings";
 import { fetchPortfolioChartData } from "@/lib/api/portfolio";
 import { CheckCircle2, XCircle, MinusCircle, RefreshCcw } from "lucide-react";
 import { formatAbsoluteDate } from "@/lib/utils";
@@ -31,8 +31,7 @@ export default function APICheckPanel() {
     () => [
       { key: "artifacts", name: t("mypage.apiStatus.items.artifacts"), path: "/api/v1/artifacts/", run: fetchArtifactsList },
       { key: "approvals", name: t("mypage.apiStatus.items.approvals"), path: "/api/v1/approvals/", run: fetchApprovalsList },
-      { key: "automationLevel", name: t("mypage.apiStatus.items.automationLevel"), path: "/api/v1/settings/automation-level", run: fetchAutomationLevel },
-      { key: "automationLevels", name: t("mypage.apiStatus.items.automationLevels"), path: "/api/v1/settings/automation-levels", run: fetchAutomationLevels },
+      { key: "automationLevel", name: t("mypage.apiStatus.items.automationLevel"), path: "/api/v1/settings/automation-level", run: getAutomationLevel },
       { key: "portfolioChart", name: t("mypage.apiStatus.items.portfolioChart"), path: "/api/v1/portfolio/chart-data", run: fetchPortfolioChartData },
     ],
     [t]
