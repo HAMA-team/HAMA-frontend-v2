@@ -254,14 +254,16 @@ export default function ChatInput({
                       // Trading Agent HITL 처리
                       if (agentType === "trading") {
                         const hitlData = {
-                          type: "trading",
-                          agent: "Trading",
-                          action: result.action || "buy", // BUY/SELL
+                          type: "trading" as const,
+                          agent: "Trading" as const,
+                          action: (result.action || "buy") as "buy" | "sell",
                           stock_code: result.stock_code || "000000",
                           stock_name: result.stock_name || "종목명",
                           quantity: result.quantity || 0,
                           price: result.price || 0,
                           total_amount: result.total_amount || 0,
+                          current_weight: result.current_weight || 0,
+                          expected_weight: result.expected_weight || 0,
                           order_id: result.order_id,
                           rationale: result.summary || "매수 주문이 생성되었습니다.",
                           risk_warning: result.risk_warning || "",
