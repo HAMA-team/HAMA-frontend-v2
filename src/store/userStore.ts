@@ -174,6 +174,10 @@ export const useUserStore = create<UserStore>()(
 
       // Hydration 완료 후 기본값 병합
       merge: (persistedState: any, currentState: UserStore) => {
+        // persistedState가 없으면 currentState 그대로 반환
+        if (!persistedState) {
+          return currentState;
+        }
         return {
           ...currentState,
           ...persistedState,

@@ -245,6 +245,33 @@ export default function ChatInput({
                       description: `${ev.data?.agent || "Agent"} complete: ${summary}`,
                       timestamp: now,
                     });
+
+                    // HITL: agent_complete에서 requires_approval 체크
+                    const result = ev.data?.result;
+                    if (result && (result.requires_approval || result.status === "pending")) {
+                      const agentType = String(ev.data?.agent || "").toLowerCase();
+
+                      // Trading Agent HITL 처리
+                      if (agentType === "trading") {
+                        const hitlData = {
+                          type: "trading",
+                          agent: "Trading",
+                          action: result.action || "buy", // BUY/SELL
+                          stock_code: result.stock_code || "000000",
+                          stock_name: result.stock_name || "종목명",
+                          quantity: result.quantity || 0,
+                          price: result.price || 0,
+                          total_amount: result.total_amount || 0,
+                          order_id: result.order_id,
+                          rationale: result.summary || "매수 주문이 생성되었습니다.",
+                          risk_warning: result.risk_warning || "",
+                          alternatives: result.alternatives || [],
+                        };
+                        console.log("🚨 HITL Request (from agent_complete):", hitlData);
+                        openApprovalPanel(hitlData);
+                      }
+                      // TODO: 다른 Agent 타입 처리 추가 (portfolio, strategy, etc.)
+                    }
                     break; }
                   case "message_delta":
                   case "delta": {

@@ -164,6 +164,8 @@ def calculate_portfolio():
         openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
         return;
       }
+      console.log("🔑 Approving with thread_id:", currentThreadId);
+      console.log("📋 Approval panel data:", approvalPanel.data);
       // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
       await approveAction({
         thread_id: currentThreadId,
@@ -176,7 +178,15 @@ def calculate_portfolio():
 
     } catch (error) {
       console.error("Approval error:", error);
-      openAlert({ title: t('common.error') });
+      // 백엔드 에러 메시지 출력
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const axiosError = error as any;
+      const serverMsg = axiosError?.response?.data?.detail || axiosError?.response?.data?.message || errorMsg;
+      console.error("Server error detail:", serverMsg);
+      openAlert({
+        title: t('common.error'),
+        message: `승인 실패: ${serverMsg}`
+      });
     }
   };
 
@@ -207,7 +217,15 @@ def calculate_portfolio():
       closeApprovalPanel();
     } catch (error) {
       console.error("Rejection error:", error);
-      openAlert({ title: t('common.error') });
+      // 백엔드 에러 메시지 출력
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const axiosError = error as any;
+      const serverMsg = axiosError?.response?.data?.detail || axiosError?.response?.data?.message || errorMsg;
+      console.error("Server error detail:", serverMsg);
+      openAlert({
+        title: t('common.error'),
+        message: `거부 실패: ${serverMsg}`
+      });
     }
   };
 
