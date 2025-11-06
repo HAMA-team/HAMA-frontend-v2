@@ -49,7 +49,7 @@ export default function Home() {
   const { openAlert } = useDialogStore();
   const { hitlConfig } = useUserStore();
 
-  const handleSuggestionClick = (prompt: string) => {
+  const handleSuggestionClick = async (prompt: string) => {
     // 사용자 메시지 추가
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -60,59 +60,136 @@ export default function Home() {
     };
     addMessage(userMessage);
 
-    // TODO: 실제 API 호출로 대체 필요
-    // 테스트용 AI 응답 추가
-    setTimeout(() => {
-      const thinkingSteps: ThinkingStep[] = [
-        {
-          agent: "planner",
-          description: "요구사항을 분석하고 답변 계획을 수립합니다.",
-          timestamp: new Date(Date.now() - 2000).toISOString(),
-        },
-        {
-          agent: "researcher",
-          description: "포트폴리오 데이터를 조회하고 최신 시장 정보를 수집합니다.",
-          timestamp: new Date(Date.now() - 1000).toISOString(),
-        },
-        {
-          agent: "strategy",
-          description: "수집한 데이터를 바탕으로 투자 전략을 분석합니다.",
-          timestamp: new Date().toISOString(),
-        },
-      ];
+    // 대기용 assistant 메시지 추가
+    const tempId = `ai-${Date.now()}`;
+    const pendingMessage: Message = {
+      id: tempId,
+      role: "assistant",
+      content: "",
+      timestamp: new Date().toISOString(),
+      status: "sending",
+    };
+    addMessage(pendingMessage);
 
-      const aiMessage: Message = {
-        id: `ai-${Date.now()}`,
-        role: "assistant",
-        content: `# ${prompt.includes("포트폴리오") ? "포트폴리오 분석 결과" : "분석 결과"}
+    // Demo 모드: 더미 응답 생성
+    if (mode === "demo") {
+      setTimeout(() => {
+        const thinkingSteps: ThinkingStep[] = [
+          {
+            agent: "planner",
+            description: "요구사항을 분석하고 답변 계획을 수립합니다.",
+            timestamp: new Date(Date.now() - 2000).toISOString(),
+          },
+          {
+            agent: "researcher",
+            description: "포트폴리오 데이터를 조회하고 최신 시장 정보를 수집합니다.",
+            timestamp: new Date(Date.now() - 1000).toISOString(),
+          },
+          {
+            agent: "strategy",
+            description: "수집한 데이터를 바탕으로 투자 전략을 분석합니다.",
+            timestamp: new Date().toISOString(),
+          },
+        ];
 
-현재 질문에 대한 답변을 생성하고 있습니다.
+        updateMessage(tempId, {
+          content: `# ${prompt.includes("포트폴리오") || prompt.includes("Portfolio") ? t("portfolio.title") : t("chat.emptyState.suggestions.market.title")}
 
-## 주요 포인트
+${t("chat.receivedResponse")}
 
-- **항목 1**: 첫 번째 중요한 정보입니다
-- **항목 2**: 두 번째 분석 내용입니다
-- **항목 3**: 세 번째 권장사항입니다
+## ${t("hitl.keyPoints") || "주요 포인트"}
 
-## 코드 예시
+- **${t("common.item")} 1**: 첫 번째 중요한 정보입니다
+- **${t("common.item")} 2**: 두 번째 분석 내용입니다
+- **${t("common.item")} 3**: 세 번째 권장사항입니다
 
-\`\`\`python
-def calculate_portfolio():
-    return "Portfolio Analysis"
-\`\`\`
-
-## 다음 단계
+## ${t("common.nextSteps") || "다음 단계"}
 
 1. 추가 질문이 있으시면 말씀해주세요
 2. 더 자세한 분석이 필요하면 요청해주세요
 
-> **참고**: 이것은 테스트용 메시지입니다.`,
-        thinking: thinkingSteps,
-        timestamp: new Date().toISOString(),
-        status: "sent",
-      };
-      addMessage(aiMessage);
-    }, 1000);
+> **${t("common.note") || "참고"}**: 이것은 테스트용 메시지입니다.`,
+          thinking: thinkingSteps,
+          status: "sent",
+        });
+      }, 1000);
+      return;
+    }
+
+    // Live 모드: 실제 API 호출
+    try {
+      setLoading(true);
+
+      try {
+        await startMultiAgentStream({
+          message: prompt,
+          conversation_id: currentThreadId || undefined,
+          hitl_config: hitlConfig,
+          onEvent: (ev) => {
+            const now = new Date().toISOString();
+            try {
+              const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+              if (providedId && !useChatStore.getState().currentThreadId) {
+                setCurrentThreadId(String(providedId));
+              }
+            } catch {}
+
+            switch (ev.event) {
+              case "master_start":
+                updateMessage(tempId, { status: "sending" });
+                break;
+              case "master_complete": {
+                const text = typeof ev.data?.message === "string" ? ev.data.message : t("chat.receivedResponse");
+                updateMessage(tempId, { content: text, status: "sent" });
+                const cid = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+                if (cid) setCurrentThreadId(String(cid));
+                try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
+                break;
+              }
+              case "error": {
+                const msg = ev.data?.message || "Stream error";
+                updateMessage(tempId, { content: msg, status: "error" });
+                break;
+              }
+              default:
+                // 다른 이벤트는 무시 (간단한 버전)
+                break;
+            }
+          },
+        });
+
+        // 스트림 완료 후 상태 확인
+        const m = useChatStore.getState().messages.find(m => m.id === tempId);
+        if (m && m.status === "sending") {
+          updateMessage(tempId, { status: "sent" });
+        }
+      } catch (streamErr) {
+        // 폴백: REST API
+        const data = await sendChat({
+          message: prompt,
+          conversation_id: currentThreadId || undefined,
+          hitl_config: hitlConfig,
+        });
+        updateMessage(tempId, {
+          content: data.message || t("chat.receivedResponse"),
+          status: "sent"
+        });
+        const cid = (data as any)?.conversation_id || (data as any)?.thread_id || (data as any)?.id;
+        if (cid) setCurrentThreadId(String(cid));
+        try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
+      }
+    } catch (error) {
+      // API 연결 실패
+      const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
+      const docsUrl = `${apiBase}/docs`;
+      const errorText = `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`${apiBase}\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: ${docsUrl}\n\n${t("chat.backendErrorDetail")}`;
+      updateMessage(tempId, {
+        content: errorText,
+        status: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRetryMessage = async (messageId: string) => {

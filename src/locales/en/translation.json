@@ -50,22 +50,22 @@
                                                         "portfolio":  {
                                                                           "title":  "Portfolio Status",
                                                                           "description":  "Check your current assets and returns",
-                                                                          "prompt":  "Show me my portfolio status"
+                                                                          "prompt":  "Please provide a detailed overview of my current portfolio, including holdings, investment amounts, returns, and the weight of each stock. Also include recent performance trends."
                                                                       },
                                                         "market":  {
                                                                        "title":  "Market Analysis",
                                                                        "description":  "Latest market trends and investment strategies",
-                                                                       "prompt":  "Analyze recent market trends"
+                                                                       "prompt":  "Please analyze today's major economic news and stock market trends both domestically and internationally. Include the current market cycle and key issues that investors should pay attention to."
                                                                    },
                                                         "recommendation":  {
                                                                                "title":  "Stock Recommendations",
                                                                                "description":  "AI-powered personalized investment ideas",
-                                                                               "prompt":  "Recommend stocks for my investment style"
+                                                                               "prompt":  "Please recommend stocks suitable for beginners who are just starting to invest. Focus on stable yet growth-potential stocks from a long-term investment perspective, and also recommend books that can help learn about stock investing."
                                                                            },
                                                         "risk":  {
                                                                      "title":  "Risk Analysis",
                                                                      "description":  "Review portfolio risk factors",
-                                                                     "prompt":  "Analyze my portfolio risks"
+                                                                     "prompt":  "Please analyze the risk factors in my current portfolio. Evaluate sector concentration, volatility, and potential maximum drawdown, and provide specific improvement measures to reduce risks."
                                                                  }
                                                     }
                                 },
