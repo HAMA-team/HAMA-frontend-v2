@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Loader2, AlertTriangle, Copy, Check } from "lucide-react";
+import { Loader2, AlertTriangle, Copy, Check, X } from "lucide-react";
 import { Message } from "@/lib/types/chat";
 import ThinkingSection from "./ThinkingSection";
 import SaveArtifactButton from "./SaveArtifactButton";
@@ -25,14 +25,14 @@ import { useTranslation } from "react-i18next";
 interface ChatMessageProps {
   message: Message;
   onRetry?: () => void;
-  onDelete?: () => void;
+  onCloseError?: () => void;
   onSaveArtifact?: () => void;
 }
 
 export default function ChatMessage({
   message,
   onRetry,
-  onDelete,
+  onCloseError,
   onSaveArtifact,
 }: ChatMessageProps) {
   const [isCopied, setIsCopied] = useState(false);
@@ -325,10 +325,10 @@ export default function ChatMessage({
                 {t("chat.retry")}
               </button>
             )}
-            {onDelete && (
+            {onCloseError && (
               <button
-                onClick={onDelete}
-                className="px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-150 border"
+                onClick={onCloseError}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-150 border"
                 style={{
                   backgroundColor: "transparent",
                   color: "var(--error-600)",
@@ -341,7 +341,8 @@ export default function ChatMessage({
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
-                {t("common.delete")}
+                <X className="w-4 h-4" strokeWidth={1.5} />
+                <span>{t("common.close")}</span>
               </button>
             )}
           </div>

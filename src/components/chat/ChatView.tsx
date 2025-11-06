@@ -18,14 +18,14 @@ import ChatMessage from "./ChatMessage";
 interface ChatViewProps {
   messages: Message[];
   onRetryMessage?: (messageId: string) => void;
-  onDeleteMessage?: (messageId: string) => void;
+  onCloseError?: (messageId: string) => void;
   onSaveArtifact?: (messageId: string) => void;
 }
 
 export default function ChatView({
   messages,
   onRetryMessage,
-  onDeleteMessage,
+  onCloseError,
   onSaveArtifact,
 }: ChatViewProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -61,8 +61,8 @@ export default function ChatView({
               onRetry={
                 onRetryMessage ? () => onRetryMessage(message.id) : undefined
               }
-              onDelete={
-                onDeleteMessage ? () => onDeleteMessage(message.id) : undefined
+              onCloseError={
+                onCloseError ? () => onCloseError(message.id) : undefined
               }
               onSaveArtifact={
                 onSaveArtifact && message.role === "assistant"

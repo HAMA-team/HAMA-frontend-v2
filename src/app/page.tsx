@@ -12,6 +12,9 @@ import { useDialogStore } from "@/store/dialogStore";
 import { approveAction } from "@/lib/api/approvals";
 import { useAppModeStore } from "@/store/appModeStore";
 import { useTranslation } from "react-i18next";
+import { sendChat } from "@/lib/api/chat";
+import { startMultiAgentStream } from "@/lib/api/chatStream";
+import { useUserStore } from "@/store/userStore";
 
 /**
  * Home Page - Chat Interface
@@ -41,9 +44,10 @@ const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
 export default function Home() {
   const { t } = useTranslation();
   const { mode } = useAppModeStore();
-  const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId } = useChatStore();
+  const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId } = useChatStore();
   const { addArtifact } = useArtifactStore();
   const { openAlert } = useDialogStore();
+  const { hitlConfig } = useUserStore();
 
   const handleSuggestionClick = (prompt: string) => {
     // 사용자 메시지 추가
@@ -111,13 +115,144 @@ def calculate_portfolio():
     }, 1000);
   };
 
-  const handleRetryMessage = (messageId: string) => {
-    console.log("Retry message:", messageId);
-    // TODO: 메시지 재전송 로직 구현
+  const handleRetryMessage = async (messageId: string) => {
+    // 1. 실패한 assistant 메시지 찾기
+    const failedMessage = messages.find((msg) => msg.id === messageId);
+    if (!failedMessage || failedMessage.role !== "assistant") {
+      console.error("Failed message not found or not an assistant message");
+      return;
+    }
+
+    // 2. 직전 사용자 메시지 찾기
+    const failedIndex = messages.findIndex((msg) => msg.id === messageId);
+    const userMessage = messages
+      .slice(0, failedIndex)
+      .reverse()
+      .find((msg) => msg.role === "user");
+
+    if (!userMessage) {
+      console.error("Previous user message not found");
+      return;
+    }
+
+    // 3. 사용자 메시지와 실패한 assistant 메시지 모두 삭제 (중복 방지)
+    deleteMessage(userMessage.id);
+    deleteMessage(messageId);
+
+    // 4. 사용자 메시지 다시 추가
+    const newUserMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: userMessage.content,
+      timestamp: new Date().toISOString(),
+      status: "sent",
+    };
+    addMessage(newUserMessage);
+
+    // 5. 대기용 assistant 메시지 추가
+    const tempId = `ai-${Date.now()}`;
+    const pendingMessage: Message = {
+      id: tempId,
+      role: "assistant",
+      content: "",
+      timestamp: new Date().toISOString(),
+      status: "sending",
+    };
+    addMessage(pendingMessage);
+
+    // 6. 실제 API 호출
+    try {
+      setLoading(true);
+
+      if (mode === "demo") {
+        // Demo 모드: 더미 응답
+        const data = {
+          message: t("chat.receivedResponse"),
+          conversation_id: `demo-${Date.now()}`,
+          requires_approval: false,
+        };
+        updateMessage(tempId, {
+          content: data.message,
+          status: "sent",
+        });
+        setCurrentThreadId(data.conversation_id);
+      } else {
+        // Live 모드: 실제 API 호출 (스트림 시도, 실패 시 REST 폴백)
+        try {
+          await startMultiAgentStream({
+            message: userMessage.content,
+            conversation_id: currentThreadId || undefined,
+            hitl_config: hitlConfig,
+            onEvent: (ev) => {
+              const now = new Date().toISOString();
+              try {
+                const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+                if (providedId && !useChatStore.getState().currentThreadId) {
+                  setCurrentThreadId(String(providedId));
+                }
+              } catch {}
+
+              switch (ev.event) {
+                case "master_start":
+                  updateMessage(tempId, { status: "sending" });
+                  break;
+                case "master_complete": {
+                  const text = typeof ev.data?.message === "string" ? ev.data.message : t("chat.receivedResponse");
+                  updateMessage(tempId, { content: text, status: "sent" });
+                  const cid = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+                  if (cid) setCurrentThreadId(String(cid));
+                  break;
+                }
+                case "error": {
+                  const msg = ev.data?.message || "Stream error";
+                  updateMessage(tempId, { content: msg, status: "error" });
+                  break;
+                }
+                default:
+                  // 다른 이벤트는 무시 (간단한 버전)
+                  break;
+              }
+            },
+          });
+
+          // 스트림 완료 후 상태 확인
+          const m = useChatStore.getState().messages.find(m => m.id === tempId);
+          if (m && m.status === "sending") {
+            updateMessage(tempId, { status: "sent" });
+          }
+        } catch (streamErr) {
+          // 폴백: REST API
+          const data = await sendChat({
+            message: userMessage.content,
+            conversation_id: currentThreadId || undefined,
+            hitl_config: hitlConfig,
+          });
+          updateMessage(tempId, {
+            content: data.message || t("chat.receivedResponse"),
+            status: "sent"
+          });
+          const cid = (data as any)?.conversation_id || (data as any)?.thread_id || (data as any)?.id;
+          if (cid) setCurrentThreadId(String(cid));
+        }
+      }
+    } catch (error) {
+      // API 연결 실패
+      const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
+      const docsUrl = `${apiBase}/docs`;
+      const errorText = `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`${apiBase}\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: ${docsUrl}\n\n${t("chat.backendErrorDetail")}`;
+      updateMessage(tempId, {
+        content: errorText,
+        status: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteMessage = (messageId: string) => {
-    deleteMessage(messageId);
+  const handleCloseError = (messageId: string) => {
+    // 에러 상태만 해제 (메시지는 유지하되 에러 바 숨김)
+    const { updateMessage } = useChatStore.getState();
+    updateMessage(messageId, { status: "sent" });
   };
 
   const handleSaveArtifact = async (messageId: string) => {
@@ -400,7 +535,7 @@ def calculate_portfolio():
         <ChatView
           messages={messages}
           onRetryMessage={handleRetryMessage}
-          onDeleteMessage={handleDeleteMessage}
+          onCloseError={handleCloseError}
           onSaveArtifact={handleSaveArtifact}
         />
       )}
