@@ -43,6 +43,12 @@
                  "retry":  "Retry",
                  "backendError":  "⚠️ **Cannot connect to backend server**",
                  "backendErrorDetail":  "You can test the UI without backend API in local environment.",
+                 "errorContent":  "Error Details:",
+                 "solution":  "Solution:",
+                 "unknownError":  "Unknown error",
+                 "checkBackendRunning":  "Check if the backend server is running",
+                 "startServer":  "Start server",
+                 "checkApiDocs":  "Check API documentation",
                  "emptyState":  {
                                     "greeting":  "Hello!",
                                     "subGreeting":  "How can I help you?",

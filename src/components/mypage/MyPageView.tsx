@@ -6,6 +6,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { useHITLConfigSync } from "@/hooks/useHITLConfigSync";
+import { useAppModeStore } from "@/store/appModeStore";
 import AutomationLevelSelector from "./AutomationLevelSelector";
 import InvestmentProfile from "./InvestmentProfile";
 import { Sun, Moon, Globe } from "lucide-react";
@@ -32,6 +33,7 @@ export default function MyPageView() {
   const router = useRouter();
   const { userInfo } = useUserStore();
   const { theme, toggleTheme } = useThemeStore();
+  const { mode } = useAppModeStore();
 
   // HITL Config 동기화 (앱 시작, 모드 전환, 멀티탭)
   useHITLConfigSync();
@@ -297,16 +299,18 @@ export default function MyPageView() {
         </div>
       </section>
 
-      {/* 섹션 5: API 상태 확인 (임시) */}
-      <section>
-        <h2
-          className="text-xl font-semibold mb-4"
-          style={{ color: "var(--text-primary)" }}
-        >
-          {t("mypage.apiStatus.header")}
-        </h2>
-        <APICheckPanel />
-      </section>
+      {/* 섹션 5: API 상태 확인 (임시) - Demo 모드에서만 표시 */}
+      {mode === "demo" && (
+        <section>
+          <h2
+            className="text-xl font-semibold mb-4"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {t("mypage.apiStatus.header")}
+          </h2>
+          <APICheckPanel />
+        </section>
+      )}
 
       {/* 섹션 6: 온보딩 체험하기 (선택적) */}
       <section>

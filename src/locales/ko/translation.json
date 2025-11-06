@@ -45,6 +45,12 @@
     "hitlTestTitle": "HITL 패널 테스트 (Agent 선택)",
     "backendError": "⚠️ **백엔드 서버에 연결할 수 없습니다**",
     "backendErrorDetail": "로컬 환경에서는 백엔드 API 없이도 UI 테스트가 가능합니다.",
+    "errorContent": "오류 내용:",
+    "solution": "해결 방법:",
+    "unknownError": "알 수 없는 오류",
+    "checkBackendRunning": "백엔드 서버가 실행 중인지 확인하세요",
+    "startServer": "서버 실행",
+    "checkApiDocs": "API 문서 확인",
     "emptyState": {
       "greeting": "안녕하세요!",
       "subGreeting": "무엇을 도와드릴까요?",

@@ -182,7 +182,7 @@ ${t("chat.receivedResponse")}
       // API 연결 실패
       const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
       const docsUrl = `${apiBase}/docs`;
-      const errorText = `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`${apiBase}\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: ${docsUrl}\n\n${t("chat.backendErrorDetail")}`;
+      const errorText = `${t("chat.backendError")}\n\n**${t("chat.errorContent")}**\n\`\`\`\n${error instanceof Error ? error.message : t("chat.unknownError")}\n\`\`\`\n\n**${t("chat.solution")}**\n1. ${t("chat.checkBackendRunning")} (\`${apiBase}\`)\n2. ${t("chat.startServer")}: \`python -m uvicorn src.main:app --reload\`\n3. ${t("chat.checkApiDocs")}: ${docsUrl}\n\n${t("chat.backendErrorDetail")}`;
       updateMessage(tempId, {
         content: errorText,
         status: "error",
@@ -316,7 +316,7 @@ ${t("chat.receivedResponse")}
       // API 연결 실패
       const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
       const docsUrl = `${apiBase}/docs`;
-      const errorText = `${t("chat.backendError")}\n\n**오류 내용:**\n\`\`\`\n${error instanceof Error ? error.message : "알 수 없는 오류"}\n\`\`\`\n\n**해결 방법:**\n1. 백엔드 서버가 실행 중인지 확인하세요 (\`${apiBase}\`)\n2. 서버 실행: \`python -m uvicorn src.main:app --reload\`\n3. API 문서 확인: ${docsUrl}\n\n${t("chat.backendErrorDetail")}`;
+      const errorText = `${t("chat.backendError")}\n\n**${t("chat.errorContent")}**\n\`\`\`\n${error instanceof Error ? error.message : t("chat.unknownError")}\n\`\`\`\n\n**${t("chat.solution")}**\n1. ${t("chat.checkBackendRunning")} (\`${apiBase}\`)\n2. ${t("chat.startServer")}: \`python -m uvicorn src.main:app --reload\`\n3. ${t("chat.checkApiDocs")}: ${docsUrl}\n\n${t("chat.backendErrorDetail")}`;
       updateMessage(tempId, {
         content: errorText,
         status: "error",
