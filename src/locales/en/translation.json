@@ -48,6 +48,20 @@
                  "unknownError":  "Unknown error",
                  "checkBackendRunning":  "Check if the backend server is running",
                  "startServer":  "Start server",
+                 "thinking": {
+                   "title": "AI Thinking",
+                   "steps": "steps",
+                   "current": "Current",
+                   "agents": {
+                     "planner": "Planning",
+                     "researcher": "Data Collection",
+                     "strategy": "Strategy Analysis",
+                     "portfolio": "Portfolio",
+                     "risk": "Risk",
+                     "trading": "Trading",
+                     "unknown": "Analyzing"
+                   }
+                 },
                  "checkApiDocs":  "Check API documentation",
                  "emptyState":  {
                                     "greeting":  "Hello!",

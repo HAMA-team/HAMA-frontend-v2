@@ -41,26 +41,26 @@ const getAgentIcon = (agent: AgentType) => {
 };
 
 /**
- * 에이전트 타입별 한글 이름
- * TODO: i18n 적용 시 번역 키로 변경
+ * 에이전트 타입별 번역 키
  */
-const getAgentName = (agent: AgentType): string => {
-  switch (agent) {
-    case "planner":
-      return "계획 수립";
-    case "researcher":
-      return "데이터 수집";
-    case "strategy":
-      return "전략 분석";
-    default:
-      return "분석 중";
+const getAgentNameKey = (agent: string): string => {
+  // agent 문자열을 소문자로 변환하여 매핑
+  const agentLower = agent.toLowerCase();
+
+  // 알려진 에이전트 타입
+  const knownAgents = ["planner", "researcher", "strategy", "portfolio", "risk", "trading"];
+
+  if (knownAgents.includes(agentLower)) {
+    return `chat.thinking.agents.${agentLower}`;
   }
+
+  return "chat.thinking.agents.unknown";
 };
 
 
 export default function ThinkingSection({ steps }: ThinkingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   if (!steps || steps.length === 0) {
     return null;
@@ -100,10 +100,10 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
-              AI 생각 과정
+              {t("chat.thinking.title")}
             </span>
             <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-              ({steps.length}단계)
+              ({steps.length}{t("chat.thinking.steps")})
             </span>
           </div>
           <ChevronDown
@@ -119,7 +119,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
         {!isExpanded && latestStep && (
           <div className="flex items-center gap-1.5 w-full text-left">
             <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-              현재:
+              {t("chat.thinking.current")}:
             </span>
             <span className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>
               {latestStep.description}
@@ -136,7 +136,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
         <div className="px-3 pb-3 pt-1">
           {steps.map((step, index) => {
             const Icon = getAgentIcon(step.agent);
-            const agentName = getAgentName(step.agent);
+            const agentNameKey = getAgentNameKey(step.agent);
 
             return (
               <div
@@ -152,7 +152,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                 </div>
                 <div className="flex-1 min-w-0 flex items-center justify-between">
                   <div className="text-xs" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
-                    <span className="font-medium" style={{ color: "var(--text-secondary)" }}>{agentName}</span>
+                    <span className="font-medium" style={{ color: "var(--text-secondary)" }}>{t(agentNameKey)}</span>
                     <span> · {step.description}</span>
                   </div>
                   <div
