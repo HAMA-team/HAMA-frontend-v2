@@ -126,6 +126,7 @@ ${t("chat.receivedResponse")}
           conversation_id: currentThreadId || undefined,
           hitl_config: hitlConfig,
           onEvent: (ev) => {
+            console.log("📥 SSE Event:", ev.event, ev.data);
             const now = new Date().toISOString();
             try {
               const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
@@ -135,11 +136,50 @@ ${t("chat.receivedResponse")}
             } catch {}
 
             switch (ev.event) {
-              case "master_start":
+              case "master_start": {
                 updateMessage(tempId, { status: "sending" });
+                // "분석을 시작합니다..." 메시지도 thinking에 추가
+                if (ev.data?.message) {
+                  const { addThinkingStep } = useChatStore.getState();
+                  addThinkingStep(tempId, {
+                    agent: "planner",
+                    description: ev.data.message,
+                    timestamp: now,
+                  });
+                  console.log("✅ Added thinking step (master_start):", ev.data.message);
+                }
                 break;
+              }
+              case "agent_start": {
+                // "PORTFOLIO Agent 실행 중..." 같은 메시지 추가
+                if (ev.data?.message) {
+                  const { addThinkingStep } = useChatStore.getState();
+                  addThinkingStep(tempId, {
+                    agent: ev.data.agent || "unknown",
+                    description: ev.data.message,
+                    timestamp: now,
+                  });
+                  console.log("✅ Added thinking step (agent_start):", ev.data.agent, ev.data.message);
+                }
+                break;
+              }
+              case "agent_node": {
+                // 실시간으로 thinking steps 추가
+                if (ev.data?.status === "complete" && ev.data?.message) {
+                  const { addThinkingStep } = useChatStore.getState();
+                  addThinkingStep(tempId, {
+                    agent: ev.data.node || ev.data.agent || "unknown",
+                    description: ev.data.message,
+                    timestamp: now,
+                  });
+                  console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
+                }
+                break;
+              }
               case "master_complete": {
                 const text = typeof ev.data?.message === "string" ? ev.data.message : t("chat.receivedResponse");
+                // master_complete에서 온 thinking은 무시 (이미 실시간으로 추가됨)
+                console.log("📊 Final message received");
                 updateMessage(tempId, { content: text, status: "sent" });
                 const cid = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
                 if (cid) setCurrentThreadId(String(cid));
@@ -152,7 +192,7 @@ ${t("chat.receivedResponse")}
                 break;
               }
               default:
-                // 다른 이벤트는 무시 (간단한 버전)
+                // 다른 이벤트는 로그만 (master_routing, master_aggregating 등)
                 break;
             }
           },
@@ -261,6 +301,7 @@ ${t("chat.receivedResponse")}
             conversation_id: currentThreadId || undefined,
             hitl_config: hitlConfig,
             onEvent: (ev) => {
+              console.log("📥 SSE Event (Retry):", ev.event, ev.data);
               const now = new Date().toISOString();
               try {
                 const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
@@ -270,11 +311,47 @@ ${t("chat.receivedResponse")}
               } catch {}
 
               switch (ev.event) {
-                case "master_start":
+                case "master_start": {
                   updateMessage(tempId, { status: "sending" });
+                  if (ev.data?.message) {
+                    const { addThinkingStep } = useChatStore.getState();
+                    addThinkingStep(tempId, {
+                      agent: "planner",
+                      description: ev.data.message,
+                      timestamp: now,
+                    });
+                    console.log("✅ Added thinking step (master_start):", ev.data.message);
+                  }
                   break;
+                }
+                case "agent_start": {
+                  if (ev.data?.message) {
+                    const { addThinkingStep } = useChatStore.getState();
+                    addThinkingStep(tempId, {
+                      agent: ev.data.agent || "unknown",
+                      description: ev.data.message,
+                      timestamp: now,
+                    });
+                    console.log("✅ Added thinking step (agent_start):", ev.data.agent, ev.data.message);
+                  }
+                  break;
+                }
+                case "agent_node": {
+                  // 실시간으로 thinking steps 추가
+                  if (ev.data?.status === "complete" && ev.data?.message) {
+                    const { addThinkingStep } = useChatStore.getState();
+                    addThinkingStep(tempId, {
+                      agent: ev.data.node || ev.data.agent || "unknown",
+                      description: ev.data.message,
+                      timestamp: now,
+                    });
+                    console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
+                  }
+                  break;
+                }
                 case "master_complete": {
                   const text = typeof ev.data?.message === "string" ? ev.data.message : t("chat.receivedResponse");
+                  console.log("📊 Final message received");
                   updateMessage(tempId, { content: text, status: "sent" });
                   const cid = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
                   if (cid) setCurrentThreadId(String(cid));
@@ -286,7 +363,7 @@ ${t("chat.receivedResponse")}
                   break;
                 }
                 default:
-                  // 다른 이벤트는 무시 (간단한 버전)
+                  // 다른 이벤트는 로그만
                   break;
               }
             },

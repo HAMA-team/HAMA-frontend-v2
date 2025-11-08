@@ -66,6 +66,9 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
     return null;
   }
 
+  // 가장 최근 thinking step (현재 진행 중인 작업)
+  const latestStep = steps[steps.length - 1];
+
   return (
     <div
       className="rounded-lg border overflow-hidden mb-4"
@@ -79,7 +82,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
       {/* Header - Clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-3 py-2.5 flex items-center justify-between transition-colors duration-150"
+        className="w-full px-3 py-2.5 flex flex-col gap-1.5 transition-colors duration-150"
         style={{
           cursor: "pointer",
           backgroundColor: "transparent"
@@ -93,21 +96,36 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
         aria-expanded={isExpanded}
         aria-controls="thinking-content"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
-            AI 생각 과정
-          </span>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-            ({steps.length}단계)
-          </span>
+        {/* 첫 번째 줄: 제목 + 단계 수 + 아이콘 */}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+              AI 생각 과정
+            </span>
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+              ({steps.length}단계)
+            </span>
+          </div>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-200 ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+            style={{ color: "var(--text-secondary)" }}
+            strokeWidth={1.5}
+          />
         </div>
-        <ChevronDown
-          className={`w-4 h-4 transition-transform duration-200 ${
-            isExpanded ? "rotate-180" : ""
-          }`}
-          style={{ color: "var(--text-secondary)" }}
-          strokeWidth={1.5}
-        />
+
+        {/* 두 번째 줄: 현재 진행 중인 작업 (접혀있을 때만) */}
+        {!isExpanded && latestStep && (
+          <div className="flex items-center gap-1.5 w-full text-left">
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+              현재:
+            </span>
+            <span className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>
+              {latestStep.description}
+            </span>
+          </div>
+        )}
       </button>
 
       {/* Content - Accordion */}
