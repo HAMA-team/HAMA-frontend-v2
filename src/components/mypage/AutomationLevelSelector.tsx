@@ -379,12 +379,15 @@ export default function AutomationLevelSelector() {
       </div>
 
       {/* 워크플로우 프로그레스 바 */}
-      <div className="relative pt-8 pb-12">
+      <div className="relative pb-12" style={{ paddingTop: "32px" }}>
 
         {/* 배경 라인 */}
         <div
-          className="absolute top-4 left-0 right-0 h-0.5 rounded-full"
-          style={{ backgroundColor: "var(--border-default)" }}
+          className="absolute left-0 right-0 h-0.5 rounded-full"
+          style={{
+            backgroundColor: "var(--border-default)",
+            top: "32px" // paddingTop과 동일
+          }}
         />
 
         {/* 워크플로우 단계들 */}
@@ -401,29 +404,33 @@ export default function AutomationLevelSelector() {
                 className="flex flex-col items-center"
                 style={{ width: "20%" }}
               >
-                {/* 점 (클릭 가능) */}
-                <button
-                  onClick={() => handleDotClick(step.id)}
-                  disabled={isUpdating || globalLoading}
-                  className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 hover:scale-110 active:scale-95 cursor-pointer"
-                  style={{
-                    backgroundColor: "transparent",
-                  }}
-                  title={isTrade ? getTradeLabel() : (isHitl ? t("mypage.automation.workflow.approvalRequired") : t("mypage.automation.workflow.autoExecute"))}
-                >
-                  <div
-                    className="w-4 h-4 rounded-full border-2 transition-all duration-300"
+                {/* 점 (클릭 가능) - 라인과 정확히 같은 높이 */}
+                <div className="relative" style={{ height: "0px" }}>
+                  <button
+                    onClick={() => handleDotClick(step.id)}
+                    disabled={isUpdating || globalLoading}
+                    className="rounded-full flex items-center justify-center transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 hover:scale-110 active:scale-95 cursor-pointer"
                     style={{
+                      width: "16px",
+                      height: "16px",
                       backgroundColor: dotColor,
-                      borderColor: dotColor,
+                      border: `2px solid ${dotColor}`,
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
                     }}
+                    title={isTrade ? getTradeLabel() : (isHitl ? t("mypage.automation.workflow.approvalRequired") : t("mypage.automation.workflow.autoExecute"))}
                   />
-                </button>
+                </div>
 
                 {/* 레이블 */}
                 <div
-                  className="text-xs mt-1 text-center"
-                  style={{ color: "var(--text-secondary)" }}
+                  className="text-xs text-center"
+                  style={{
+                    color: "var(--text-secondary)",
+                    marginTop: "20px"
+                  }}
                 >
                   {step.label}
                 </div>
