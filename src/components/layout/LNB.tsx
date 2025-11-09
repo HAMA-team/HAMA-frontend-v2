@@ -57,9 +57,9 @@ export default function LNB() {
     if (mode === "live") {
       setLoadingSessions(true);
       getChatSessions(sessionsLimit)
-        .then((data: any[]) => {
+        .then((data: any) => {
           if (!mounted) return;
-          let list = Array.isArray(data) ? data : [];
+          let list = Array.isArray(data?.sessions) ? data.sessions : Array.isArray(data) ? data : [];
           const curId = useChatStore.getState().currentThreadId;
           if (curId && !list.some((s: any) => s?.conversation_id === curId || s?.id === curId || s?.thread_id === curId || s?.uuid === curId)) {
             const firstUser = useChatStore.getState().messages.find(m => m.role === 'user');
@@ -112,8 +112,8 @@ export default function LNB() {
     let cancelled = false;
     (async () => {
       try {
-        const data: any[] = await getChatSessions(sessionsLimit);
-        if (!cancelled) setSessions(Array.isArray(data) ? data : []);
+        const data: any = await getChatSessions(sessionsLimit);
+        if (!cancelled) setSessions(Array.isArray(data?.sessions) ? data.sessions : Array.isArray(data) ? data : []);
       } catch (e) {
         if (!cancelled) console.error("Failed to refresh sessions after thread change", e);
       }
@@ -200,8 +200,8 @@ export default function LNB() {
   const refreshSessions = async () => {
     if (mode !== "live") return;
     try {
-      const data: any[] = await getChatSessions(sessionsLimit);
-      let list = Array.isArray(data) ? data : [];
+      const data: any = await getChatSessions(sessionsLimit);
+      let list = Array.isArray(data?.sessions) ? data.sessions : Array.isArray(data) ? data : [];
       // 보장: 현재 스레드가 목록에 없으면 낙관적으로 추가
       const curId = useChatStore.getState().currentThreadId;
       if (curId && !list.some((s: any) => s?.conversation_id === curId || s?.id === curId || s?.thread_id === curId || s?.uuid === curId)) {
