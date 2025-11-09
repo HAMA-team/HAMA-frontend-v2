@@ -26,6 +26,8 @@ export interface ThinkingStep {
   agent: AgentType;
   description: string;
   timestamp: string;
+  content?: string; // 실시간 사고 내용 (agent_thinking 이벤트)
+  node?: string; // 현재 실행 중인 노드명
 }
 
 /**

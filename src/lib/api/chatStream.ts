@@ -44,6 +44,7 @@ export async function startMultiAgentStream({
       message,
       conversation_id,
       hitl_config,
+      stream_thinking: true, // Agent thinking trace 활성화
     }),
     signal,
   });

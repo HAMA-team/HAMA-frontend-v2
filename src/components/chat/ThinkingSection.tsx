@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { formatRelativeTime, formatAbsoluteDate } from "@/lib/utils";
 import { ChevronDown, FileText, Search, Lightbulb } from "lucide-react";
 import { ThinkingStep, AgentType } from "@/lib/types/chat";
+import ReactMarkdown from "react-markdown";
 
 /**
  * ThinkingSection Component
@@ -141,28 +142,100 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
             return (
               <div
                 key={index}
-                className="flex items-center gap-2 py-1.5"
+                className="flex flex-col gap-1 py-1.5"
                 style={{
                   borderBottom:
                     index < steps.length - 1 ? "1px solid var(--border-default)" : "none",
                 }}
               >
-                <div className="flex-shrink-0">
-                  <Icon className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
-                </div>
-                <div className="flex-1 min-w-0 flex items-center justify-between">
-                  <div className="text-xs" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
-                    <span className="font-medium" style={{ color: "var(--text-secondary)" }}>{t(agentNameKey)}</span>
-                    <span> · {step.description}</span>
+                {/* Step Header */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-shrink-0">
+                    <Icon className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
                   </div>
-                  <div
-                    className="text-[11px] ml-3 whitespace-nowrap"
-                    style={{ color: "var(--text-muted)" }}
-                    title={formatAbsoluteDate(step.timestamp, i18n?.language || 'en')}
-                  >
-                    {formatRelativeTime(step.timestamp, i18n?.language || 'en')}
+                  <div className="flex-1 min-w-0 flex items-center justify-between">
+                    <div className="text-xs" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
+                      <span className="font-medium" style={{ color: "var(--text-secondary)" }}>{t(agentNameKey)}</span>
+                      <span> · {step.description}</span>
+                    </div>
+                    <div
+                      className="text-[11px] ml-3 whitespace-nowrap"
+                      style={{ color: "var(--text-muted)" }}
+                      title={formatAbsoluteDate(step.timestamp, i18n?.language || 'en')}
+                    >
+                      {formatRelativeTime(step.timestamp, i18n?.language || 'en')}
+                    </div>
                   </div>
                 </div>
+
+                {/* Thinking Content (실시간 사고 과정) */}
+                {step.content && step.content.length > 0 && (
+                  <div className="ml-6 mt-1">
+                    <div className="flex items-start gap-1">
+                      <span className="text-xs flex-shrink-0" style={{ color: "var(--text-muted)" }}>💭</span>
+                      <div
+                        className="text-xs flex-1"
+                        style={{
+                          color: "var(--text-muted)",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        <ReactMarkdown
+                          components={{
+                            p: ({ node, ...props }) => <p style={{ marginBottom: "8px" }} {...props} />,
+                            strong: ({ node, ...props }) => <strong style={{ fontWeight: 600 }} {...props} />,
+                            em: ({ node, ...props }) => <em {...props} />,
+                            ul: ({ node, ...props }) => (
+                              <ul style={{ marginLeft: "16px", marginBottom: "8px", listStyleType: "disc" }} {...props} />
+                            ),
+                            li: ({ node, ...props }) => <li style={{ marginBottom: "4px" }} {...props} />,
+                            code: ({ node, className, children, ...props }) => {
+                              const isInline = !className;
+                              if (isInline) {
+                                return (
+                                  <code
+                                    style={{
+                                      backgroundColor: "var(--code-bg)",
+                                      padding: "2px 4px",
+                                      borderRadius: "3px",
+                                      fontSize: "0.9em",
+                                      fontFamily: "monospace",
+                                    }}
+                                    {...props}
+                                  >
+                                    {children}
+                                  </code>
+                                );
+                              }
+                              // 코드 블록
+                              return (
+                                <code
+                                  className={className}
+                                  style={{
+                                    display: "block",
+                                    backgroundColor: "var(--code-bg)",
+                                    padding: "8px",
+                                    borderRadius: "4px",
+                                    fontSize: "0.85em",
+                                    fontFamily: "monospace",
+                                    overflowX: "auto",
+                                    marginBottom: "8px",
+                                  }}
+                                  {...props}
+                                >
+                                  {children}
+                                </code>
+                              );
+                            },
+                            pre: ({ node, ...props }) => <pre style={{ margin: 0 }} {...props} />,
+                          }}
+                        >
+                          {step.content}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

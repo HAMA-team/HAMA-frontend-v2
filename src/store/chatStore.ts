@@ -36,6 +36,7 @@ interface ChatStore {
   beginAssistantMessage: (tempId: string) => void;
   appendAssistantContent: (messageId: string, delta: string) => void;
   addThinkingStep: (messageId: string, step: ThinkingStep) => void;
+  appendThinkingContent: (messageId: string, contentDelta: string) => void;
   finishAssistantMessage: (messageId: string, final?: Partial<Message>) => void;
   openApprovalPanel: (data: ApprovalRequest) => void;
   closeApprovalPanel: () => void;
@@ -119,6 +120,25 @@ export const useChatStore = create<ChatStore>((set) => ({
           ? { ...m, thinking: [...(m.thinking || []), step] }
           : m
       ),
+    })),
+
+  appendThinkingContent: (messageId, contentDelta) =>
+    set((state) => ({
+      messages: state.messages.map((m) => {
+        if (m.id !== messageId) return m;
+        const thinking = m.thinking || [];
+        if (thinking.length === 0) return m;
+
+        // 마지막 thinking step의 content에 추가
+        const lastIndex = thinking.length - 1;
+        const updatedThinking = thinking.map((step, idx) =>
+          idx === lastIndex
+            ? { ...step, content: (step.content || '') + contentDelta }
+            : step
+        );
+
+        return { ...m, thinking: updatedThinking };
+      }),
     })),
 
   finishAssistantMessage: (messageId, final) =>
