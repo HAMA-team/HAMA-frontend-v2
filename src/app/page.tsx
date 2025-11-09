@@ -636,6 +636,7 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
 
     } catch (error) {
       console.error("Approval error:", error);
+      closeApprovalPanel(); // HITL 패널 먼저 닫기
       // 백엔드 에러 메시지 출력
       const errorMsg = error instanceof Error ? error.message : String(error);
       const axiosError = error as any;
@@ -695,6 +696,7 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       const axiosError = error as any;
       const serverMsg = axiosError?.response?.data?.detail || axiosError?.response?.data?.message || errorMsg;
       console.error("Server error detail:", serverMsg);
+      closeApprovalPanel(); // 에러 다이얼로그 표시 전 패널 닫기
       openAlert({
         title: t('common.error'),
         message: `거부 실패: ${serverMsg}`

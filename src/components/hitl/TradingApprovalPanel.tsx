@@ -157,7 +157,7 @@ export default function TradingApprovalPanel({
                   {(mode !== 'live' || typeof raw.total_amount === 'number') && (
                     <div className="flex justify-between pt-3 border-t" style={{ borderColor: 'var(--border-default)' }}>
                       <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                        {t('hitl.expectedAmount')} {getTradeTypeLabel(raw.action)}{t('hitl.totalAmount')}
+                        {t('hitl.expectedAmount')} {getTradeTypeLabel(raw.action)} {t('hitl.totalAmount')}
                       </span>
                       <span className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
                         {formatCurrency(raw.total_amount)}

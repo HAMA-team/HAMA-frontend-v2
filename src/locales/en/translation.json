@@ -9,7 +9,12 @@
                    "close":  "Close",
                    "loading":  "Loading...",
                    "error":  "An error occurred",
-                   "loadMore": "Load more"
+                   "loadMore": "Load more",
+                   "stock": "Stock",
+                   "stocks": "Stocks",
+                   "cash": "Cash",
+                   "shares": "shares",
+                   "won": "KRW"
                },
     "nav":  {
                 "chat":  "Chat",
@@ -107,8 +112,8 @@
                  "quantity":  "Quantity",
                  "amount":  "Amount",
                  "currentPrice":  "Current Price",
-                 "expectedAmount":  "Expected",
-                 "totalAmount":  "Amount",
+                 "expectedAmount": "Expected",
+                 "totalAmount": "Amount",
                  "portfolioWeightChange":  "Portfolio Weight Change",
                  "currentWeight":  "Current",
                  "expectedWeight":  "Expected",
@@ -127,14 +132,17 @@
                                   "query":  "Query",
                                   "complexityLabel":  "Analysis Complexity",
                                   "depthLabel":  "Analysis Depth",
+                                  "routingReason":  "Routing Reason",
                                   "reason":  "Rationale",
                                   "info":  "This analysis utilizes external data sources and AI models to provide comprehensive insights.",
                                   "complexity":  {
+                                                     "label":  "Complexity",
                                                      "simple":  "Simple",
                                                      "moderate":  "Moderate",
                                                      "expert":  "Expert"
                                                  },
                                   "depth":  {
+                                                "label":  "Depth",
                                                 "brief":  "Brief",
                                                 "detailed":  "Detailed",
                                                 "comprehensive":  "Comprehensive"
@@ -143,6 +151,7 @@
                  "strategy":  {
                                   "title":  "Investment Strategy Approval",
                                   "type":  "Strategy Type",
+                                  "strategyType":  "Strategy Type",
                                   "marketOutlook":  "Market Outlook",
                                   "cycle":  "Cycle",
                                   "sentiment":  "Sentiment",
@@ -177,8 +186,11 @@
                                    "tradesRequired":  "Trades Required",
                                    "netAmount":  "Net Amount Required",
                                    "metrics":  "Expected Metrics",
+                                   "portfolioMetrics":  "Portfolio Metrics",
                                    "expectedReturn":  "Expected Return",
+                                   "expectedRisk":  "Expected Risk",
                                    "risk":  "Risk",
+                                   "turnoverRatio":  "Turnover Ratio",
                                    "diversification":  "Diversification"
                                },
                  "risk":  {
@@ -186,6 +198,8 @@
                               "detectedTitle":  "High Risk Detected",
                               "detectedDesc":  "Please review the following risk factors carefully before proceeding.",
                               "factors":  "Risk Factors",
+                              "riskFactors":  "Risk Factors",
+                              "riskLevel":  "Risk Level",
                               "critical":  "Critical",
                               "warning":  "Warning",
                               "mitigation":  "Mitigation",
@@ -196,7 +210,22 @@
                               "recommendedActions":  "Recommended Actions",
                               "cancel":  "Cancel",
                               "proceedAnyway":  "Proceed Anyway"
-                          }
+                          },
+                 "trading":  {
+                                 "title":  "Trade Order Approval",
+                                 "action":  "Trade Type",
+                                 "buy":  "Buy",
+                                 "sell":  "Sell",
+                                 "quantity":  "Quantity",
+                                 "price":  "Price",
+                                 "totalAmount":  "Total Amount",
+                                 "portfolioImpact":  "Portfolio Impact",
+                                 "currentWeight":  "Current Weight",
+                                 "expectedWeight":  "Expected Weight",
+                                 "riskWarning":  "Risk Warning"
+                             },
+                 "approved":  "Approved",
+                 "rejected":  "Rejected"
              },
     "portfolio":  {
                       "title":  "Portfolio",

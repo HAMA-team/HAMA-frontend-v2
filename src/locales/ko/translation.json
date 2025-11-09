@@ -9,7 +9,12 @@
     "close": "닫기",
     "loading": "로딩 중...",
     "error": "오류가 발생했습니다",
-    "loadMore": "더 보기"
+    "loadMore": "더 보기",
+    "stock": "종목",
+    "stocks": "주식",
+    "cash": "현금",
+    "shares": "주",
+    "won": "원"
   },
   "nav": {
     "chat": "채팅",
@@ -91,38 +96,6 @@
         }
       }
     }
-  },
-  "hitl": {
-    "title": "매매 승인 요청",
-    "pending": "승인 대기",
-    "approvalRequired": "거래 승인 필요",
-    "orderDetails": "주문 내역",
-    "orderInfo": "주문 정보",
-    "stockName": "종목명",
-    "stockCode": "종목코드",
-    "orderType": "주문 유형",
-    "tradeType": "거래 유형",
-    "buy": "매수",
-    "sell": "매도",
-    "orderQuantity": "주문 수량",
-    "quantity": "수량",
-    "amount": "금액",
-    "currentPrice": "현재 시세가",
-    "expectedAmount": "예상",
-    "totalAmount": "금액",
-    "portfolioWeightChange": "포트폴리오 비중 변화",
-    "currentWeight": "현재 비중",
-    "expectedWeight": "예상 비중",
-    "riskWarning": "리스크 경고",
-    "alternatives": "권장 대안",
-    "shares": "주",
-    "approve": "승인",
-    "reject": "거부",
-    "approvalNote": "승인 시 즉시 주문이 체결됩니다",
-    "noDetails": "승인을 위한 세부 정보가 포함되지 않았습니다",
-    "approved": "매수 주문이 실행되었습니다",
-    "rejected": "매수 주문이 거부되었습니다",
-    "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"
   },
   "portfolio": {
     "title": "포트폴리오",
@@ -319,6 +292,8 @@
     "currentPrice": "현재가",
     "quantity": "수량",
     "amount": "금액",
+    "expectedAmount": "예상",
+    "totalAmount": "금액",
     "approvalRequired": "승인 필요",
     "orderDetails": "주문 상세",
     "portfolioWeightChange": "포트폴리오 비중 변화",
@@ -331,14 +306,17 @@
       "query": "질문",
       "complexityLabel": "분석 복잡도",
       "depthLabel": "분석 깊이",
+      "routingReason": "라우팅 이유",
       "reason": "분석이 필요한 이유",
       "info": "이 분석은 외부 데이터 소스와 AI 모델을 활용하여 종합적인 인사이트를 제공합니다.",
       "complexity": {
+        "label": "복잡도",
         "simple": "단순",
         "moderate": "중간",
         "expert": "전문가"
       },
       "depth": {
+        "label": "상세도",
         "brief": "간략",
         "detailed": "상세",
         "comprehensive": "종합"
@@ -347,6 +325,7 @@
     "strategy": {
       "title": "투자 전략 승인",
       "type": "전략 유형",
+      "strategyType": "전략 유형",
       "marketOutlook": "시장 전망",
       "cycle": "사이클",
       "sentiment": "심리",
@@ -381,8 +360,11 @@
       "tradesRequired": "필요한 거래",
       "netAmount": "순 필요 금액",
       "metrics": "예상 지표",
+      "portfolioMetrics": "포트폴리오 지표",
       "expectedReturn": "예상 수익률",
+      "expectedRisk": "예상 리스크",
       "risk": "리스크",
+      "turnoverRatio": "회전율",
       "diversification": "분산도"
     },
     "risk": {
@@ -390,6 +372,8 @@
       "detectedTitle": "고위험 상황 감지",
       "detectedDesc": "다음 리스크 요인을 확인하고 신중하게 결정하세요.",
       "factors": "주요 리스크",
+      "riskFactors": "리스크 요인",
+      "riskLevel": "리스크 수준",
       "critical": "심각",
       "warning": "경고",
       "mitigation": "완화 방법",
@@ -400,6 +384,22 @@
       "recommendedActions": "권장 조치",
       "cancel": "취소",
       "proceedAnyway": "경고 무시하고 진행"
-    }
+    },
+    "trading": {
+      "title": "매매 주문 승인 요청",
+      "action": "거래 유형",
+      "buy": "매수",
+      "sell": "매도",
+      "quantity": "수량",
+      "price": "가격",
+      "totalAmount": "총 금액",
+      "portfolioImpact": "포트폴리오 영향",
+      "currentWeight": "현재 비중",
+      "expectedWeight": "예상 비중",
+      "riskWarning": "리스크 경고"
+    },
+    "approved": "승인됨",
+    "rejected": "거부됨",
+    "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"
   }
 }
