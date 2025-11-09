@@ -203,8 +203,8 @@ export default function ArtifactDetailPage() {
                       style={{
                         fontSize: "24px",
                         fontWeight: 600,
-                        marginTop: "24px",
-                        marginBottom: "12px",
+                        marginTop: "28px",
+                        marginBottom: "14px",
                         letterSpacing: "-0.01em",
                         color: "var(--text-primary)",
                       }}
@@ -216,23 +216,36 @@ export default function ArtifactDetailPage() {
                       style={{
                         fontSize: "20px",
                         fontWeight: 600,
-                        marginTop: "20px",
-                        marginBottom: "8px",
+                        marginTop: "24px",
+                        marginBottom: "12px",
                         color: "var(--text-primary)",
+                      }}
+                      {...props}
+                    />
+                  ),
+                  // Horizontal Rule (구분선)
+                  hr: ({ node, ...props }) => (
+                    <hr
+                      style={{
+                        marginTop: "32px",
+                        marginBottom: "32px",
+                        border: "none",
+                        borderTop: "2px solid var(--border-emphasis)",
                       }}
                       {...props}
                     />
                   ),
                   // Paragraph
                   p: ({ node, ...props }) => (
-                    <p style={{ marginBottom: "16px", color: "var(--text-primary)" }} {...props} />
+                    <p style={{ marginBottom: "20px", lineHeight: "1.7", color: "var(--text-primary)" }} {...props} />
                   ),
                   // Lists
                   ul: ({ node, ...props }) => (
                     <ul
                       style={{
-                        marginBottom: "16px",
-                        paddingLeft: "24px",
+                        marginTop: "16px",
+                        marginBottom: "20px",
+                        paddingLeft: "28px",
                         color: "var(--text-primary)",
                         listStyleType: "disc",
                         listStylePosition: "outside",
@@ -243,8 +256,9 @@ export default function ArtifactDetailPage() {
                   ol: ({ node, ...props }) => (
                     <ol
                       style={{
-                        marginBottom: "16px",
-                        paddingLeft: "24px",
+                        marginTop: "16px",
+                        marginBottom: "20px",
+                        paddingLeft: "28px",
                         color: "var(--text-primary)",
                         listStyleType: "decimal",
                         listStylePosition: "outside",
@@ -255,7 +269,8 @@ export default function ArtifactDetailPage() {
                   li: ({ node, ...props }) => (
                     <li
                       style={{
-                        marginBottom: "8px",
+                        marginBottom: "10px",
+                        lineHeight: "1.6",
                         color: "var(--text-primary)",
                         display: "list-item",
                       }}
@@ -290,11 +305,13 @@ export default function ArtifactDetailPage() {
                       style={{
                         backgroundColor: "var(--lnb-background)",
                         color: "var(--text-primary)",
-                        padding: "16px",
+                        padding: "20px",
                         borderRadius: "8px",
                         overflowX: "auto",
-                        marginBottom: "16px",
+                        marginTop: "16px",
+                        marginBottom: "24px",
                         border: "1px solid var(--border-default)",
+                        lineHeight: "1.6",
                       }}
                       {...props}
                     />
@@ -317,7 +334,8 @@ export default function ArtifactDetailPage() {
                       style={{
                         width: "100%",
                         borderCollapse: "collapse",
-                        marginBottom: "16px",
+                        marginTop: "16px",
+                        marginBottom: "24px",
                         tableLayout: "auto",
                         wordBreak: "break-word",
                       }}
@@ -327,12 +345,13 @@ export default function ArtifactDetailPage() {
                   th: ({ node, ...props }) => (
                     <th
                       style={{
-                        border: "1px solid var(--border-default)",
-                        padding: "8px",
+                        border: "1px solid var(--border-emphasis)",
+                        padding: "12px",
                         backgroundColor: "var(--lnb-recent-hover)",
                         textAlign: "left",
                         fontWeight: 600,
                         color: "var(--text-primary)",
+                        lineHeight: "1.5",
                       }}
                       {...props}
                     />
@@ -340,9 +359,10 @@ export default function ArtifactDetailPage() {
                   td: ({ node, ...props }) => (
                     <td
                       style={{
-                        border: "1px solid var(--border-default)",
-                        padding: "8px",
+                        border: "1px solid var(--border-emphasis)",
+                        padding: "12px",
                         color: "var(--text-primary)",
+                        lineHeight: "1.5",
                       }}
                       {...props}
                     />
@@ -354,7 +374,8 @@ export default function ArtifactDetailPage() {
                         borderLeft: "4px solid var(--primary-500)",
                         paddingLeft: "16px",
                         marginLeft: "0",
-                        marginBottom: "16px",
+                        marginTop: "20px",
+                        marginBottom: "20px",
                         color: "var(--text-secondary)",
                         fontStyle: "italic",
                       }}
