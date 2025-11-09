@@ -6,6 +6,7 @@ import { formatRelativeTime, formatAbsoluteDate } from "@/lib/utils";
 import { ChevronDown, FileText, Search, Lightbulb } from "lucide-react";
 import { ThinkingStep, AgentType } from "@/lib/types/chat";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 /**
  * ThinkingSection Component
@@ -181,6 +182,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                         }}
                       >
                         <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
                           components={{
                             p: ({ node, ...props }) => <p style={{ marginBottom: "8px" }} {...props} />,
                             strong: ({ node, ...props }) => <strong style={{ fontWeight: 600 }} {...props} />,
@@ -218,7 +220,8 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                                     borderRadius: "4px",
                                     fontSize: "0.85em",
                                     fontFamily: "monospace",
-                                    overflowX: "auto",
+                                    whiteSpace: "pre-wrap",
+                                    wordBreak: "break-word",
                                     marginBottom: "8px",
                                   }}
                                   {...props}
@@ -228,6 +231,41 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                               );
                             },
                             pre: ({ node, ...props }) => <pre style={{ margin: 0 }} {...props} />,
+                            table: ({ node, ...props }) => (
+                              <table
+                                style={{
+                                  width: "100%",
+                                  borderCollapse: "collapse",
+                                  marginBottom: "12px",
+                                  fontSize: "0.85em",
+                                }}
+                                {...props}
+                              />
+                            ),
+                            thead: ({ node, ...props }) => <thead {...props} />,
+                            tbody: ({ node, ...props }) => <tbody {...props} />,
+                            tr: ({ node, ...props }) => <tr {...props} />,
+                            th: ({ node, ...props }) => (
+                              <th
+                                style={{
+                                  border: "1px solid var(--border-emphasis)",
+                                  padding: "6px 8px",
+                                  backgroundColor: "var(--lnb-background)",
+                                  fontWeight: 600,
+                                  textAlign: "left",
+                                }}
+                                {...props}
+                              />
+                            ),
+                            td: ({ node, ...props }) => (
+                              <td
+                                style={{
+                                  border: "1px solid var(--border-emphasis)",
+                                  padding: "6px 8px",
+                                }}
+                                {...props}
+                              />
+                            ),
                           }}
                         >
                           {step.content}
