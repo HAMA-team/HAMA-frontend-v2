@@ -7,7 +7,7 @@ import HITLPanel from "@/components/hitl/HITLPanel";
 import { useChatStore } from "@/store/chatStore";
 import { useArtifactStore } from "@/store/artifactStore";
 import { createArtifact } from "@/lib/api/artifacts";
-import { Message, ThinkingStep } from "@/lib/types/chat";
+import { Message, ThinkingStep, ApprovalRequest } from "@/lib/types/chat";
 import { useDialogStore } from "@/store/dialogStore";
 import { approveAction } from "@/lib/api/approvals";
 import { useAppModeStore } from "@/store/appModeStore";
@@ -173,6 +173,30 @@ ${t("chat.receivedResponse")}
                     timestamp: now,
                   });
                   console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
+                }
+                // agent_node running 상태일 때도 step 추가 (content는 나중에 agent_thinking에서 채움)
+                if (ev.data?.status === "running" && ev.data?.message) {
+                  const { addThinkingStep } = useChatStore.getState();
+                  addThinkingStep(tempId, {
+                    agent: ev.data.agent || "unknown",
+                    description: ev.data.message,
+                    timestamp: now,
+                    node: ev.data.node,
+                    content: "", // 초기 빈 content (agent_thinking에서 채워짐)
+                  });
+                  console.log("🔄 Added thinking step (agent_node running):", ev.data.node);
+                }
+                break;
+              }
+              case "agent_thinking": {
+                // AI 사고 내용을 실시간으로 마지막 thinking step에 추가
+                if (ev.data?.content) {
+                  const { appendThinkingContent } = useChatStore.getState();
+                  appendThinkingContent(tempId, ev.data.content);
+                  // 로그는 너무 많이 나올 수 있으므로 샘플링
+                  if (Math.random() < 0.01) {
+                    console.log("💭 Appending thinking content...");
+                  }
                 }
                 break;
               }
@@ -347,6 +371,29 @@ ${t("chat.receivedResponse")}
                     });
                     console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
                   }
+                  // agent_node running 상태일 때도 step 추가
+                  if (ev.data?.status === "running" && ev.data?.message) {
+                    const { addThinkingStep } = useChatStore.getState();
+                    addThinkingStep(tempId, {
+                      agent: ev.data.agent || "unknown",
+                      description: ev.data.message,
+                      timestamp: now,
+                      node: ev.data.node,
+                      content: "",
+                    });
+                    console.log("🔄 Added thinking step (agent_node running):", ev.data.node);
+                  }
+                  break;
+                }
+                case "agent_thinking": {
+                  // AI 사고 내용을 실시간으로 마지막 thinking step에 추가
+                  if (ev.data?.content) {
+                    const { appendThinkingContent } = useChatStore.getState();
+                    appendThinkingContent(tempId, ev.data.content);
+                    if (Math.random() < 0.01) {
+                      console.log("💭 Appending thinking content...");
+                    }
+                  }
                   break;
                 }
                 case "master_complete": {
@@ -442,10 +489,115 @@ ${t("chat.receivedResponse")}
     // Note: Toast is automatically shown by SaveArtifactButton
   };
 
+  // HITL 승인 요청을 마크다운 메시지로 포맷팅
+  const formatApprovalRequest = (request: ApprovalRequest): string => {
+    const data = request as any;
+
+    switch (request.type) {
+      case "research":
+        return `## 🔍 ${t("hitl.research.title") || "분석 실행 승인 요청"}
+
+**${t("hitl.research.query") || "분석 질문"}**: ${data.query}
+
+**${t("hitl.research.complexity.label") || "복잡도"}**: ${data.query_complexity}
+**${t("hitl.research.depth.label") || "상세도"}**: ${data.depth_level}
+
+${data.routing_reason ? `**${t("hitl.research.routingReason") || "라우팅 이유"}**: ${data.routing_reason}` : ""}
+
+${data.rationale ? `\n---\n\n${data.rationale}` : ""}`;
+
+      case "strategy":
+        return `## 📊 ${t("hitl.strategy.title") || "투자 전략 승인 요청"}
+
+**${t("hitl.strategy.strategyType") || "전략 유형"}**: ${data.strategy_type}
+
+**${t("hitl.strategy.marketOutlook") || "시장 전망"}**:
+- ${t("hitl.strategy.cycle") || "사이클"}: ${data.market_outlook?.cycle}
+- ${t("hitl.strategy.sentiment") || "투자 심리"}: ${data.market_outlook?.sentiment}
+
+**${t("hitl.strategy.targetAllocation") || "목표 자산 배분"}**:
+- ${t("common.stocks") || "주식"}: ${data.target_allocation?.stocks}%
+- ${t("common.cash") || "현금"}: ${data.target_allocation?.cash}%
+
+**${t("hitl.strategy.expectedReturn") || "기대 수익률"}**: ${data.expected_return}%
+**${t("hitl.strategy.expectedRisk") || "예상 리스크"}**: ${data.expected_risk}
+
+${data.rationale ? `\n---\n\n${data.rationale}` : ""}`;
+
+      case "portfolio":
+        return `## 💼 ${t("hitl.portfolio.title") || "포트폴리오 리밸런싱 승인 요청"}
+
+**${t("hitl.portfolio.tradesRequired") || "필요한 거래"}**:
+
+${data.trades_required?.map((trade: any) =>
+  `- **${trade.stock_code}**: ${trade.order_type === "buy" ? "매수" : "매도"} ${trade.quantity}주 (약 ${(trade.estimated_amount / 10000).toFixed(0)}만원)`
+).join("\n")}
+
+**${t("hitl.portfolio.portfolioMetrics") || "포트폴리오 지표"}**:
+- ${t("hitl.portfolio.expectedReturn") || "기대 수익률"}: ${data.portfolio_metrics?.expected_return}%
+- ${t("hitl.portfolio.expectedRisk") || "예상 리스크"}: ${data.portfolio_metrics?.expected_risk}%
+- ${t("hitl.portfolio.turnoverRatio") || "회전율"}: ${data.portfolio_metrics?.turnover_ratio}%
+
+${data.rationale ? `\n---\n\n${data.rationale}` : ""}`;
+
+      case "risk":
+        return `## ⚠️ ${t("hitl.risk.title") || "리스크 경고"}
+
+**${t("hitl.risk.riskLevel") || "리스크 수준"}**: ${data.risk_level}
+
+**${t("hitl.risk.riskFactors") || "리스크 요인"}**:
+
+${data.risk_factors?.map((factor: any) =>
+  `- **${factor.category}** (${factor.severity}): ${factor.description}\n  → ${t("hitl.risk.mitigation") || "완화 방안"}: ${factor.mitigation}`
+).join("\n\n")}
+
+${data.rationale ? `\n---\n\n${data.rationale}` : ""}`;
+
+      case "trading":
+        return `## 💰 ${t("hitl.trading.title") || "매매 주문 승인 요청"}
+
+**${t("hitl.trading.action") || "거래 유형"}**: ${data.action === "buy" ? t("hitl.trading.buy") || "매수" : t("hitl.trading.sell") || "매도"}
+**${t("common.stock") || "종목"}**: ${data.stock_name} (${data.stock_code})
+**${t("hitl.trading.quantity") || "수량"}**: ${data.quantity}${t("common.shares") || "주"}
+**${t("hitl.trading.price") || "가격"}**: ${data.price?.toLocaleString()}${t("common.won") || "원"}
+**${t("hitl.trading.totalAmount") || "총 금액"}**: ${data.total_amount?.toLocaleString()}${t("common.won") || "원"}
+
+**${t("hitl.trading.portfolioImpact") || "포트폴리오 영향"}**:
+- ${t("hitl.trading.currentWeight") || "현재 비중"}: ${data.current_weight}%
+- ${t("hitl.trading.expectedWeight") || "예상 비중"}: ${data.expected_weight}%
+
+${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 경고"}**: ${data.risk_warning}` : ""}`;
+
+      default:
+        return `## 승인 요청\n\n${JSON.stringify(data, null, 2)}`;
+    }
+  };
+
   const handleApprove = async (messageId: string) => {
     try {
+      // 1. HITL 승인 요청 내용을 채팅창에 메시지로 추가
+      if (approvalPanel.data) {
+        const approvalRequestMessage: Message = {
+          id: `approval-request-${Date.now()}`,
+          role: "assistant",
+          content: formatApprovalRequest(approvalPanel.data),
+          timestamp: new Date().toISOString(),
+          status: "sent",
+        };
+        addMessage(approvalRequestMessage);
+      }
+
+      // 2. 승인 결정을 사용자 메시지로 추가
+      const approvalDecisionMessage: Message = {
+        id: `approval-decision-${Date.now()}`,
+        role: "user",
+        content: `✅ **${t("hitl.approved") || "승인됨"}**`,
+        timestamp: new Date().toISOString(),
+        status: "sent",
+      };
+      addMessage(approvalDecisionMessage);
+
       if (mode === "demo") {
-        openAlert({ title: t('hitl.approved') });
         closeApprovalPanel();
         return;
       }
@@ -480,7 +632,6 @@ ${t("chat.receivedResponse")}
       });
 
       console.log("Approve:", messageId, currentThreadId);
-      openAlert({ title: t("hitl.approved") });
       closeApprovalPanel();
 
     } catch (error) {
@@ -499,8 +650,29 @@ ${t("chat.receivedResponse")}
 
   const handleReject = async (messageId: string) => {
     try {
+      // 1. HITL 승인 요청 내용을 채팅창에 메시지로 추가
+      if (approvalPanel.data) {
+        const approvalRequestMessage: Message = {
+          id: `approval-request-${Date.now()}`,
+          role: "assistant",
+          content: formatApprovalRequest(approvalPanel.data),
+          timestamp: new Date().toISOString(),
+          status: "sent",
+        };
+        addMessage(approvalRequestMessage);
+      }
+
+      // 2. 거부 결정을 사용자 메시지로 추가
+      const approvalDecisionMessage: Message = {
+        id: `approval-decision-${Date.now()}`,
+        role: "user",
+        content: `❌ **${t("hitl.rejected") || "거부됨"}**`,
+        timestamp: new Date().toISOString(),
+        status: "sent",
+      };
+      addMessage(approvalDecisionMessage);
+
       if (mode === "demo") {
-        openAlert({ title: t('hitl.rejected') });
         closeApprovalPanel();
         return;
       }
@@ -513,14 +685,8 @@ ${t("chat.receivedResponse")}
         thread_id: currentThreadId,
         decision: "rejected"
       });
-      // const response = await axios.post("/api/v1/chat/approve", {
-      //   thread_id: currentThreadId,
-      //   decision: "rejected",
-      //   automation_level: 2,
-      // });
 
       console.log("Reject:", messageId, currentThreadId);
-      openAlert({ title: t('hitl.rejected') });
       closeApprovalPanel();
     } catch (error) {
       console.error("Rejection error:", error);
