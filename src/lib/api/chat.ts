@@ -34,12 +34,12 @@ export async function getChatSessions(limit = 50) {
 }
 
 export async function getChatHistory(conversationId: string, limit = 100) {
-  const { data } = await apiClient.get(`/api/v1/chat/history/${conversationId}`, { params: { limit } });
+  const { data } = await apiClient.get(`/api/v1/chat/sessions/${conversationId}`);
   return data;
 }
 
 export async function deleteChatHistory(conversationId: string) {
-  const { data } = await apiClient.delete(`/api/v1/chat/history/${conversationId}`);
+  const { data } = await apiClient.delete(`/api/v1/chat/sessions/${conversationId}`);
   return data;
 }
 
