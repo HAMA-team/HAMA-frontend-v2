@@ -556,7 +556,7 @@ ${data.rationale ? `\n---\n\n${data.rationale}` : ""}`;
       case "trading":
         return `## 💰 ${t("hitl.trading.title") || "매매 주문 승인 요청"}
 
-**${t("hitl.trading.action") || "거래 유형"}**: ${data.action === "buy" ? t("hitl.trading.buy") || "매수" : t("hitl.trading.sell") || "매도"}
+**${t("hitl.trading.action") || "거래 유형"}**: ${data.action?.toUpperCase() === "BUY" ? t("hitl.trading.buy") || "매수" : t("hitl.trading.sell") || "매도"}
 **${t("common.stock") || "종목"}**: ${data.stock_name} (${data.stock_code})
 **${t("hitl.trading.quantity") || "수량"}**: ${data.quantity}${t("common.shares") || "주"}
 **${t("hitl.trading.price") || "가격"}**: ${data.price?.toLocaleString()}${t("common.won") || "원"}

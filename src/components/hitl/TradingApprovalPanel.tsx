@@ -39,8 +39,8 @@ export default function TradingApprovalPanel({
     try { return num.toLocaleString(); } catch { return String(num); }
   };
 
-  const getTradeTypeLabel = (type?: "buy" | "sell") => {
-    if (type === "sell") return t("hitl.sell");
+  const getTradeTypeLabel = (type?: string) => {
+    if (type?.toUpperCase() === "SELL") return t("hitl.sell");
     return t("hitl.buy");
   };
 
@@ -130,7 +130,7 @@ export default function TradingApprovalPanel({
                 ],
                 [
                   { label: t("hitl.tradeType"), value: (
-                    <span style={{ color: raw.action === "sell" ? "var(--error-500)" : "var(--primary-500)" }}>
+                    <span style={{ color: raw.action?.toUpperCase() === "SELL" ? "var(--error-500)" : "var(--primary-500)" }}>
                       {getTradeTypeLabel(raw.action)}
                     </span>
                   ), present: !!raw.action },
