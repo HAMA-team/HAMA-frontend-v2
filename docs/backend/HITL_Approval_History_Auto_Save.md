@@ -4,7 +4,13 @@
 프론트엔드에서 HITL 승인/거부 시 로컬 chatStore에만 기록 추가되고 백엔드 채팅 히스토리에 저장되지 않아 채팅 히스토리 불러올 때 HITL 기록 사라짐
 
 ## 해결 방안
-새로운 `/api/v1/chat/approve` POST 엔드포인트 생성 → 승인/거부 처리 + 채팅 히스토리 자동 저장
+새로운 `/api/v1/chat/approve` POST 엔드포인트 생성 → 승인/거부/수정 처리 + 채팅 히스토리 자동 저장
+
+스트림 연동(트리거)
+- SSE에서 HITL 승인 신호 수신 시점에 “승인 요청”을 자동 저장합니다.
+  - 표준: `event: hitl.request`
+  - 현행 호환: `agent_complete`의 `result.requires_approval === true`
+  - 저장 위치: `approval_requests`(요청 요약) + 대화 히스토리(assistant, approval_request)
 
 ## 구현 상세
 
@@ -29,17 +35,20 @@ router = APIRouter()
 
 
 class ApprovalRequest(BaseModel):
-    """승인/거부 요청"""
+    """승인/거부/수정 요청"""
     thread_id: str
-    decision: str = Field(..., regex="^(approved|rejected)$")
+    decision: str = Field(..., regex="^(approved|rejected|modified)$")
     modifications: Optional[Dict[str, Any]] = None
+    user_notes: Optional[str] = None
 
 
 class ApprovalResponse(BaseModel):
-    """승인/거부 응답"""
+    """승인/거부/수정 응답"""
     success: bool
     message: str
     conversation_id: str
+    graph_completed: bool = False
+    result: Optional[Dict[str, Any]] = None
 
 
 @router.post("/approve", response_model=ApprovalResponse)
@@ -70,8 +79,12 @@ async def handle_approval(request: ApprovalRequest):
         )
 
         # ✅ 2. 사용자 결정을 user 메시지로 저장
-        decision_emoji = "✅" if request.decision == "approved" else "❌"
-        decision_text = "승인됨" if request.decision == "approved" else "거부됨"
+        decision_emoji = "✅" if request.decision == "approved" else ("✏️" if request.decision == "modified" else "❌")
+        decision_text = (
+            "승인됨" if request.decision == "approved" else (
+                "수정 승인" if request.decision == "modified" else "거부됨"
+            )
+        )
         decision_msg = f"{decision_emoji} **{decision_text}**"
 
         await chat_history_service.append_message(
@@ -81,7 +94,8 @@ async def handle_approval(request: ApprovalRequest):
             metadata={
                 "type": "approval_decision",
                 "decision": request.decision,
-                "modifications": request.modifications
+                "modifications": request.modifications,
+                "user_notes": request.user_notes,
             }
         )
 
@@ -92,10 +106,15 @@ async def handle_approval(request: ApprovalRequest):
         #     "user_modifications": request.modifications
         # })
 
+        # 예시: 실행 결과(옵션)
+        exec_result: Dict[str, Any] = {}
+
         return ApprovalResponse(
             success=True,
             message=f"승인 처리 완료: {decision_text}",
-            conversation_id=request.thread_id
+            conversation_id=request.thread_id,
+            graph_completed=False,  # LangGraph resume 후 완료 시 true로 반환
+            result=exec_result or None,
         )
 
     except ValueError as e:
@@ -205,10 +224,11 @@ approval_request_data = {
 return {"approval_request_data": approval_request_data, ...}
 
 # Option 2: 별도 테이블에 저장 (권장)
+# approval_requests 테이블에 저장하고 status=pending 으로 마킹
 # await save_approval_request(approval_request_data)
 ```
 
-### 6. 프론트엔드 변경 (Optional)
+### 6. 프론트엔드 변경 (정책 권장: 즉시 메시지 + 백엔드 자동 저장 병행)
 
 현재 프론트엔드는 승인/거부 시 `addMessage()`로 로컬 state에 기록을 추가함.
 백엔드가 자동 저장하므로 이 부분을 **제거할 수 있음**:
@@ -225,7 +245,12 @@ closeApprovalPanel();
 // ❌ addMessage() 호출 제거 - 백엔드가 자동 저장
 ```
 
-**하지만 유지 권장**: 즉각적인 UI 피드백 제공. 다음 히스토리 로드 시 백엔드 데이터로 대체됨.
+권장 정책(A): 프론트 즉시 메시지 + 백엔드 자동 저장 병행
+- 프론트는 승인/거부 클릭 즉시 메시지 2개(assistant 요약, user 결정)를 추가해 즉시 피드백 제공
+- 백엔드는 동일 내역을 채팅 히스토리에 저장(출처 구분을 위해 metadata.type 사용)
+- 중복 렌더 방지: 프론트가 히스토리 재로딩 시 metadata.type(approval_request/approval_decision)와 타임스탬프 범위로 중복 억제
+
+대안(B): 프론트 메시지 추가 제거, 백엔드 자동 저장만 사용(즉시성 저하를 로더/토스트로 보완)
 
 ## 테스트
 
@@ -233,6 +258,16 @@ closeApprovalPanel();
 2. `GET /api/v1/chat/sessions/{conversation_id}` 호출
 3. 승인 요청(assistant) + 결정(user) 메시지 2개 확인
 4. 브라우저 새로고침 후 채팅 히스토리 불러와서 기록 유지 확인
+
+## 상태/이력 저장 범위(권장)
+
+- 승인 요청 생성 시
+  - `approval_requests` upsert (status=pending, 요청 요약/영향/리스크/대안 저장)
+  - 채팅 히스토리에 assistant 메시지(approval_request) 저장
+- 승인 결정 수신 시
+  - `user_decisions` insert (decision, decided_at, modifications, user_notes)
+  - `approval_requests.status` 업데이트(pending → approved|rejected|modified)
+  - 필요 시 실행 결과 요약(result)을 채팅 히스토리에 반영
 
 ## 참고
 
