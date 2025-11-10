@@ -1,13 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Treemap, ResponsiveContainer, Tooltip } from "recharts";
+import { useTranslation } from "react-i18next";
 import { Stock } from "@/lib/types/portfolio";
 import { useChartColors } from "@/lib/hooks/useChartColors";
 
 interface PortfolioTreemapProps {
   stocks: Stock[];
 }
+
+type ColorMode = "default" | "return";
 
 /**
  * PortfolioTreemap Component
@@ -21,15 +24,36 @@ interface PortfolioTreemapProps {
  * @see ProductRequirements.md - US-3.1 포트폴리오 즉시 시각화
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
-export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
-  const { chartColors } = useChartColors();
+export default function PortfolioTreemap({ stocks = [] }: PortfolioTreemapProps) {
+  const { t } = useTranslation();
+  const { chartColors, profitColor, lossColor } = useChartColors();
+  const [colorMode, setColorMode] = useState<ColorMode>("default");
+
+  /**
+   * 수익률 기반 색상 계산
+   * 수익률이 높을수록 진한 초록, 낮을수록 진한 빨강
+   * 다크모드 고려: CSS 변수 기반 색상 사용
+   */
+  const getReturnBasedColor = (returnRate: number): string => {
+    // 명확한 구간 설정
+    if (returnRate > 10) return profitColor || "#10b981"; // 진한 초록 (10% 이상)
+    if (returnRate > 5) return profitColor || "#34d399"; // 초록 (5-10%)
+    if (returnRate > 0) return profitColor || "#6ee7b7"; // 연한 초록 (0-5%)
+    if (returnRate === 0) return "#9ca3af"; // 회색 (0%)
+    // 손실은 바로 빨간색 계열
+    if (returnRate > -5) return lossColor || "#f87171"; // 연한 빨강 (-5~0%)
+    if (returnRate > -10) return lossColor || "#ef4444"; // 빨강 (-10~-5%)
+    return lossColor || "#dc2626"; // 진한 빨강 (-10% 이하)
+  };
 
   const data = stocks.map((stock, index) => ({
     name: stock.name,
     size: stock.value,
     weight: stock.weight,
     returnRate: stock.returnRate,
-    fill: chartColors[index % chartColors.length] || "#3b82f6", // fallback
+    fill: colorMode === "return"
+      ? getReturnBasedColor(stock.returnRate)
+      : (chartColors[index % chartColors.length] || "#3b82f6"),
   }));
 
   const formatCurrency = (value: number) => {
@@ -170,6 +194,43 @@ export default function PortfolioTreemap({ stocks }: PortfolioTreemapProps) {
         borderColor: "var(--border-default)",
       }}
     >
+      {/* 차트 제목 + 색상 모드 토글 */}
+      <div className="mb-4 flex items-start justify-between">
+        <div>
+          <h3 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+            {t("portfolio.charts.treemap.title")}
+          </h3>
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+            {t("portfolio.charts.treemap.description")}
+          </p>
+        </div>
+
+        {/* 색상 모드 토글 버튼 */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setColorMode("default")}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+            style={{
+              backgroundColor: colorMode === "default" ? "var(--primary-500)" : "transparent",
+              color: colorMode === "default" ? "#ffffff" : "var(--text-secondary)",
+              border: `1px solid ${colorMode === "default" ? "var(--primary-500)" : "var(--border-default)"}`,
+            }}
+          >
+            {t("portfolio.charts.treemap.colorMode")}
+          </button>
+          <button
+            onClick={() => setColorMode("return")}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+            style={{
+              backgroundColor: colorMode === "return" ? "var(--primary-500)" : "transparent",
+              color: colorMode === "return" ? "#ffffff" : "var(--text-secondary)",
+              border: `1px solid ${colorMode === "return" ? "var(--primary-500)" : "var(--border-default)"}`,
+            }}
+          >
+            {t("portfolio.charts.treemap.returnMode")}
+          </button>
+        </div>
+      </div>
       <div style={{ width: "100%", height: 500, backgroundColor: "var(--container-background)" }}>
         <ResponsiveContainer width="100%" height={500}>
           <Treemap

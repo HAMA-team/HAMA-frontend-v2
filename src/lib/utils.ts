@@ -5,13 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string, locale: string = 'en'): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  const isKo = locale.startsWith('ko');
+  const fmt = new Intl.DateTimeFormat(isKo ? 'ko' : locale || 'en',
+    isKo
+      ? { year: 'numeric', month: 'numeric', day: 'numeric' }
+      : { year: 'numeric', month: 'short', day: 'numeric' }
+  );
+  return fmt.format(d);
 }
 
 export function formatCurrency(amount: number, currency = 'USD'): string {

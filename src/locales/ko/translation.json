@@ -4,10 +4,17 @@
     "cancel": "취소",
     "confirm": "확인",
     "delete": "삭제",
+    "rename": "이름 바꾸기",
     "edit": "수정",
     "close": "닫기",
     "loading": "로딩 중...",
-    "error": "오류가 발생했습니다"
+    "error": "오류가 발생했습니다",
+    "loadMore": "더 보기",
+    "stock": "종목",
+    "stocks": "주식",
+    "cash": "현금",
+    "shares": "주",
+    "won": "원"
   },
   "nav": {
     "chat": "채팅",
@@ -34,64 +41,61 @@
     "copy": "복사",
     "copied": "복사됨",
     "receivedResponse": "응답을 받았습니다.",
+    "artifactPromptSeparator": "여기부터 위의 글에 대한 유저의 프롬프트 시작이다.",
+    "artifactContextPreamble": "다음은 참고용 아티팩트 컨텍스트입니다. 도구 호출이나 외부 데이터 조회를 하지 말고, 아래 컨텍스트를 기반으로 텍스트로만 답변을 구성하세요.",
+    "generating": "응답 생성 중...",
+    "sendFailed": "전송 실패",
+    "retry": "재전송",
+    "hitlTest": "🧪 HITL 패널 테스트",
+    "hitlTestTitle": "HITL 패널 테스트 (Agent 선택)",
     "backendError": "⚠️ **백엔드 서버에 연결할 수 없습니다**",
     "backendErrorDetail": "로컬 환경에서는 백엔드 API 없이도 UI 테스트가 가능합니다.",
+    "errorContent": "오류 내용:",
+    "solution": "해결 방법:",
+    "unknownError": "알 수 없는 오류",
+    "thinking": {
+      "title": "AI 생각 과정",
+      "steps": "단계",
+      "current": "현재",
+      "agents": {
+        "planner": "계획 수립",
+        "researcher": "데이터 수집",
+        "strategy": "전략 분석",
+        "portfolio": "포트폴리오",
+        "risk": "리스크",
+        "trading": "매매",
+        "unknown": "분석 중"
+      }
+    },
+    "checkBackendRunning": "백엔드 서버가 실행 중인지 확인하세요",
+    "startServer": "서버 실행",
+    "checkApiDocs": "API 문서 확인",
     "emptyState": {
       "greeting": "안녕하세요!",
       "subGreeting": "무엇을 도와드릴까요?",
       "suggestions": {
         "portfolio": {
           "title": "포트폴리오 현황",
-          "description": "전체 평가금액, 수익률, 종목별 상세 분석",
-          "prompt": "현재 내 포트폴리오의 전체 평가금액, 수익률, 보유 종목별 상세 현황을 분석해줘. 각 종목의 매수가, 현재가, 수익률, 섹터 정보를 포함해서 알려줘."
+          "description": "현재 보유 자산과 수익률을 확인하세요",
+          "prompt": "현재 내 포트폴리오의 보유 종목, 투자 금액, 수익률, 그리고 각 종목별 비중을 상세히 알려주세요. 최근 수익률 변동 추이도 포함해주세요."
         },
         "market": {
           "title": "시장 분석",
-          "description": "코스피 시황과 섹터별 동향 분석",
-          "prompt": "오늘 코스피 시황과 주요 섹터별 동향을 분석해줘. 반도체, 배터리, IT서비스 섹터의 외국인/기관 순매수 현황과 주요 이슈를 자세히 설명해줘."
+          "description": "최신 시장 동향과 투자 전략",
+          "prompt": "오늘의 주요 경제 뉴스와 국내외 주식 시장 동향을 분석해주세요. 현재 시장 사이클과 투자자들이 주목해야 할 핵심 이슈를 포함해주세요."
         },
         "recommendation": {
           "title": "종목 추천",
-          "description": "섹터 분산 고려한 맞춤형 추천",
-          "prompt": "내 포트폴리오 구성을 고려해서 섹터 분산이 가능한 종목을 추천해줘. 추천 종목의 재무제표 분석, 기술적 분석, 목표가, 매수 전략을 구체적으로 제시해줘."
+          "description": "AI 기반 맞춤형 투자 아이디어",
+          "prompt": "주식 투자를 처음 시작하는 초보자에게 적합한 종목을 추천해주세요. 장기 투자 관점에서 안정적이면서도 성장 가능성이 있는 종목을 중심으로 추천해주시고, 주식 투자를 배우는 데 도움이 되는 추천 도서도 함께 알려주세요."
         },
         "risk": {
           "title": "리스크 분석",
-          "description": "집중도, VaR, 시나리오 분석",
-          "prompt": "내 포트폴리오의 섹터 집중도, 단일 종목 집중 리스크, 손실 종목 현황을 분석해줘. VaR 계산과 시나리오별 예상 손익, 리스크 관리 권장사항을 자세히 알려줘."
+          "description": "포트폴리오 위험 요소 점검",
+          "prompt": "현재 내 포트폴리오의 리스크 요인을 분석해주세요. 섹터 집중도, 변동성, 최대 낙폭 가능성 등을 평가하고, 리스크를 줄이기 위한 구체적인 개선 방안을 제시해주세요."
         }
       }
     }
-  },
-  "hitl": {
-    "title": "매매 승인 요청",
-    "pending": "승인 대기",
-    "approvalRequired": "거래 승인 필요",
-    "orderDetails": "주문 내역",
-    "orderInfo": "주문 정보",
-    "stockName": "종목명",
-    "stockCode": "종목코드",
-    "orderType": "주문 유형",
-    "tradeType": "거래 유형",
-    "buy": "매수",
-    "sell": "매도",
-    "orderQuantity": "주문 수량",
-    "quantity": "수량",
-    "amount": "금액",
-    "currentPrice": "현재 시세가",
-    "expectedAmount": "예상",
-    "totalAmount": "금액",
-    "portfolioWeightChange": "포트폴리오 비중 변화",
-    "currentWeight": "현재 비중",
-    "expectedWeight": "예상 비중",
-    "riskWarning": "리스크 경고",
-    "alternatives": "권장 대안",
-    "shares": "주",
-    "approve": "승인",
-    "reject": "거부",
-    "approvalNote": "승인 시 즉시 주문이 체결됩니다",
-    "approved": "매수 주문이 실행되었습니다",
-    "rejected": "매수 주문이 거부되었습니다"
   },
   "portfolio": {
     "title": "포트폴리오",
@@ -102,11 +106,35 @@
       "cash": "현금 보유액",
       "stockCount": "개"
     },
+    "holdings": {
+      "title": "보유 종목",
+      "quantity": "보유 수량",
+      "value": "평가금액",
+      "return": "수익률",
+      "weight": "비중",
+      "empty": "보유 중인 종목이 없습니다"
+    },
     "chartTypeLabel": "차트 타입:",
     "chartTypes": {
       "treemap": "트리맵",
       "pie": "원형",
       "bar": "막대"
+    },
+    "charts": {
+      "treemap": {
+        "title": "종목별 비중",
+        "description": "보유 종목의 평가금액을 면적으로 표시합니다",
+        "colorMode": "종목별",
+        "returnMode": "수익률별"
+      },
+      "pie": {
+        "title": "섹터별 비중",
+        "description": "보유 종목을 섹터별로 그룹화하여 표시합니다"
+      },
+      "bar": {
+        "title": "종목별 수익률",
+        "description": "수익률이 높은 종목부터 순서대로 표시합니다"
+      }
     }
   },
   "artifacts": {
@@ -136,9 +164,37 @@
     "ko": "한국어",
     "en": "English"
   },
+  "system": {
+    "mode": {
+      "demo": "데모",
+      "live": "실시간"
+    }
+  },
   "mypage": {
     "title": "마이페이지",
     "subtitle": "계정 설정 및 환경 설정",
+    "apiStatus": {
+      "header": "API 상태 확인(임시)",
+      "title": "엔드포인트 연결 상태",
+      "subtitleLive": "아래 엔드포인트의 연결을 점검합니다.",
+      "subtitleDemo": "데모 모드: 네트워크 호출은 생략됩니다.",
+      "checkNow": "지금 점검",
+      "lastChecked": "방금 전 점검됨",
+      "notCheckedYet": "아직 점검하지 않았습니다",
+      "items": {
+        "artifacts": "아티팩트",
+        "approvals": "승인 이력",
+        "automationLevel": "자동화 레벨(현재)",
+        "automationLevels": "자동화 레벨(옵션)",
+        "portfolioChart": "포트폴리오 차트 데이터"
+      },
+      "status": {
+        "idle": "대기",
+        "success": "정상",
+        "error": "오류",
+        "skipped": "생략"
+      }
+    },
     "user": {
       "title": "사용자 정보",
       "demoName": "데모 사용자"
@@ -150,14 +206,17 @@
       "hitlIndicator": "HITL 개입",
       "changeSuccess": "자동화 레벨이 변경되었습니다",
       "changeFailed": "자동화 레벨 변경에 실패했습니다",
+      "updateInProgress": "다른 설정이 업데이트 중입니다. 잠시 후 다시 시도하세요",
+      "loadError": "설정을 불러오는 중 오류가 발생했습니다",
       "workflow": {
         "dataCollection": "데이터 수집",
         "analysis": "데이터 분석",
         "portfolio": "포트폴리오 구성",
         "risk": "리스크 분석",
         "trade": "매매",
-        "autoExecute": "자동 실행 |",
-        "approvalRequired": "사용자 승인 필요"
+        "autoExecute": "자동 실행",
+        "approvalRequired": "사용자 승인 필요",
+        "conditional": "조건부"
       },
       "advisor": {
         "name": "어드바이저 모드",
@@ -179,6 +238,26 @@
         "feature1": "저위험 매매 자동 실행",
         "feature2": "고위험 매매만 승인 필요",
         "feature3": "AI 주도 거래"
+      },
+      "custom": {
+        "name": "커스텀 모드",
+        "description": "각 단계별로 세밀하게 제어",
+        "feature1": "Phase별 개별 HITL 제어",
+        "feature2": "조건부 매매 승인 지원",
+        "feature3": "고급 사용자를 위한 모드"
+      }
+    },
+    "customHitl": {
+      "title": "커스텀 모드 설정",
+      "subtitle": "각 단계별로 HITL 개입 여부를 설정하세요",
+      "info": "커스텀 모드는 고급 사용자를 위한 기능입니다. 각 단계에서 AI가 자동으로 진행할지, 사용자 승인을 받을지 세밀하게 제어할 수 있습니다.",
+      "approvalRequired": "사용자 승인 필요",
+      "autoExecute": "자동 실행",
+      "trade": {
+        "always": "항상 승인",
+        "never": "자동 실행",
+        "conditional": "조건부",
+        "conditionalHint": "저위험 매매는 자동, 고위험 매매는 승인"
       }
     },
     "profile": {
@@ -205,5 +284,130 @@
       "description": "4단계 질문으로 나의 투자 성향을 파악하고 맞춤형 AI 서비스를 받아보세요",
       "button": "온보딩 체험하기"
     }
+  },
+  "hitl": {
+    "title": "승인 요청",
+    "pending": "승인 대기 중",
+    "approve": "승인",
+    "reject": "거부",
+    "buy": "매수",
+    "sell": "매도",
+    "shares": "주",
+    "stockName": "종목명",
+    "stockCode": "종목 코드",
+    "tradeType": "거래 유형",
+    "orderQuantity": "수량",
+    "currentPrice": "현재가",
+    "quantity": "수량",
+    "amount": "금액",
+    "expectedAmount": "예상",
+    "totalAmount": "금액",
+    "approvalRequired": "승인 필요",
+    "orderDetails": "주문 상세",
+    "portfolioWeightChange": "포트폴리오 비중 변화",
+    "currentWeight": "현재",
+    "expectedWeight": "예상",
+    "alternatives": "대안 제안",
+    "approvalNote": "* 승인 시 거래가 즉시 실행됩니다",
+    "research": {
+      "title": "분석 실행 승인",
+      "query": "질문",
+      "complexityLabel": "분석 복잡도",
+      "depthLabel": "분석 깊이",
+      "routingReason": "라우팅 이유",
+      "reason": "분석이 필요한 이유",
+      "info": "이 분석은 외부 데이터 소스와 AI 모델을 활용하여 종합적인 인사이트를 제공합니다.",
+      "complexity": {
+        "label": "복잡도",
+        "simple": "단순",
+        "moderate": "중간",
+        "expert": "전문가"
+      },
+      "depth": {
+        "label": "상세도",
+        "brief": "간략",
+        "detailed": "상세",
+        "comprehensive": "종합"
+      }
+    },
+    "strategy": {
+      "title": "투자 전략 승인",
+      "type": "전략 유형",
+      "strategyType": "전략 유형",
+      "marketOutlook": "시장 전망",
+      "cycle": "사이클",
+      "sentiment": "심리",
+      "sectorStrategy": "섹터 전략",
+      "overweight": "비중 확대",
+      "underweight": "비중 축소",
+      "targetAllocation": "목표 자산배분",
+      "stocks": "주식",
+      "cash": "현금",
+      "expectedReturn": "예상 수익률",
+      "expectedRisk": "예상 리스크",
+      "types": {
+        "momentum": "모멘텀",
+        "value": "가치투자",
+        "growth": "성장주",
+        "defensive": "방어적"
+      },
+      "cycle": {
+        "expansion": "확장기",
+        "peak": "정점",
+        "contraction": "수축기",
+        "trough": "저점"
+      },
+      "sentiment": {
+        "bullish": "강세",
+        "neutral": "중립",
+        "bearish": "약세"
+      }
+    },
+    "portfolio": {
+      "title": "포트폴리오 리밸런싱",
+      "tradesRequired": "필요한 거래",
+      "netAmount": "순 필요 금액",
+      "metrics": "예상 지표",
+      "portfolioMetrics": "포트폴리오 지표",
+      "expectedReturn": "예상 수익률",
+      "expectedRisk": "예상 리스크",
+      "risk": "리스크",
+      "turnoverRatio": "회전율",
+      "diversification": "분산도"
+    },
+    "risk": {
+      "title": "리스크 경고",
+      "detectedTitle": "고위험 상황 감지",
+      "detectedDesc": "다음 리스크 요인을 확인하고 신중하게 결정하세요.",
+      "factors": "주요 리스크",
+      "riskFactors": "리스크 요인",
+      "riskLevel": "리스크 수준",
+      "critical": "심각",
+      "warning": "경고",
+      "mitigation": "완화 방법",
+      "portfolioMetrics": "포트폴리오 지표",
+      "concentration": "집중도",
+      "volatility": "변동성",
+      "maxDrawdown": "최대 낙폭",
+      "recommendedActions": "권장 조치",
+      "cancel": "취소",
+      "proceedAnyway": "경고 무시하고 진행"
+    },
+    "trading": {
+      "title": "매매 주문 승인 요청",
+      "action": "거래 유형",
+      "buy": "매수",
+      "sell": "매도",
+      "quantity": "수량",
+      "price": "가격",
+      "totalAmount": "총 금액",
+      "portfolioImpact": "포트폴리오 영향",
+      "currentWeight": "현재 비중",
+      "expectedWeight": "예상 비중",
+      "riskWarning": "리스크 경고"
+    },
+    "approved": "승인됨",
+    "rejected": "거부됨",
+    "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"
   }
 }

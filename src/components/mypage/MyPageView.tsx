@@ -5,9 +5,12 @@ import { useUserStore } from "@/store/userStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import { useHITLConfigSync } from "@/hooks/useHITLConfigSync";
+import { useAppModeStore } from "@/store/appModeStore";
 import AutomationLevelSelector from "./AutomationLevelSelector";
 import InvestmentProfile from "./InvestmentProfile";
 import { Sun, Moon, Globe } from "lucide-react";
+import APICheckPanel from "./APICheckPanel";
 
 /**
  * MyPageView Component
@@ -30,6 +33,10 @@ export default function MyPageView() {
   const router = useRouter();
   const { userInfo } = useUserStore();
   const { theme, toggleTheme } = useThemeStore();
+  const { mode } = useAppModeStore();
+
+  // HITL Config 동기화 (앱 시작, 모드 전환, 멀티탭)
+  useHITLConfigSync();
 
   // TODO: Phase 3 - 실제 사용자 정보 로드
   const displayUser = userInfo || {
@@ -121,21 +128,6 @@ export default function MyPageView() {
 
       {/* 섹션 2: 자동화 레벨 설정 ⭐ Phase 2 */}
       <section>
-        <div className="mb-4">
-          <h2
-            className="text-xl font-semibold mb-2"
-            style={{ color: "var(--text-primary)" }}
-          >
-            {t("mypage.automation.title")}
-          </h2>
-          <p
-            className="text-sm"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {t("mypage.automation.subtitle")}
-          </p>
-        </div>
-
         <AutomationLevelSelector />
       </section>
 
@@ -280,7 +272,7 @@ export default function MyPageView() {
                       : "1px solid var(--border-default)",
                 }}
               >
-                한국어
+                {t("language.ko")}
               </button>
               <button
                 onClick={() => handleLanguageChange("en")}
@@ -300,14 +292,27 @@ export default function MyPageView() {
                       : "1px solid var(--border-default)",
                 }}
               >
-                English
+                {t("language.en")}
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 섹션 5: 온보딩 체험하기 (선택적) */}
+      {/* 섹션 5: API 상태 확인 (임시) - Demo 모드에서만 표시 */}
+      {mode === "demo" && (
+        <section>
+          <h2
+            className="text-xl font-semibold mb-4"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {t("mypage.apiStatus.header")}
+          </h2>
+          <APICheckPanel />
+        </section>
+      )}
+
+      {/* 섹션 6: 온보딩 체험하기 (선택적) */}
       <section>
         <div
           className="p-6 rounded-xl border text-center"

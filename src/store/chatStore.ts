@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { Message, ApprovalRequest } from "@/lib/types/chat";
+import { create } from 'zustand';
+import { Message, ApprovalRequest, ThinkingStep } from '@/lib/types/chat';
 
 /**
  * Chat Store (Zustand)
@@ -18,6 +18,7 @@ interface ChatStore {
   messages: Message[];
   currentThreadId: string;
   isLoading: boolean;
+  isHistoryLoading: boolean; // 세션 히스토리 전환/복원 로딩 전용
   approvalPanel: {
     isOpen: boolean;
     data: ApprovalRequest | null;
@@ -29,7 +30,14 @@ interface ChatStore {
   deleteMessage: (messageId: string) => void;
   clearMessages: () => void;
   setLoading: (loading: boolean) => void;
+  setHistoryLoading: (loading: boolean) => void;
   setCurrentThreadId: (threadId: string) => void;
+  // Streaming helpers
+  beginAssistantMessage: (tempId: string) => void;
+  appendAssistantContent: (messageId: string, delta: string) => void;
+  addThinkingStep: (messageId: string, step: ThinkingStep) => void;
+  appendThinkingContent: (messageId: string, contentDelta: string) => void;
+  finishAssistantMessage: (messageId: string, final?: Partial<Message>) => void;
   openApprovalPanel: (data: ApprovalRequest) => void;
   closeApprovalPanel: () => void;
 }
@@ -37,8 +45,9 @@ interface ChatStore {
 export const useChatStore = create<ChatStore>((set) => ({
   // Initial State
   messages: [],
-  currentThreadId: "",
+  currentThreadId: '',
   isLoading: false,
+  isHistoryLoading: false,
   approvalPanel: {
     isOpen: false,
     data: null,
@@ -72,10 +81,72 @@ export const useChatStore = create<ChatStore>((set) => ({
       isLoading: loading,
     }),
 
+  setHistoryLoading: (loading) =>
+    set({
+      isHistoryLoading: loading,
+    }),
+
   setCurrentThreadId: (threadId) =>
     set({
       currentThreadId: threadId,
     }),
+
+  beginAssistantMessage: (tempId) =>
+    set((state) => ({
+      messages: [
+        ...state.messages,
+        {
+          id: tempId,
+          role: 'assistant',
+          content: '',
+          thinking: [],
+          timestamp: new Date().toISOString(),
+          status: 'sending',
+        },
+      ],
+    })),
+
+  appendAssistantContent: (messageId, delta) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === messageId ? { ...m, content: (m.content || '') + delta } : m
+      ),
+    })),
+
+  addThinkingStep: (messageId, step) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === messageId
+          ? { ...m, thinking: [...(m.thinking || []), step] }
+          : m
+      ),
+    })),
+
+  appendThinkingContent: (messageId, contentDelta) =>
+    set((state) => ({
+      messages: state.messages.map((m) => {
+        if (m.id !== messageId) return m;
+        const thinking = m.thinking || [];
+        if (thinking.length === 0) return m;
+
+        // 마지막 thinking step의 content에 추가
+        const lastIndex = thinking.length - 1;
+        const updatedThinking = thinking.map((step, idx) =>
+          idx === lastIndex
+            ? { ...step, content: (step.content || '') + contentDelta }
+            : step
+        );
+
+        return { ...m, thinking: updatedThinking };
+      }),
+    })),
+
+  finishAssistantMessage: (messageId, final) =>
+    set((state) => ({
+      messages: state.messages.map((m) =>
+        m.id === messageId ? { ...m, ...final, status: final?.status ?? 'sent' } : m
+      ),
+    })),
 
   openApprovalPanel: (data) =>
     set({

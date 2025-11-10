@@ -3,6 +3,7 @@
 import React from "react";
 import { PieChart, TrendingUp, Sparkles, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useAppModeStore } from "@/store/appModeStore";
 
 interface SuggestionCard {
   icon: React.ElementType;
@@ -15,7 +16,7 @@ interface SuggestionCard {
 
 interface ChatEmptyStateProps {
   onSuggestionClick: (prompt: string) => void;
-  onTestHITL: () => void;
+  onTestHITL: (agentType: string) => void;
 }
 
 /**
@@ -27,6 +28,7 @@ interface ChatEmptyStateProps {
  */
 export default function ChatEmptyState({ onSuggestionClick, onTestHITL }: ChatEmptyStateProps) {
   const { t } = useTranslation();
+  const { mode } = useAppModeStore();
 
   const suggestions: SuggestionCard[] = [
     {
@@ -126,19 +128,80 @@ export default function ChatEmptyState({ onSuggestionClick, onTestHITL }: ChatEm
           })}
         </div>
 
-        {/* TEST: HITL 패널 테스트 버튼 (개발 완료 후 제거) */}
-        <button
-          onClick={onTestHITL}
-          className="mt-8 px-6 py-3 rounded-lg font-medium transition-colors duration-150"
-          style={{
-            backgroundColor: "var(--warning-500)",
-            color: "var(--lnb-active-text)",
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--warning-600)"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--warning-500)"}
-        >
-          🧪 HITL 패널 테스트
-        </button>
+        {/* TEST: HITL 패널 테스트 버튼들 (Demo 모드에서만 표시) */}
+        {mode === "demo" && (
+          <div className="mt-8 space-y-2">
+            <p className="text-xs text-center mb-3" style={{ color: "var(--text-muted)" }}>
+              {t("chat.hitlTestTitle") || "HITL 패널 테스트"}
+            </p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <button
+                onClick={() => onTestHITL("research")}
+                className="px-4 py-2 text-sm rounded-lg font-medium transition-colors duration-150"
+                style={{
+                  backgroundColor: "var(--primary-100)",
+                  color: "var(--primary-700)",
+                  border: "1px solid var(--primary-300)",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-200)"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-100)"}
+              >
+                Research
+              </button>
+              <button
+                onClick={() => onTestHITL("strategy")}
+                className="px-4 py-2 text-sm rounded-lg font-medium transition-colors duration-150"
+                style={{
+                  backgroundColor: "var(--primary-100)",
+                  color: "var(--primary-700)",
+                  border: "1px solid var(--primary-300)",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-200)"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-100)"}
+              >
+                Strategy
+              </button>
+              <button
+                onClick={() => onTestHITL("portfolio")}
+                className="px-4 py-2 text-sm rounded-lg font-medium transition-colors duration-150"
+                style={{
+                  backgroundColor: "var(--primary-100)",
+                  color: "var(--primary-700)",
+                  border: "1px solid var(--primary-300)",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-200)"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-100)"}
+              >
+                Portfolio
+              </button>
+              <button
+                onClick={() => onTestHITL("risk")}
+                className="px-4 py-2 text-sm rounded-lg font-medium transition-colors duration-150"
+                style={{
+                  backgroundColor: "var(--primary-100)",
+                  color: "var(--primary-700)",
+                  border: "1px solid var(--primary-300)",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--primary-200)"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--primary-100)"}
+              >
+                Risk
+              </button>
+              <button
+                onClick={() => onTestHITL("trading")}
+                className="px-4 py-2 text-sm rounded-lg font-medium transition-colors duration-150"
+                style={{
+                  backgroundColor: "var(--warning-500)",
+                  color: "var(--lnb-active-text)",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--warning-600)"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "var(--warning-500)"}
+              >
+                Trading
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

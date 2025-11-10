@@ -1,209 +1,418 @@
 {
-  "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "delete": "Delete",
-    "edit": "Edit",
-    "close": "Close",
-    "loading": "Loading...",
-    "error": "An error occurred"
-  },
-  "nav": {
-    "chat": "Chat",
-    "portfolio": "Portfolio",
-    "artifacts": "Artifacts",
-    "mypage": "My Page",
-    "discover": "Discover",
-    "newChat": "New Chat",
-    "recentChats": "Recent Chats",
-    "collapseMenu": "Collapse sidebar",
-    "expandMenu": "Expand sidebar"
-  },
-  "chat": {
-    "inputPlaceholder": "Type a message...",
-    "helperText": "AI can make mistakes. Please verify important information.",
-    "helperTextFull": "AI can make mistakes. Please verify important information. • Shift+Enter for new line",
-    "sendMessage": "Send",
-    "send": "Send",
-    "attachFile": "Attach file",
-    "saveAsArtifact": "Save as Artifact",
-    "saveAsArtifactKo": "Save as Artifact",
-    "saved": "Saved",
-    "saving": "Saving...",
-    "copy": "Copy",
-    "copied": "Copied",
-    "receivedResponse": "Received a response.",
-    "backendError": "⚠️ **Cannot connect to backend server**",
-    "backendErrorDetail": "You can test the UI without backend API in local environment.",
-    "emptyState": {
-      "greeting": "Hello!",
-      "subGreeting": "How can I help you?",
-      "suggestions": {
-        "portfolio": {
-          "title": "Portfolio Status",
-          "description": "Check your current assets and returns",
-          "prompt": "Show me my portfolio status"
-        },
-        "market": {
-          "title": "Market Analysis",
-          "description": "Latest market trends and investment strategies",
-          "prompt": "Analyze recent market trends"
-        },
-        "recommendation": {
-          "title": "Stock Recommendations",
-          "description": "AI-powered personalized investment ideas",
-          "prompt": "Recommend stocks for my investment style"
-        },
-        "risk": {
-          "title": "Risk Analysis",
-          "description": "Review portfolio risk factors",
-          "prompt": "Analyze my portfolio risks"
-        }
-      }
-    }
-  },
-  "hitl": {
-    "title": "Trade Approval Request",
-    "pending": "Pending Approval",
-    "approvalRequired": "Approval Required",
-    "orderDetails": "Order Details",
-    "orderInfo": "Order Information",
-    "stockName": "Stock Name",
-    "stockCode": "Stock Code",
-    "orderType": "Order Type",
-    "tradeType": "Trade Type",
-    "buy": "Buy",
-    "sell": "Sell",
-    "orderQuantity": "Order Quantity",
-    "quantity": "Quantity",
-    "amount": "Amount",
-    "currentPrice": "Current Price",
-    "expectedAmount": "Expected",
-    "totalAmount": "Amount",
-    "portfolioWeightChange": "Portfolio Weight Change",
-    "currentWeight": "Current Weight",
-    "expectedWeight": "Expected Weight",
-    "riskWarning": "Risk Warning",
-    "alternatives": "Recommended Alternatives",
-    "shares": "shares",
-    "approve": "Approve",
-    "reject": "Reject",
-    "approvalNote": "Order will be executed immediately upon approval",
-    "approved": "Buy order has been executed",
-    "rejected": "Buy order has been rejected"
-  },
-  "portfolio": {
-    "title": "Portfolio",
-    "summary": {
-      "totalValue": "Total Value",
-      "totalReturn": "Total Return",
-      "holdings": "Holdings",
-      "cash": "Cash",
-      "stockCount": ""
-    },
-    "chartTypeLabel": "Chart Type:",
-    "chartTypes": {
-      "treemap": "Treemap",
-      "pie": "Pie",
-      "bar": "Bar"
-    }
-  },
-  "artifacts": {
-    "title": "Artifacts",
-    "listTitle": "Artifacts",
-    "listSubtitle": "Saved reports and analysis results",
-    "empty": "No saved artifacts",
-    "emptyState": "No saved artifacts",
-    "emptySuggestion": "Click \"Save as Artifact\" button in chat to save AI responses",
-    "viewInArtifacts": "View in Artifacts",
-    "notFound": "Artifact not found",
-    "notFoundDescription": "This artifact has been deleted or does not exist",
-    "backToList": "Back to artifact list",
-    "backToListShort": "Artifact list",
-    "wordCount": "words",
-    "download": "Download",
-    "share": "Share",
-    "shareComingSoon": "Share feature will be implemented in Phase 3",
-    "deleteConfirm": "Delete this artifact?",
-    "chatPlaceholder": "Ask a question about this artifact..."
-  },
-  "toast": {
-    "artifactSaved": "Artifact has been saved",
-    "artifactSaveFailed": "Failed to save artifact"
-  },
-  "language": {
-    "ko": "한국어",
-    "en": "English"
-  },
-  "mypage": {
-    "title": "My Page",
-    "subtitle": "Account settings and preferences",
-    "user": {
-      "title": "User Information",
-      "demoName": "Demo User"
-    },
-    "automation": {
-      "title": "Automation Level",
-      "subtitle": "Choose AI autonomy level",
-      "current": "Current Level",
-      "hitlIndicator": "HITL Intervention",
-      "changeSuccess": "Automation level has been updated",
-      "changeFailed": "Failed to update automation level",
-      "workflow": {
-        "dataCollection": "Data Collection",
-        "analysis": "Analysis",
-        "portfolio": "Portfolio",
-        "risk": "Risk Analysis",
-        "trade": "Trade",
-        "autoExecute": "Auto Execute |",
-        "approvalRequired": "Approval Required"
-      },
-      "advisor": {
-        "name": "Advisor Mode",
-        "description": "AI provides information only without trading suggestions",
-        "feature1": "Investment information and analysis only",
-        "feature2": "No trading suggestions",
-        "feature3": "You make all decisions"
-      },
-      "copilot": {
-        "name": "Copilot Mode",
-        "description": "User approval required for all trades (HITL mandatory)",
-        "feature1": "AI suggests trades",
-        "feature2": "Approval required for all trades",
-        "feature3": "You make final decisions"
-      },
-      "pilot": {
-        "name": "Pilot Mode",
-        "description": "Some trades execute automatically, approval needed only for high-risk trades",
-        "feature1": "Low-risk trades execute automatically",
-        "feature2": "Approval needed only for high-risk trades",
-        "feature3": "AI-driven trading"
-      }
-    },
-    "profile": {
-      "title": "Investment Profile",
-      "subtitle": "Your investment style analyzed by AI",
-      "lastUpdated": "Last Updated",
-      "comingSoon": "AI will automatically generate based on your investment activity. Coming soon."
-    },
-    "preferences": {
-      "title": "Preferences",
-      "theme": {
-        "title": "Theme",
-        "light": "Light Mode",
-        "dark": "Dark Mode"
-      },
-      "language": {
-        "title": "Language",
-        "korean": "한국어",
-        "english": "English"
-      }
-    },
-    "onboarding": {
-      "title": "Try Investment Profiling",
-      "description": "Discover your investment style through 4 questions and get personalized AI service",
-      "button": "Start Onboarding"
-    }
-  }
+    "common":  {
+                   "save":  "Save",
+                   "cancel":  "Cancel",
+                   "confirm":  "Confirm",
+                   "delete":  "Delete",
+                   "rename":  "Rename",
+                   "edit":  "Edit",
+                   "close":  "Close",
+                   "loading":  "Loading...",
+                   "error":  "An error occurred",
+                   "loadMore": "Load more",
+                   "stock": "Stock",
+                   "stocks": "Stocks",
+                   "cash": "Cash",
+                   "shares": "shares",
+                   "won": "KRW"
+               },
+    "nav":  {
+                "chat":  "Chat",
+                "portfolio":  "Portfolio",
+                "artifacts":  "Artifacts",
+                "mypage":  "My Page",
+                "discover":  "Discover",
+                "newChat":  "New Chat",
+                "recentChats":  "Recent Chats",
+                "collapseMenu":  "Collapse sidebar",
+                "expandMenu":  "Expand sidebar"
+            },
+    "chat":  {
+                 "inputPlaceholder":  "Type a message...",
+                 "helperText":  "AI can make mistakes. Please verify important information.",
+                 "helperTextFull":  "AI can make mistakes. Please verify important information. • Shift+Enter for new line",
+                 "sendMessage":  "Send",
+                 "send":  "Send",
+                 "attachFile":  "Attach file",
+                 "saveAsArtifact":  "Save as Artifact",
+                 "saveAsArtifactKo":  "Save as Artifact",
+                 "saved":  "Saved",
+                 "saving":  "Saving...",
+                 "copy":  "Copy",
+                 "copied":  "Copied",
+                 "hitlTest":  "🧪 HITL Panel Test",
+                 "hitlTestTitle":  "HITL Panel Test (Select Agent)",
+                 "receivedResponse":  "Received a response.",
+                 "generating":  "Generating response...",
+                 "sendFailed":  "Send failed",
+                 "retry":  "Retry",
+                 "backendError":  "⚠️ **Cannot connect to backend server**",
+                 "backendErrorDetail":  "You can test the UI without backend API in local environment.",
+                 "errorContent":  "Error Details:",
+                 "solution":  "Solution:",
+                 "unknownError":  "Unknown error",
+                 "checkBackendRunning":  "Check if the backend server is running",
+                 "startServer":  "Start server",
+                 "thinking": {
+                   "title": "AI Thinking",
+                   "steps": "steps",
+                   "current": "Current",
+                   "agents": {
+                     "planner": "Planning",
+                     "researcher": "Data Collection",
+                     "strategy": "Strategy Analysis",
+                     "portfolio": "Portfolio",
+                     "risk": "Risk",
+                     "trading": "Trading",
+                     "unknown": "Analyzing"
+                   }
+                 },
+                 "checkApiDocs":  "Check API documentation",
+                 "emptyState":  {
+                                    "greeting":  "Hello!",
+                                    "subGreeting":  "How can I help you?",
+                                    "suggestions":  {
+                                                        "portfolio":  {
+                                                                          "title":  "Portfolio Status",
+                                                                          "description":  "Check your current assets and returns",
+                                                                          "prompt":  "Please provide a detailed overview of my current portfolio, including holdings, investment amounts, returns, and the weight of each stock. Also include recent performance trends."
+                                                                      },
+                                                        "market":  {
+                                                                       "title":  "Market Analysis",
+                                                                       "description":  "Latest market trends and investment strategies",
+                                                                       "prompt":  "Please analyze today's major economic news and stock market trends both domestically and internationally. Include the current market cycle and key issues that investors should pay attention to."
+                                                                   },
+                                                        "recommendation":  {
+                                                                               "title":  "Stock Recommendations",
+                                                                               "description":  "AI-powered personalized investment ideas",
+                                                                               "prompt":  "Please recommend stocks suitable for beginners who are just starting to invest. Focus on stable yet growth-potential stocks from a long-term investment perspective, and also recommend books that can help learn about stock investing."
+                                                                           },
+                                                        "risk":  {
+                                                                     "title":  "Risk Analysis",
+                                                                     "description":  "Review portfolio risk factors",
+                                                                     "prompt":  "Please analyze the risk factors in my current portfolio. Evaluate sector concentration, volatility, and potential maximum drawdown, and provide specific improvement measures to reduce risks."
+                                                                 }
+                                                    }
+                                },
+                 "artifactPromptSeparator":  "From here begins the user\u0027s prompt referring to the above content."
+             },
+    "hitl":  {
+                 "title":  "Approval Request",
+                 "pending":  "Pending Approval",
+                 "approvalRequired":  "Approval Required",
+                 "orderDetails":  "Order Details",
+                 "orderInfo":  "Order Information",
+                 "stockName":  "Stock Name",
+                 "stockCode":  "Stock Code",
+                 "orderType":  "Order Type",
+                 "tradeType":  "Trade Type",
+                 "buy":  "Buy",
+                 "sell":  "Sell",
+                 "orderQuantity":  "Order Quantity",
+                 "quantity":  "Quantity",
+                 "amount":  "Amount",
+                 "currentPrice":  "Current Price",
+                 "expectedAmount": "Expected",
+                 "totalAmount": "Amount",
+                 "portfolioWeightChange":  "Portfolio Weight Change",
+                 "currentWeight":  "Current",
+                 "expectedWeight":  "Expected",
+                 "riskWarning":  "Risk Warning",
+                 "alternatives":  "Recommended Alternatives",
+                 "shares":  "shares",
+                 "approve":  "Approve",
+                 "reject":  "Reject",
+                 "approvalNote":  "* Trade will be executed immediately upon approval",
+                 "noDetails":  "No detailed order information was provided",
+                 "approved":  "Buy order has been executed",
+                 "rejected":  "Buy order has been rejected",
+                 "noActiveThread":  "No active conversation. Please send a message first",
+                 "research":  {
+                                  "title":  "Analysis Execution Approval",
+                                  "query":  "Query",
+                                  "complexityLabel":  "Analysis Complexity",
+                                  "depthLabel":  "Analysis Depth",
+                                  "routingReason":  "Routing Reason",
+                                  "reason":  "Rationale",
+                                  "info":  "This analysis utilizes external data sources and AI models to provide comprehensive insights.",
+                                  "complexity":  {
+                                                     "label":  "Complexity",
+                                                     "simple":  "Simple",
+                                                     "moderate":  "Moderate",
+                                                     "expert":  "Expert"
+                                                 },
+                                  "depth":  {
+                                                "label":  "Depth",
+                                                "brief":  "Brief",
+                                                "detailed":  "Detailed",
+                                                "comprehensive":  "Comprehensive"
+                                            }
+                              },
+                 "strategy":  {
+                                  "title":  "Investment Strategy Approval",
+                                  "type":  "Strategy Type",
+                                  "strategyType":  "Strategy Type",
+                                  "marketOutlook":  "Market Outlook",
+                                  "cycle":  "Cycle",
+                                  "sentiment":  "Sentiment",
+                                  "sectorStrategy":  "Sector Strategy",
+                                  "overweight":  "Overweight",
+                                  "underweight":  "Underweight",
+                                  "targetAllocation":  "Target Allocation",
+                                  "stocks":  "Stocks",
+                                  "cash":  "Cash",
+                                  "expectedReturn":  "Expected Return",
+                                  "expectedRisk":  "Expected Risk",
+                                  "types":  {
+                                                "momentum":  "Momentum",
+                                                "value":  "Value",
+                                                "growth":  "Growth",
+                                                "defensive":  "Defensive"
+                                            },
+                                  "cycle":  {
+                                                "expansion":  "Expansion",
+                                                "peak":  "Peak",
+                                                "contraction":  "Contraction",
+                                                "trough":  "Trough"
+                                            },
+                                  "sentiment":  {
+                                                    "bullish":  "Bullish",
+                                                    "neutral":  "Neutral",
+                                                    "bearish":  "Bearish"
+                                                }
+                              },
+                 "portfolio":  {
+                                   "title":  "Portfolio Rebalancing",
+                                   "tradesRequired":  "Trades Required",
+                                   "netAmount":  "Net Amount Required",
+                                   "metrics":  "Expected Metrics",
+                                   "portfolioMetrics":  "Portfolio Metrics",
+                                   "expectedReturn":  "Expected Return",
+                                   "expectedRisk":  "Expected Risk",
+                                   "risk":  "Risk",
+                                   "turnoverRatio":  "Turnover Ratio",
+                                   "diversification":  "Diversification"
+                               },
+                 "risk":  {
+                              "title":  "Risk Warning",
+                              "detectedTitle":  "High Risk Detected",
+                              "detectedDesc":  "Please review the following risk factors carefully before proceeding.",
+                              "factors":  "Risk Factors",
+                              "riskFactors":  "Risk Factors",
+                              "riskLevel":  "Risk Level",
+                              "critical":  "Critical",
+                              "warning":  "Warning",
+                              "mitigation":  "Mitigation",
+                              "portfolioMetrics":  "Portfolio Metrics",
+                              "concentration":  "Concentration",
+                              "volatility":  "Volatility",
+                              "maxDrawdown":  "Max Drawdown",
+                              "recommendedActions":  "Recommended Actions",
+                              "cancel":  "Cancel",
+                              "proceedAnyway":  "Proceed Anyway"
+                          },
+                 "trading":  {
+                                 "title":  "Trade Order Approval",
+                                 "action":  "Trade Type",
+                                 "buy":  "Buy",
+                                 "sell":  "Sell",
+                                 "quantity":  "Quantity",
+                                 "price":  "Price",
+                                 "totalAmount":  "Total Amount",
+                                 "portfolioImpact":  "Portfolio Impact",
+                                 "currentWeight":  "Current Weight",
+                                 "expectedWeight":  "Expected Weight",
+                                 "riskWarning":  "Risk Warning"
+                             },
+                 "approved":  "Approved",
+                 "rejected":  "Rejected"
+             },
+    "portfolio":  {
+                      "title":  "Portfolio",
+                      "summary":  {
+                                      "totalValue":  "Total Value",
+                                      "totalReturn":  "Total Return",
+                                      "holdings":  "Holdings",
+                                      "cash":  "Cash",
+                                      "stockCount":  ""
+                                  },
+                      "holdings":  {
+                                       "title":  "Holdings",
+                                       "quantity":  "Quantity",
+                                       "value":  "Value",
+                                       "return":  "Return",
+                                       "weight":  "Weight",
+                                       "empty":  "No holdings"
+                                   },
+                      "chartTypeLabel":  "Chart Type:",
+                      "chartTypes":  {
+                                         "treemap":  "Treemap",
+                                         "pie":  "Pie",
+                                         "bar":  "Bar"
+                                     },
+                      "charts":  {
+                                     "treemap":  {
+                                                     "title":  "Holdings by Stock",
+                                                     "description":  "Shows portfolio value by stock as area",
+                                                     "colorMode":  "By Stock",
+                                                     "returnMode":  "By Return"
+                                                 },
+                                     "pie":  {
+                                                 "title":  "Allocation by Sector",
+                                                 "description":  "Shows holdings grouped by sector"
+                                             },
+                                     "bar":  {
+                                                 "title":  "Return by Stock",
+                                                 "description":  "Shows stocks ordered by return rate"
+                                             }
+                                 }
+                  },
+    "artifacts":  {
+                      "title":  "Artifacts",
+                      "listTitle":  "Artifacts",
+                      "listSubtitle":  "Saved reports and analysis results",
+                      "empty":  "No saved artifacts",
+                      "emptyState":  "No saved artifacts",
+                      "emptySuggestion":  "Click \"Save as Artifact\" button in chat to save AI responses",
+                      "viewInArtifacts":  "View in Artifacts",
+                      "notFound":  "Artifact not found",
+                      "notFoundDescription":  "This artifact has been deleted or does not exist",
+                      "backToList":  "Back to artifact list",
+                      "backToListShort":  "Artifact list",
+                      "wordCount":  "words",
+                      "download":  "Download",
+                      "share":  "Share",
+                      "shareComingSoon":  "Share feature will be implemented in Phase 3",
+                      "deleteConfirm":  "Delete this artifact?",
+                      "chatPlaceholder":  "Ask a question about this artifact..."
+                  },
+    "toast":  {
+                  "artifactSaved":  "Artifact has been saved",
+                  "artifactSaveFailed":  "Failed to save artifact"
+              },
+    "language":  {
+                     "ko":  "한국어",
+                     "en":  "English"
+                 },
+    "system":  {
+                   "mode":  {
+                                "demo":  "Demo",
+                                "live":  "Live"
+                            }
+               },
+    "mypage":  {
+                   "title":  "My Page",
+                   "subtitle":  "Account settings and preferences",
+                   "apiStatus": {
+                      "header": "API Status (Temporary)",
+                      "title": "Endpoint Connectivity",
+                      "subtitleLive": "Checks connectivity for endpoints below.",
+                      "subtitleDemo": "Demo mode: network calls are skipped.",
+                      "checkNow": "Check now",
+                      "lastChecked": "Last checked just now",
+                      "notCheckedYet": "Not checked yet",
+                      "items": {
+                        "artifacts": "Artifacts",
+                        "approvals": "Approvals (History)",
+                        "automationLevel": "Automation Level (current)",
+                        "automationLevels": "Automation Levels (options)",
+                        "portfolioChart": "Portfolio Chart Data"
+                      },
+                      "status": {
+                        "idle": "Idle",
+                        "success": "OK",
+                        "error": "Error",
+                        "skipped": "Skipped"
+                      }
+                   },
+                   "user":  {
+                                "title":  "User Information",
+                                "demoName":  "Demo User"
+                            },
+                   "automation":  {
+                                      "title":  "Automation Level",
+                                      "subtitle":  "Choose AI autonomy level",
+                                      "current":  "Current Level",
+                                      "hitlIndicator":  "HITL Intervention",
+                                      "changeSuccess":  "Automation level has been updated",
+                                      "changeFailed":  "Failed to update automation level",
+                                      "updateInProgress":  "Another setting is being updated. Please try again later",
+                                      "loadError":  "Failed to load automation settings",
+                                      "workflow":  {
+                                                       "dataCollection":  "Data Collection",
+                                                       "analysis":  "Analysis",
+                                                       "portfolio":  "Portfolio",
+                                                       "risk":  "Risk Analysis",
+                                                       "trade":  "Trade",
+                                                       "autoExecute":  "Auto Execute",
+                                                       "approvalRequired":  "Approval Required",
+                                                       "conditional":  "Conditional"
+                                                   },
+                                      "advisor":  {
+                                                      "name":  "Advisor Mode",
+                                                      "description":  "AI provides information only without trading suggestions",
+                                                      "feature1":  "Investment information and analysis only",
+                                                      "feature2":  "No trading suggestions",
+                                                      "feature3":  "You make all decisions"
+                                                  },
+                                      "copilot":  {
+                                                      "name":  "Copilot Mode",
+                                                      "description":  "User approval required for all trades (HITL mandatory)",
+                                                      "feature1":  "AI suggests trades",
+                                                      "feature2":  "Approval required for all trades",
+                                                      "feature3":  "You make final decisions"
+                                                  },
+                                      "pilot":  {
+                                                    "name":  "Pilot Mode",
+                                                    "description":  "Some trades execute automatically, approval needed only for high-risk trades",
+                                                    "feature1":  "Low-risk trades execute automatically",
+                                                    "feature2":  "Approval needed only for high-risk trades",
+                                                    "feature3":  "AI-driven trading"
+                                                },
+                                      "custom":  {
+                                                     "name":  "Custom Mode",
+                                                     "description":  "Fine-grained control for each phase",
+                                                     "feature1":  "Individual HITL control per phase",
+                                                     "feature2":  "Conditional trade approval support",
+                                                     "feature3":  "Mode for advanced users"
+                                                 }
+                                  },
+                   "customHitl":  {
+                                      "title":  "Custom Mode Settings",
+                                      "subtitle":  "Configure HITL intervention for each phase",
+                                      "info":  "Custom mode is for advanced users. You can fine-tune whether AI proceeds automatically or requires user approval at each phase.",
+                                      "approvalRequired":  "Approval Required",
+                                      "autoExecute":  "Auto Execute",
+                                      "trade":  {
+                                                    "always":  "Always Approve",
+                                                    "never":  "Auto Execute",
+                                                    "conditional":  "Conditional",
+                                                    "conditionalHint":  "Auto for low-risk, approval for high-risk trades"
+                                                }
+                                  },
+                   "profile":  {
+                                   "title":  "Investment Profile",
+                                   "subtitle":  "Your investment style analyzed by AI",
+                                   "lastUpdated":  "Last Updated",
+                                   "comingSoon":  "AI will automatically generate based on your investment activity. Coming soon."
+                               },
+                   "preferences":  {
+                                       "title":  "Preferences",
+                                       "theme":  {
+                                                     "title":  "Theme",
+                                                     "light":  "Light Mode",
+                                                     "dark":  "Dark Mode"
+                                                 },
+                                       "language":  {
+                                                        "title":  "Language",
+                                                        "korean":  "한국어",
+                                                        "english":  "English"
+                                                    }
+                                   },
+                   "onboarding":  {
+                                      "title":  "Try Investment Profiling",
+                                      "description":  "Discover your investment style through 4 questions and get personalized AI service",
+                                      "button":  "Start Onboarding"
+                                  }
+               }
 }

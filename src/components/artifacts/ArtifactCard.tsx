@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { Artifact, useArtifactStore } from '@/store/artifactStore';
-import { formatDate } from '@/lib/utils';
+import { formatRelativeOrDate, formatAbsoluteDate } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useDialogStore } from '@/store/dialogStore';
 
@@ -19,7 +19,7 @@ interface ArtifactCardProps {
  */
 export default function ArtifactCard({ artifact }: ArtifactCardProps) {
   const { deleteArtifact } = useArtifactStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const { openConfirm } = useDialogStore();
@@ -31,8 +31,22 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
     return () => window.removeEventListener('click', onGlobalClick);
   }, [menuOpen]);
 
+  // 다른 카드에서 컨텍스트 메뉴를 열면, 현재 열린 메뉴는 닫히도록 글로벌 이벤트 처리
+  useEffect(() => {
+    const onAnyContextOpen = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { id?: string } | undefined;
+      if (detail?.id !== artifact.id) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('artifact-contextmenu-open', onAnyContextOpen as EventListener);
+    return () => window.removeEventListener('artifact-contextmenu-open', onAnyContextOpen as EventListener);
+  }, [artifact.id]);
+
   const handleContextMenu: React.MouseEventHandler<HTMLDivElement> = (e) => {
     e.preventDefault();
+    // 다른 카드의 메뉴를 닫도록 브로드캐스트
+    window.dispatchEvent(new CustomEvent('artifact-contextmenu-open', { detail: { id: artifact.id } }));
     setMenuPos({ x: e.clientX, y: e.clientY });
     setMenuOpen(true);
   };
@@ -54,7 +68,7 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
     <Link href={`/artifacts/${artifact.id}`}>
       <div
         onContextMenu={handleContextMenu}
-        className="group p-6 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer relative"
+        className="group p-6 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer relative h-full flex flex-col min-h-[240px]"
         style={{
           backgroundColor: 'var(--container-background)',
           borderColor: 'var(--border-default)',
@@ -68,25 +82,31 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
           {artifact.icon}
         </div>
 
-        {/* Title */}
-        <h3
-          className="text-lg font-semibold mb-2 line-clamp-2 group-hover:underline"
-          style={{ color: 'var(--text-primary)' }}
-        >
-          {artifact.title}
-        </h3>
+        {/* Title + Summary (flex-1 to push date to bottom) */}
+        <div className="flex-1">
+          <h3
+            className="text-lg font-semibold mb-2 line-clamp-2 group-hover:underline"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {artifact.title}
+          </h3>
 
-        {/* Summary */}
+          {/* Summary */}
+          <p
+            className="text-sm mb-4 line-clamp-2"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            {artifact.summary}
+          </p>
+        </div>
+
+        {/* Date (sticks to bottom via flex) */}
         <p
-          className="text-sm mb-4 line-clamp-2"
-          style={{ color: 'var(--text-secondary)' }}
+          className="text-xs mt-auto"
+          style={{ color: 'var(--text-muted)' }}
+          title={formatAbsoluteDate(artifact.createdAt, i18n?.language || 'en')}
         >
-          {artifact.summary}
-        </p>
-
-        {/* Date */}
-        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          {formatDate(artifact.createdAt)}
+          {formatRelativeOrDate(artifact.createdAt, i18n?.language || 'en', 30)}
         </p>
 
         {/* Context Menu */}

@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Loader2, AlertTriangle, Copy, Check } from "lucide-react";
+import remarkGfm from "remark-gfm";
+import { Loader2, AlertTriangle, Copy, Check, X } from "lucide-react";
 import { Message } from "@/lib/types/chat";
 import ThinkingSection from "./ThinkingSection";
 import SaveArtifactButton from "./SaveArtifactButton";
@@ -24,14 +25,14 @@ import { useTranslation } from "react-i18next";
 interface ChatMessageProps {
   message: Message;
   onRetry?: () => void;
-  onDelete?: () => void;
+  onCloseError?: () => void;
   onSaveArtifact?: () => void;
 }
 
 export default function ChatMessage({
   message,
   onRetry,
-  onDelete,
+  onCloseError,
   onSaveArtifact,
 }: ChatMessageProps) {
   const [isCopied, setIsCopied] = useState(false);
@@ -99,6 +100,7 @@ export default function ChatMessage({
         }}
       >
         <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
           components={{
             // Headings
             h1: ({ node, ...props }) => (
@@ -106,6 +108,7 @@ export default function ChatMessage({
                 style={{
                   fontSize: "24px",
                   fontWeight: 700,
+                  marginTop: "32px",
                   marginBottom: "16px",
                   letterSpacing: "-0.02em",
                   color: "var(--text-primary)",
@@ -118,7 +121,8 @@ export default function ChatMessage({
                 style={{
                   fontSize: "20px",
                   fontWeight: 600,
-                  marginBottom: "12px",
+                  marginTop: "28px",
+                  marginBottom: "14px",
                   letterSpacing: "-0.01em",
                   color: "var(--text-primary)",
                 }}
@@ -130,31 +134,80 @@ export default function ChatMessage({
                 style={{
                   fontSize: "18px",
                   fontWeight: 600,
-                  marginBottom: "8px",
+                  marginTop: "24px",
+                  marginBottom: "12px",
                   color: "var(--text-primary)",
+                }}
+                {...props}
+              />
+            ),
+            // Horizontal Rule (구분선)
+            hr: ({ node, ...props }) => (
+              <hr
+                style={{
+                  marginTop: "32px",
+                  marginBottom: "32px",
+                  border: "none",
+                  borderTop: "2px solid var(--border-emphasis)",
                 }}
                 {...props}
               />
             ),
             // Paragraph
             p: ({ node, ...props }) => (
-              <p style={{ marginBottom: "16px", color: "var(--text-primary)" }} {...props} />
+              <p style={{ marginBottom: "20px", lineHeight: "1.7", color: "var(--text-primary)" }} {...props} />
+            ),
+            // Blockquote
+            blockquote: ({ node, ...props }) => (
+              <blockquote
+                style={{
+                  marginTop: "20px",
+                  marginBottom: "20px",
+                  paddingLeft: "16px",
+                  borderLeft: "4px solid var(--primary-500)",
+                  color: "var(--text-secondary)",
+                  fontStyle: "italic",
+                }}
+                {...props}
+              />
             ),
             // Lists
             ul: ({ node, ...props }) => (
               <ul
-                style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
+                style={{
+                  marginTop: "16px",
+                  marginBottom: "20px",
+                  paddingLeft: "28px",
+                  color: "var(--text-primary)",
+                  listStyleType: "disc",
+                  listStylePosition: "outside",
+                }}
                 {...props}
               />
             ),
             ol: ({ node, ...props }) => (
               <ol
-                style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
+                style={{
+                  marginTop: "16px",
+                  marginBottom: "20px",
+                  paddingLeft: "28px",
+                  color: "var(--text-primary)",
+                  listStyleType: "decimal",
+                  listStylePosition: "outside",
+                }}
                 {...props}
               />
             ),
             li: ({ node, ...props }) => (
-              <li style={{ marginBottom: "8px", color: "var(--text-primary)" }} {...props} />
+              <li
+                style={{
+                  marginBottom: "10px",
+                  lineHeight: "1.6",
+                  color: "var(--text-primary)",
+                  display: "list-item",
+                }}
+                {...props}
+              />
             ),
             // Code
             code: ({ node, inline, ...props }: any) =>
@@ -184,11 +237,13 @@ export default function ChatMessage({
                 style={{
                   backgroundColor: "var(--lnb-background)",
                   color: "var(--text-primary)",
-                  padding: "16px",
+                  padding: "20px",
                   borderRadius: "8px",
                   overflowX: "auto",
-                  marginBottom: "16px",
+                  marginTop: "16px",
+                  marginBottom: "24px",
                   border: "1px solid var(--border-default)",
+                  lineHeight: "1.6",
                 }}
                 {...props}
               />
@@ -211,7 +266,10 @@ export default function ChatMessage({
                 style={{
                   width: "100%",
                   borderCollapse: "collapse",
-                  marginBottom: "16px",
+                  marginTop: "16px",
+                  marginBottom: "24px",
+                  tableLayout: "auto",
+                  wordBreak: "break-word",
                 }}
                 {...props}
               />
@@ -219,12 +277,13 @@ export default function ChatMessage({
             th: ({ node, ...props }) => (
               <th
                 style={{
-                  border: "1px solid var(--border-default)",
-                  padding: "8px",
+                  border: "1px solid var(--border-emphasis)",
+                  padding: "12px",
                   backgroundColor: "var(--lnb-recent-hover)",
                   textAlign: "left",
                   fontWeight: 600,
                   color: "var(--text-primary)",
+                  lineHeight: "1.5",
                 }}
                 {...props}
               />
@@ -232,9 +291,10 @@ export default function ChatMessage({
             td: ({ node, ...props }) => (
               <td
                 style={{
-                  border: "1px solid var(--border-default)",
-                  padding: "8px",
+                  border: "1px solid var(--border-emphasis)",
+                  padding: "12px",
                   color: "var(--text-primary)",
+                  lineHeight: "1.5",
                 }}
                 {...props}
               />
@@ -247,11 +307,19 @@ export default function ChatMessage({
 
       {/* Loading State */}
       {message.status === "sending" && (
-        <div className="flex items-center gap-2 mb-4" aria-live="polite" aria-busy="true">
-          <Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--primary-500)" }} strokeWidth={1.5} />
-          <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            응답 생성 중...
-          </span>
+        <div className="mb-4" aria-live="polite" aria-busy="true">
+          <div className="flex items-center gap-2 mb-3">
+            <Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--primary-500)" }} strokeWidth={1.5} />
+            <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              {t("chat.generating")}
+            </span>
+          </div>
+          {/* Subtle skeleton lines */}
+          <div className="space-y-2 animate-pulse">
+            <div className="h-4 rounded" style={{ backgroundColor: "var(--lnb-hover-bg)", width: "85%" }} />
+            <div className="h-4 rounded" style={{ backgroundColor: "var(--lnb-hover-bg)", width: "72%" }} />
+            <div className="h-4 rounded" style={{ backgroundColor: "var(--lnb-hover-bg)", width: "60%" }} />
+          </div>
         </div>
       )}
 
@@ -272,7 +340,7 @@ export default function ChatMessage({
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4" style={{ color: "var(--error-500)" }} strokeWidth={1.5} />
             <span className="text-sm font-semibold" style={{ color: "var(--error-600)" }}>
-              전송 실패
+              {t("chat.sendFailed")}
             </span>
           </div>
           <div className="flex gap-2">
@@ -291,13 +359,13 @@ export default function ChatMessage({
                   e.currentTarget.style.backgroundColor = "var(--error-500)";
                 }}
               >
-                재전송
+                {t("chat.retry")}
               </button>
             )}
-            {onDelete && (
+            {onCloseError && (
               <button
-                onClick={onDelete}
-                className="px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-150 border"
+                onClick={onCloseError}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-colors duration-150 border"
                 style={{
                   backgroundColor: "transparent",
                   color: "var(--error-600)",
@@ -310,7 +378,8 @@ export default function ChatMessage({
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
-                삭제
+                <X className="w-4 h-4" strokeWidth={1.5} />
+                <span>{t("common.close")}</span>
               </button>
             )}
           </div>

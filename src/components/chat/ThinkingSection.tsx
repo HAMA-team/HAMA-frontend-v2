@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { formatRelativeTime, formatAbsoluteDate } from "@/lib/utils";
 import { ChevronDown, FileText, Search, Lightbulb } from "lucide-react";
 import { ThinkingStep, AgentType } from "@/lib/types/chat";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 /**
  * ThinkingSection Component
@@ -39,42 +43,33 @@ const getAgentIcon = (agent: AgentType) => {
 };
 
 /**
- * 에이전트 타입별 한글 이름
- * TODO: i18n 적용 시 번역 키로 변경
+ * 에이전트 타입별 번역 키
  */
-const getAgentName = (agent: AgentType): string => {
-  switch (agent) {
-    case "planner":
-      return "계획 수립";
-    case "researcher":
-      return "데이터 수집";
-    case "strategy":
-      return "전략 분석";
-    default:
-      return "분석 중";
+const getAgentNameKey = (agent: string): string => {
+  // agent 문자열을 소문자로 변환하여 매핑
+  const agentLower = agent.toLowerCase();
+
+  // 알려진 에이전트 타입
+  const knownAgents = ["planner", "researcher", "strategy", "portfolio", "risk", "trading"];
+
+  if (knownAgents.includes(agentLower)) {
+    return `chat.thinking.agents.${agentLower}`;
   }
+
+  return "chat.thinking.agents.unknown";
 };
 
-/**
- * 시간 포맷팅 (예: "2초 전")
- * TODO: i18n 적용 시 번역 필요
- */
-const formatTime = (timestamp: string): string => {
-  const now = new Date();
-  const time = new Date(timestamp);
-  const diff = Math.floor((now.getTime() - time.getTime()) / 1000);
-
-  if (diff < 60) return `${diff}초 전`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
-  return `${Math.floor(diff / 3600)}시간 전`;
-};
 
 export default function ThinkingSection({ steps }: ThinkingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t, i18n } = useTranslation();
 
   if (!steps || steps.length === 0) {
     return null;
   }
+
+  // 가장 최근 thinking step (현재 진행 중인 작업)
+  const latestStep = steps[steps.length - 1];
 
   return (
     <div
@@ -89,7 +84,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
       {/* Header - Clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between transition-colors duration-150"
+        className="w-full px-3 py-2.5 flex flex-col gap-1.5 transition-colors duration-150"
         style={{
           cursor: "pointer",
           backgroundColor: "transparent"
@@ -103,73 +98,182 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
         aria-expanded={isExpanded}
         aria-controls="thinking-content"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
-            AI 생각 과정
-          </span>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-            ({steps.length}단계)
-          </span>
+        {/* 첫 번째 줄: 제목 + 단계 수 + 아이콘 */}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+              {t("chat.thinking.title")}
+            </span>
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+              ({steps.length}{t("chat.thinking.steps")})
+            </span>
+          </div>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-200 ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+            style={{ color: "var(--text-secondary)" }}
+            strokeWidth={1.5}
+          />
         </div>
-        <ChevronDown
-          className={`w-4 h-4 transition-transform duration-200 ${
-            isExpanded ? "rotate-180" : ""
-          }`}
-          style={{ color: "var(--text-secondary)" }}
-          strokeWidth={1.5}
-        />
+
+        {/* 두 번째 줄: 현재 진행 중인 작업 (접혀있을 때만) */}
+        {!isExpanded && latestStep && (
+          <div className="flex items-center gap-1.5 w-full text-left">
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+              {t("chat.thinking.current")}:
+            </span>
+            <span className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>
+              {latestStep.description}
+            </span>
+          </div>
+        )}
       </button>
 
       {/* Content - Accordion */}
       <div
         id="thinking-content"
-        className={`overflow-hidden transition-all duration-200 ${
-          isExpanded ? "max-h-[1000px]" : "max-h-0"
-        }`}
+        className={`${isExpanded ? "" : "max-h-0 overflow-hidden"}`}
       >
-        <div className="px-4 pb-4 pt-2">
+        <div className="px-3 pb-3 pt-1">
           {steps.map((step, index) => {
             const Icon = getAgentIcon(step.agent);
-            const agentName = getAgentName(step.agent);
+            const agentNameKey = getAgentNameKey(step.agent);
 
             return (
               <div
                 key={index}
-                className="flex items-start gap-2 py-2"
+                className="flex flex-col gap-1 py-1.5"
                 style={{
                   borderBottom:
                     index < steps.length - 1 ? "1px solid var(--border-default)" : "none",
                 }}
               >
-                {/* Icon */}
-                <div className="flex-shrink-0 mt-1">
-                  <Icon
-                    className="w-5 h-5"
-                    style={{ color: "var(--text-secondary)" }}
-                    strokeWidth={1.5}
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  {/* Title */}
-                  <div className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
-                    {agentName}
+                {/* Step Header */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-shrink-0">
+                    <Icon className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
                   </div>
-
-                  {/* Description */}
-                  <div
-                    className="text-xs mb-1"
-                    style={{ color: "var(--text-secondary)", lineHeight: "18px" }}
-                  >
-                    {step.description}
-                  </div>
-
-                  {/* Time */}
-                  <div className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    {formatTime(step.timestamp)}
+                  <div className="flex-1 min-w-0 flex items-center justify-between">
+                    <div className="text-xs" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
+                      <span className="font-medium" style={{ color: "var(--text-secondary)" }}>{t(agentNameKey)}</span>
+                      <span> · {step.description}</span>
+                    </div>
+                    <div
+                      className="text-[11px] ml-3 whitespace-nowrap"
+                      style={{ color: "var(--text-muted)" }}
+                      title={formatAbsoluteDate(step.timestamp, i18n?.language || 'en')}
+                    >
+                      {formatRelativeTime(step.timestamp, i18n?.language || 'en')}
+                    </div>
                   </div>
                 </div>
+
+                {/* Thinking Content (실시간 사고 과정) */}
+                {step.content && step.content.length > 0 && (
+                  <div className="ml-6 mt-1">
+                    <div className="flex items-start gap-1">
+                      <span className="text-xs flex-shrink-0" style={{ color: "var(--text-muted)" }}>💭</span>
+                      <div
+                        className="text-xs flex-1"
+                        style={{
+                          color: "var(--text-muted)",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ node, ...props }) => <p style={{ marginBottom: "8px" }} {...props} />,
+                            strong: ({ node, ...props }) => <strong style={{ fontWeight: 600 }} {...props} />,
+                            em: ({ node, ...props }) => <em {...props} />,
+                            ul: ({ node, ...props }) => (
+                              <ul style={{ marginLeft: "16px", marginBottom: "8px", listStyleType: "disc" }} {...props} />
+                            ),
+                            li: ({ node, ...props }) => <li style={{ marginBottom: "4px" }} {...props} />,
+                            code: ({ node, className, children, ...props }) => {
+                              const isInline = !className;
+                              if (isInline) {
+                                return (
+                                  <code
+                                    style={{
+                                      backgroundColor: "var(--code-bg)",
+                                      padding: "2px 4px",
+                                      borderRadius: "3px",
+                                      fontSize: "0.9em",
+                                      fontFamily: "monospace",
+                                    }}
+                                    {...props}
+                                  >
+                                    {children}
+                                  </code>
+                                );
+                              }
+                              // 코드 블록
+                              return (
+                                <code
+                                  className={className}
+                                  style={{
+                                    display: "block",
+                                    backgroundColor: "var(--code-bg)",
+                                    padding: "8px",
+                                    borderRadius: "4px",
+                                    fontSize: "0.85em",
+                                    fontFamily: "monospace",
+                                    whiteSpace: "pre-wrap",
+                                    wordBreak: "break-word",
+                                    marginBottom: "8px",
+                                  }}
+                                  {...props}
+                                >
+                                  {children}
+                                </code>
+                              );
+                            },
+                            pre: ({ node, ...props }) => <pre style={{ margin: 0 }} {...props} />,
+                            table: ({ node, ...props }) => (
+                              <table
+                                style={{
+                                  width: "100%",
+                                  borderCollapse: "collapse",
+                                  marginBottom: "12px",
+                                  fontSize: "0.85em",
+                                }}
+                                {...props}
+                              />
+                            ),
+                            thead: ({ node, ...props }) => <thead {...props} />,
+                            tbody: ({ node, ...props }) => <tbody {...props} />,
+                            tr: ({ node, ...props }) => <tr {...props} />,
+                            th: ({ node, ...props }) => (
+                              <th
+                                style={{
+                                  border: "1px solid var(--border-emphasis)",
+                                  padding: "6px 8px",
+                                  backgroundColor: "var(--lnb-background)",
+                                  fontWeight: 600,
+                                  textAlign: "left",
+                                }}
+                                {...props}
+                              />
+                            ),
+                            td: ({ node, ...props }) => (
+                              <td
+                                style={{
+                                  border: "1px solid var(--border-emphasis)",
+                                  padding: "6px 8px",
+                                }}
+                                {...props}
+                              />
+                            ),
+                          }}
+                        >
+                          {step.content}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

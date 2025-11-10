@@ -339,3 +339,24 @@
     animation: slideUp 0.3s ease-out both;
   }
 }
+/* Hover-only scrollbar for scrollable areas */
+.hover-scrollbar {
+  scrollbar-width: none; /* Firefox hidden by default */
+}
+.hover-scrollbar:hover {
+  scrollbar-width: thin; /* Firefox show on hover */
+}
+.hover-scrollbar::-webkit-scrollbar {
+  width: 0px; height: 0px; /* WebKit hidden by default */
+}
+.hover-scrollbar:hover::-webkit-scrollbar {
+  width: 8px; height: 8px; /* WebKit show on hover */
+}
+.hover-scrollbar:hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+.hover-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(115, 115, 115, 0.5);
+  border-radius: 8px;
+  border: 2px solid transparent;
+}

@@ -207,6 +207,21 @@ src/
 - `docs/ErrorHandling.md`: 에러 시나리오 및 복구 전략
 - `docs/InformationArchitecture.md`: IA 다이어그램 및 페이지 구조
 - `docs/Userflow.md`: 사용자 플로우 다이어그램
+- `docs/AutomationLevelIntegration.md`: 자동화 레벨 시스템 백엔드 연동 가이드 ⭐ (2025-10-30 추가)
+- `docs/AutomationLevelAPIChanges.md`: automation_level → hitl_config 마이그레이션 가이드 ⭐ (2025-10-30 추가)
+  - 영향받는 API 6개 상세 분석
+  - 스키마 변경 사항 (before/after)
+  - 백엔드/프론트엔드 마이그레이션 체크리스트
+  - 테스트 계획 및 롤아웃 전략
+- `docs/Research_Agent_Dynamic_Routing.md`: Research Agent 동적 Worker 선택 ⭐ (2025-10-31 추가)
+  - Worker 역할 정의 (data/bull/bear/macro/insight)
+  - planner_node의 LLM 기반 동적 라우팅
+  - 사용자 질문 유형별 Worker 매핑
+  - HITL 적용 위치 (Agent 레벨 vs Worker 레벨)
+- `docs/HITL_Panel_Specifications.md`: HITL 패널 UI 설계 (5개 Agent별) ⭐ (2025-10-31 업데이트)
+  - 각 Agent별 승인 대상 및 UI 구조
+  - Master 레벨 interrupt 구현 가이드
+  - Worker 레벨 HITL 비권장 이유 (동적 라우팅)
 
 ### Reference Documents
 - `references/BackendPRD.md`: 백엔드 기능 요구사항
@@ -268,13 +283,41 @@ src/
     - ✅ Dark Mode 완전 구현 (CSS 변수, 모든 컴포넌트 색상 전환, ThemeToggle, 차트 색상 adaptive)
     - ✅ useChartColors 훅 (CSS 변수 기반 차트 색상, 다크 모드 자동 전환)
     - ✅ Dynamic import로 i18n hydration 에러 해결
-  - **Phase 2 (완료 ✅)**:
+  - **Phase 2 (완료 ✅)** - 2025-11-02 완료:
     - ✅ My Page 구현 (마이페이지 5개 섹션)
-    - ✅ 자동화 레벨 설정 (3단계: Advisor/Copilot/Pilot)
+    - ✅ **자동화 레벨 설정 (4단계: Advisor/Copilot/Pilot/Custom)**
       - ✅ 5단계 워크플로우 프로그레스 바 (데이터 수집 → 분석 → 포트폴리오 → 리스크 → 매매)
+      - ✅ **Interactive Workflow Bar** (각 단계 클릭하여 HITL on/off 토글)
+      - ✅ **Custom Mode 구현** (phase별 개별 HITL 제어, 설정 기억 기능)
       - ✅ HITL 개입 지점 시각화 (빨간 점 + 승인 아이콘)
       - ✅ 레벨별 상세 카드 UI (특징 3개 리스트)
-    - ✅ userStore.ts (자동화 레벨, 투자 성향 프로필 상태 관리, LocalStorage persist)
+      - ✅ **automation_level → hitl_config 마이그레이션 완료** (2025-10-30~11-02)
+        - ✅ HITLConfig/HITLPhases 타입 정의 완료 (`src/types/hitl.ts`)
+        - ✅ Preset 상수 정의 (PRESET_PILOT, PRESET_COPILOT, PRESET_ADVISOR)
+        - ✅ userStore 버전 2 마이그레이션 구현 (LocalStorage 자동 변환)
+        - ✅ matchPreset 헬퍼 함수 (자동 프리셋 감지)
+        - ✅ CustomHITLSettings 컴포넌트 (Custom mode 상세 설정)
+        - ✅ Settings API 클라이언트 구현 (`src/lib/api/settings.ts`)
+        - ✅ Chat/Approval API에서 hitl_config 사용 (`src/lib/api/chat.ts`, `src/lib/api/approvals.ts`)
+        - ✅ 프론트엔드 마이그레이션 100% 완료
+      - ✅ **5개 Agent별 HITL 패널 구현 완료** (2025-11-01)
+        - ✅ ResearchApprovalPanel.tsx (분석 실행 승인)
+        - ✅ StrategyApprovalPanel.tsx (투자 전략 승인)
+        - ✅ PortfolioApprovalPanel.tsx (포트폴리오 리밸런싱 승인)
+        - ✅ RiskApprovalPanel.tsx (리스크 경고 확인)
+        - ✅ TradingApprovalPanel.tsx (매매 주문 승인)
+        - ✅ HITLPanel.tsx 라우터 구현 (request.type 기반 분기)
+      - ✅ **백엔드 연동 기준 HITL 지점 재정의** (2025-10-30)
+        - ✅ 5단계 워크플로우 → 6개 에이전트 매핑 정의
+        - ✅ 레벨별 HITL 지점 명확화 (Pilot: 저위험 자동, Copilot: 포트폴리오+매매, Advisor: 분석+포트폴리오+매매)
+      - ✅ **Research Agent 동적 라우팅 분석 및 문서화** (2025-10-31)
+        - ✅ 백엔드 코드 분석 (planner_node, Worker 5개)
+        - ✅ Worker 역할 정의 (data/bull/bear/macro/insight)
+        - ✅ 사용자 질문 유형별 Worker 매핑
+        - ✅ HITL 설계 문서 업데이트 (Master 레벨 interrupt)
+        - ✅ Worker 레벨 HITL 비권장 이유 문서화 (동적 라우팅)
+        - ✅ 복잡도 기반 HITL 로직 설계 (Router의 query_complexity/depth_level 활용)
+    - ✅ userStore.ts (자동화 레벨, 투자 성향 프로필 상태 관리, LocalStorage persist v2)
     - ✅ InvestmentProfile 컴포넌트 (Phase 3 구조 준비, 플레이스홀더)
     - ✅ My Page i18n 번역 (한국어/영어 완료)
     - ✅ Dynamic import로 My Page hydration 에러 해결
@@ -282,10 +325,11 @@ src/
       - ✅ 모든 주요 컴포넌트에 i18n 적용 완료
       - ✅ Chat, HITL, Portfolio, Artifacts, LNB, My Page 완전 번역
       - ✅ PortfolioSummary, ChartTypeSelector 번역 추가
-      - ✅ HITL Panel 모든 UI 요소 번역 (28 keys)
+      - ✅ HITL Panel 모든 UI 요소 번역 (28 keys, 5개 Agent별)
       - ✅ LNB 네비게이션 및 버튼 번역 (4 keys)
-- **Version**: 7.0 (Phase 2 완료 - i18n 전체 번역 완성)
-- **Last Updated**: 2025-01-26
+      - ✅ 번역 키 충돌 해결 (complexity/depth label vs object)
+- **Version**: 7.4 (Phase 2 완료 - hitl_config 마이그레이션 및 5개 Agent HITL 패널 구현 완료)
+- **Last Updated**: 2025-11-02
 - **Target**: 캡스톤 프로젝트 발표회 시연용
 
 ## Notes for Claude

@@ -1,11 +1,13 @@
 "use client";
 
+import React from 'react';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useArtifactStore } from '@/store/artifactStore';
 import { formatDate } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ArrowLeft, Download, Share2, Trash2 } from 'lucide-react';
 import { useDialogStore } from '@/store/dialogStore';
 
@@ -32,9 +34,14 @@ export default function ArtifactDetailPage() {
   const router = useRouter();
   const { getArtifact } = useArtifactStore();
   const { openConfirm, openAlert } = useDialogStore();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
   const artifactId = params.id as string;
   const artifact = getArtifact(artifactId);
+
+  // 마운트 전에는 렌더링을 지연시켜 hydration mismatch 방지 (LocalStorage 의존)
+  if (!mounted) return null;
 
   // Handle artifact not found
   if (!artifact) {
@@ -175,6 +182,7 @@ export default function ArtifactDetailPage() {
               }}
             >
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   // Headings
                   h1: ({ node, ...props }) => (
@@ -195,8 +203,8 @@ export default function ArtifactDetailPage() {
                       style={{
                         fontSize: "24px",
                         fontWeight: 600,
-                        marginTop: "24px",
-                        marginBottom: "12px",
+                        marginTop: "28px",
+                        marginBottom: "14px",
                         letterSpacing: "-0.01em",
                         color: "var(--text-primary)",
                       }}
@@ -208,32 +216,66 @@ export default function ArtifactDetailPage() {
                       style={{
                         fontSize: "20px",
                         fontWeight: 600,
-                        marginTop: "20px",
-                        marginBottom: "8px",
+                        marginTop: "24px",
+                        marginBottom: "12px",
                         color: "var(--text-primary)",
+                      }}
+                      {...props}
+                    />
+                  ),
+                  // Horizontal Rule (구분선)
+                  hr: ({ node, ...props }) => (
+                    <hr
+                      style={{
+                        marginTop: "32px",
+                        marginBottom: "32px",
+                        border: "none",
+                        borderTop: "2px solid var(--border-emphasis)",
                       }}
                       {...props}
                     />
                   ),
                   // Paragraph
                   p: ({ node, ...props }) => (
-                    <p style={{ marginBottom: "16px", color: "var(--text-primary)" }} {...props} />
+                    <p style={{ marginBottom: "20px", lineHeight: "1.7", color: "var(--text-primary)" }} {...props} />
                   ),
                   // Lists
                   ul: ({ node, ...props }) => (
                     <ul
-                      style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
+                      style={{
+                        marginTop: "16px",
+                        marginBottom: "20px",
+                        paddingLeft: "28px",
+                        color: "var(--text-primary)",
+                        listStyleType: "disc",
+                        listStylePosition: "outside",
+                      }}
                       {...props}
                     />
                   ),
                   ol: ({ node, ...props }) => (
                     <ol
-                      style={{ marginBottom: "16px", paddingLeft: "24px", color: "var(--text-primary)" }}
+                      style={{
+                        marginTop: "16px",
+                        marginBottom: "20px",
+                        paddingLeft: "28px",
+                        color: "var(--text-primary)",
+                        listStyleType: "decimal",
+                        listStylePosition: "outside",
+                      }}
                       {...props}
                     />
                   ),
                   li: ({ node, ...props }) => (
-                    <li style={{ marginBottom: "8px", color: "var(--text-primary)" }} {...props} />
+                    <li
+                      style={{
+                        marginBottom: "10px",
+                        lineHeight: "1.6",
+                        color: "var(--text-primary)",
+                        display: "list-item",
+                      }}
+                      {...props}
+                    />
                   ),
                   // Code
                   code: ({ node, inline, ...props }: any) =>
@@ -263,11 +305,13 @@ export default function ArtifactDetailPage() {
                       style={{
                         backgroundColor: "var(--lnb-background)",
                         color: "var(--text-primary)",
-                        padding: "16px",
+                        padding: "20px",
                         borderRadius: "8px",
                         overflowX: "auto",
-                        marginBottom: "16px",
+                        marginTop: "16px",
+                        marginBottom: "24px",
                         border: "1px solid var(--border-default)",
+                        lineHeight: "1.6",
                       }}
                       {...props}
                     />
@@ -284,6 +328,45 @@ export default function ArtifactDetailPage() {
                       {...props}
                     />
                   ),
+                  // Tables (GFM)
+                  table: ({ node, ...props }) => (
+                    <table
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        marginTop: "16px",
+                        marginBottom: "24px",
+                        tableLayout: "auto",
+                        wordBreak: "break-word",
+                      }}
+                      {...props}
+                    />
+                  ),
+                  th: ({ node, ...props }) => (
+                    <th
+                      style={{
+                        border: "1px solid var(--border-emphasis)",
+                        padding: "12px",
+                        backgroundColor: "var(--lnb-recent-hover)",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        color: "var(--text-primary)",
+                        lineHeight: "1.5",
+                      }}
+                      {...props}
+                    />
+                  ),
+                  td: ({ node, ...props }) => (
+                    <td
+                      style={{
+                        border: "1px solid var(--border-emphasis)",
+                        padding: "12px",
+                        color: "var(--text-primary)",
+                        lineHeight: "1.5",
+                      }}
+                      {...props}
+                    />
+                  ),
                   // Blockquote
                   blockquote: ({ node, ...props }) => (
                     <blockquote
@@ -291,7 +374,8 @@ export default function ArtifactDetailPage() {
                         borderLeft: "4px solid var(--primary-500)",
                         paddingLeft: "16px",
                         marginLeft: "0",
-                        marginBottom: "16px",
+                        marginTop: "20px",
+                        marginBottom: "20px",
                         color: "var(--text-secondary)",
                         fontStyle: "italic",
                       }}

@@ -26,6 +26,8 @@ export interface ThinkingStep {
   agent: AgentType;
   description: string;
   timestamp: string;
+  content?: string; // 실시간 사고 내용 (agent_thinking 이벤트)
+  node?: string; // 현재 실행 중인 노드명
 }
 
 /**
@@ -65,9 +67,116 @@ export interface ChatResponse {
 }
 
 /**
- * HITL 승인 요청 인터페이스
+ * Agent 타입 (HITL용)
  */
-export interface ApprovalRequest {
+export type HITLAgentType = "research" | "strategy" | "portfolio" | "risk" | "trading";
+
+/**
+ * HITL 승인 요청 베이스
+ */
+export interface BaseApprovalRequest {
+  type: HITLAgentType;
+  agent: string;
+}
+
+/**
+ * 1. Research Agent 승인 요청
+ */
+export interface ResearchApprovalRequest extends BaseApprovalRequest {
+  type: "research";
+  agent: "Research";
+  stock_code?: string;
+  stock_name?: string;
+  query: string;
+  routing_reason: string;
+  query_complexity: "simple" | "moderate" | "expert";
+  depth_level: "brief" | "detailed" | "comprehensive";
+  expected_workers?: string[];
+}
+
+/**
+ * 2. Strategy Agent 승인 요청
+ */
+export interface StrategyApprovalRequest extends BaseApprovalRequest {
+  type: "strategy";
+  agent: "Strategy";
+  strategy_type: "MOMENTUM" | "VALUE" | "GROWTH" | "DEFENSIVE";
+  market_outlook: {
+    cycle: "expansion" | "peak" | "contraction" | "trough";
+    sentiment: "bullish" | "neutral" | "bearish";
+  };
+  sector_strategy: {
+    overweight: string[];
+    underweight: string[];
+  };
+  target_allocation: {
+    stocks: number;
+    cash: number;
+  };
+  expected_return: number;
+  expected_risk: "low" | "medium" | "high";
+}
+
+/**
+ * 3. Portfolio Agent 승인 요청
+ */
+export interface PortfolioApprovalRequest extends BaseApprovalRequest {
+  type: "portfolio";
+  agent: "Portfolio";
+  rebalancing_needed: boolean;
+  current_holdings: Array<{
+    stock_code: string;
+    stock_name: string;
+    quantity: number;
+    current_weight: number;
+  }>;
+  proposed_allocation: Array<{
+    stock_code: string;
+    stock_name: string;
+    target_weight: number;
+    action: "BUY" | "SELL" | "HOLD";
+    quantity_change: number;
+  }>;
+  trades_required: Array<{
+    stock_code: string;
+    order_type: "buy" | "sell";
+    quantity: number;
+    estimated_amount: number;
+  }>;
+  portfolio_metrics: {
+    expected_return: number;
+    expected_risk: number;
+    diversification_score: number;
+  };
+}
+
+/**
+ * 4. Risk Agent 승인 요청
+ */
+export interface RiskApprovalRequest extends BaseApprovalRequest {
+  type: "risk";
+  agent: "Risk";
+  risk_level: "low" | "medium" | "high";
+  risk_factors: Array<{
+    category: string;
+    severity: "warning" | "critical";
+    description: string;
+    mitigation: string;
+  }>;
+  portfolio_metrics: {
+    concentration: number;
+    volatility: number;
+    max_drawdown: number;
+  };
+  recommended_actions?: string[];
+}
+
+/**
+ * 5. Trading Agent 승인 요청 (기존)
+ */
+export interface TradingApprovalRequest extends BaseApprovalRequest {
+  type: "trading";
+  agent: "Trading";
   action: "buy" | "sell";
   stock_code: string;
   stock_name: string;
@@ -88,6 +197,16 @@ export interface Alternative {
   adjusted_quantity: number;
   adjusted_amount: number;
 }
+
+/**
+ * 통합 승인 요청 타입
+ */
+export type ApprovalRequest =
+  | ResearchApprovalRequest
+  | StrategyApprovalRequest
+  | PortfolioApprovalRequest
+  | RiskApprovalRequest
+  | TradingApprovalRequest;
 
 /**
  * Chat API 응답 인터페이스 (HITL 필요)

@@ -369,7 +369,7 @@ HAMA Application
 
 ## US-4. Automation Level (자동화 레벨)
 
-**Priority: P2 (Medium)**
+**Priority: P2 (Medium) → ✅ Phase 2 완료**
 
 ### US-4.1 자동화 수준 설정
 
@@ -381,30 +381,61 @@ HAMA Application
 
 **Acceptance Criteria:**
 
-- [x] 3가지 자동화 레벨 선택 가능:
-    1. **어드바이저 모드**: AI가 정보만 제공 (매매 제안 없음)
-    2. **코파일럿 모드**: 모든 매매에 승인 필요 (HITL 필수)
-    3. **파일럿 모드**: 일부 매매 자동 실행 (고위험만 승인)
-- [x] 현재 레벨이 프로그레스 바로 표시됩니다
-- [x] 각 레벨의 특징이 설명됩니다
-- [x] 프로그레스 바에 HITL 개입 지점 표시 (👤 아이콘)
+- [x] **4가지 자동화 모드 선택 가능** (hitl_config 구조로 구현):
+    1. **Advisor (Lv3)**: 사용자 주도 - AI는 정보/제안만 제공
+    2. **Copilot (Lv2)**: AI 제안 + 사용자 승인 (기본값 ⭐)
+    3. **Pilot (Lv1)**: AI 자동 실행 + 저위험 매매 자동화
+    4. **Custom**: Phase별 개별 HITL 제어 (고급 사용자용)
+- [x] 5단계 워크플로우 프로그레스 바 표시:
+    - Phase 1: 데이터 수집 → Phase 2: 분석 → Phase 3: 포트폴리오 → Phase 4: 리스크 → Phase 5: 매매
+- [x] **Interactive Workflow Bar**: 각 단계 클릭하여 HITL on/off 토글 가능
+    - Trading phase는 3-state 토글 지원 (true → conditional → false)
+    - 설정 변경 시 자동으로 매칭되는 Preset 감지
+- [x] HITL 개입 지점 시각화 (빨간 점 + 👤 아이콘)
 - [x] 상세 레벨 카드 UI (라디오 버튼 + 특징 3개 리스트)
+- [x] **HITLConfig 구조로 마이그레이션 완료** (automation_level → hitl_config)
+    - LocalStorage 버전 2 마이그레이션 구현 (기존 데이터 자동 변환)
+    - Custom mode 설정 기억 기능 (customModePhases)
+    - Zustand persist with hydration 처리
 - [x] LocalStorage에 자동화 레벨 저장 (userStore.ts)
 - [x] 다국어 지원 (한국어/영어 번역 완료)
 
-**UI Enhancement (피드백 반영):**
+**레벨별 HITL 개입 지점 (백엔드 연동 기준):**
 
-- 프로그레스 바에 HITL 개입 지점을 시각적으로 표시합니다
+| Phase | Pilot (Lv1) | Copilot (Lv2) | Advisor (Lv3) |
+|-------|------------|--------------|--------------|
+| **Phase 1: 데이터 수집** (Research) | ✅ 자동 | ✅ 자동 | ✅ 자동 |
+| **Phase 2: 분석** (Strategy + Risk) | ✅ 자동 | ✅ 자동 | 🔴 **승인 필요** |
+| **Phase 3: 포트폴리오** (Portfolio) | ✅ 자동 (월 1회 리뷰) | 🔴 **승인 필요** | 🔴 **승인 필수** |
+| **Phase 4: 리스크 평가** (Risk) | ✅ 자동 (경고만) | ✅ 자동 (경고만) | ✅ 자동 (경고만) |
+| **Phase 5: 매매** (Trading) | 🟡 **저위험 시 자동** | 🔴 **승인 필요** | 🔴 **승인 필수** |
 
-```
-[Advisor] ────── [Copilot] ────── [Pilot]
-           No Auto  👤 HITL    Some Auto
+**아이콘 설명:**
+- ✅ 자동 실행 (HITL 없음)
+- 🔴 HITL 승인 필요
+- 🟡 조건부 자동 실행 (리스크 레벨 기반)
 
-```
+**프론트엔드 구현 상태 (✅ 100% 완료):**
+- [x] HITLConfig/HITLPhases 타입 정의 (`src/types/hitl.ts`)
+- [x] Preset 상수 정의 (PRESET_PILOT, PRESET_COPILOT, PRESET_ADVISOR)
+- [x] userStore 마이그레이션 로직 (version 2, automation_level → hitl_config)
+- [x] AutomationLevelSelector 컴포넌트 (Interactive workflow bar)
+- [x] CustomHITLSettings 컴포넌트 (Custom mode 상세 설정)
+- [x] matchPreset 헬퍼 함수 (자동 프리셋 매칭)
+- [x] Settings API 클라이언트 (`src/lib/api/settings.ts`)
+- [x] Chat/Approval API에서 hitl_config 사용 (`src/lib/api/chat.ts`, `src/lib/api/approvals.ts`)
+
+**백엔드 구현 상태 (프론트 연동 대기 중):**
+- [ ] LangGraph interrupt 메커니즘 구현
+- [ ] hitl_config를 GraphState에 저장
+- [ ] Phase별 조건부 interrupt 로직
+- [ ] Settings API DB 연동
 
 **References:**
 
-- Backend: `references/BackendPRD.md` 자동화 레벨 시스템
+- Backend: `../HAMA-backend/src/schemas/workflow.py` (Phase → Agent 매핑)
+- Frontend: `src/components/mypage/AutomationLevelSelector.tsx`, `src/types/hitl.ts`
+- Migration Guide: `docs/AutomationLevelAPIChanges.md`
 - Mockup: `references/mockup_references/My Page.png`
 
 ---
@@ -488,7 +519,7 @@ AI가 파악한 당신의 투자 스타일:
 
 ## US-7. Internationalization (다국어)
 
-**Priority: P1 (High)** ⚠️ **우선순위 상향**
+**Priority: P1 (High) → ✅ Phase 2 완료**
 
 ### US-7.1 한국어/영어 지원
 
@@ -505,23 +536,29 @@ AI가 파악한 당신의 투자 스타일:
 - [x] 선택 상태 LocalStorage 저장
 - [x] 기본 번역 파일 생성 (한국어/영어)
 - [x] LNB 내비게이션 번역 적용
-- [ ] 모든 UI 텍스트 번역 완료 (Chat, HITL, Portfolio 등 - Phase 3)
+- [x] **모든 UI 텍스트 번역 완료** (Chat, HITL, Portfolio 등 - ✅ Phase 2 완료)
 
-**Phase 1 Scope:**
+**구현 완료 상태 (✅ 99% 커버리지):**
 
 - ✅ i18n 구조 설정 (react-i18next)
 - ✅ LanguageSelector 컴포넌트 구현
 - ✅ 번역 파일 구조 생성 (ko/en)
-- ✅ LNB 내비게이션 번역 적용
-
-**Phase 3 Scope:**
-
-- 전체 화면 번역 완성
+- ✅ **160+ translation keys 완료** (한국어/영어)
+  - ✅ LNB 내비게이션 및 버튼 번역 (4 keys)
+  - ✅ Chat 인터페이스 전체 번역
+  - ✅ HITL Panel 모든 UI 요소 번역 (28 keys, 5개 Agent별)
+  - ✅ Portfolio 페이지 번역 (PortfolioSummary, ChartTypeSelector)
+  - ✅ Artifacts 페이지 번역
+  - ✅ My Page 번역 (Automation Level, Investment Profile)
+  - ✅ 공통 UI 요소 (Toast, Dialog, 버튼 등)
+- ✅ Dynamic import로 i18n hydration 에러 해결
+- ✅ 번역 키 충돌 해결 (complexity/depth label vs object)
 
 **Why Critical:**
 
 - 발표회에 외국인 방문객이 있을 경우 필수입니다
 - 글로벌 확장 가능성을 보여줄 수 있습니다
+- **현재 상태: 시연 가능한 수준의 완성도 달성 ✅**
 
 ---
 
@@ -553,7 +590,7 @@ AI가 파악한 당신의 투자 스타일:
 
 ---
 
-### Phase 2: Enhanced UX (🔄 In Progress)
+### Phase 2: Enhanced UX (✅ 완료)
 
 **목표:** 사용자 경험 강화
 
@@ -561,36 +598,58 @@ AI가 파악한 당신의 투자 스타일:
 
 - [x] US-4.1: 자동화 레벨 설정 ✅ (완료)
   - [x] My Page 구현 (5개 섹션)
-  - [x] AutomationLevelSelector 컴포넌트 (프로그레스 바 + 카드 UI)
-  - [x] userStore.ts 상태 관리
+  - [x] AutomationLevelSelector 컴포넌트 (Interactive workflow bar)
+  - [x] CustomHITLSettings 컴포넌트 (Custom mode 상세 설정)
+  - [x] **hitl_config 마이그레이션 완료** (automation_level → hitl_config)
+  - [x] userStore.ts 상태 관리 (버전 2 마이그레이션)
   - [x] 다국어 지원 (한국어/영어)
 - [x] US-5.1: 초개인화 투자 성향 (구조 완료, API 연동은 Phase 3)
   - [x] InvestmentProfile 컴포넌트 (플레이스홀더)
   - [x] userStore에 프로필 상태 관리 추가
+- [x] **US-7.1: i18n 전체 번역 완료** ✅ (원래 Phase 3 → Phase 2로 앞당김)
+  - [x] 160+ translation keys (한국어/영어)
+  - [x] 모든 주요 컴포넌트 번역 완료 (Chat, HITL, Portfolio, Artifacts, LNB, My Page)
+  - [x] 번역 키 충돌 해결
+- [x] **5개 Agent별 HITL 패널 구현 완료** ✅
+  - [x] ResearchApprovalPanel.tsx
+  - [x] StrategyApprovalPanel.tsx
+  - [x] PortfolioApprovalPanel.tsx
+  - [x] RiskApprovalPanel.tsx
+  - [x] TradingApprovalPanel.tsx
 
 **Should Have:**
 
 - [x] Dark mode 토글 완성 ✅ (Phase 1 완료)
-- [ ] Artifacts 페이지 (목록)
+- [x] Artifacts 페이지 (목록/상세) ✅ (Phase 1 완료)
 
-**Remaining:**
+**Remaining (Phase 3로 이관):**
 - Portfolio 차트 옵션 향상
+- Onboarding 플로우
+- Chat History 영구 저장
 
 ---
 
-### Phase 3: Completeness
+### Phase 3: Backend Integration & Completeness
 
-**목표:** 제품 완성도 향상
+**목표:** 백엔드 연동 및 제품 완성도 향상
 
 **Must Have:**
 
-- [ ] Artifacts 상세 뷰
+- [ ] **Backend HITL Integration**
+  - [ ] LangGraph interrupt 메커니즘 구현
+  - [ ] hitl_config를 GraphState에 저장
+  - [ ] Phase별 조건부 interrupt 로직
+  - [ ] Settings API DB 연동
+- [ ] **Chat History 영구 저장**
+  - [ ] Backend API 연동 (세션 저장/조회)
+  - [ ] LNB Recent Chats 실시간 업데이트
 - [ ] US-6.1: 온보딩 플로우
-- [ ] US-7.1: 다국어 완성
+- [ ] US-5.1 API 연동: 초개인화 투자 성향 (LLM 생성 프로필)
 
 **Should Have:**
 
 - [ ] US-2.2: 승인 이력 추적
+- [ ] Portfolio 차트 옵션 향상
 
 ---
 
@@ -734,6 +793,7 @@ AI가 파악한 당신의 투자 스타일:
 
 |버전|날짜|변경 내용|작성자|
 |---|---|---|---|
+|3.1|2025-11-02|Phase 2 완료 반영: hitl_config 마이그레이션, i18n 전체 번역, 5개 Agent HITL 패널 구현|Claude|
 |3.0|2025-10-20|PRD 구조 개선: 요구사항 중심 재작성, IA 추가, 우선순위 재조정|Claude|
 |2.0|2025-10-20|피드백 반영 (초안)|팀원|
 |1.0|2025-10-19|초기 버전|팀원|

@@ -8,9 +8,9 @@ import { Portfolio } from "@/lib/types/portfolio";
  */
 export const mockPortfolio: Portfolio = {
   summary: {
-    totalValue: 52800000, // 5,280만원
-    totalReturn: 3060000, // +306만원
-    totalReturnRate: 6.15, // +6.15%
+    totalValue: 52545000, // 5,254.5만원
+    totalReturn: 2805000, // +280.5만원
+    totalReturnRate: 5.65, // +5.65%
     stockCount: 6,
     cash: 5000000, // 500만원
   },
@@ -79,12 +79,12 @@ export const mockPortfolio: Portfolio = {
       code: "207940",
       name: "삼성바이오로직스",
       quantity: 10,
-      averagePrice: 820000,
-      currentPrice: 850000,
-      value: 8500000, // 850만원 (10 * 850,000)
-      return: 300000, // +30만원
-      returnRate: 3.66, // +3.66%
-      weight: 16.10, // 16.10% (8,500,000 / 52,800,000)
+      averagePrice: 850000,
+      currentPrice: 824500,
+      value: 8245000, // 824.5만원 (10 * 824,500)
+      return: -255000, // -25.5만원
+      returnRate: -3.0, // -3.0%
+      weight: 15.61, // 15.61% (8,245,000 / 52,800,000)
       sector: "바이오",
     },
   ],
