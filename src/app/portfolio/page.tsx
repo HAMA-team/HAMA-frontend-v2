@@ -1,13 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import PortfolioView from "@/components/portfolio/PortfolioView";
-import ChatInput from "@/components/layout/ChatInput";
 import { fetchPortfolioOverview } from "@/lib/api/portfolio";
 import { Portfolio } from "@/lib/types/portfolio";
 import { useTranslation } from "react-i18next";
 import { useAppModeStore } from "@/store/appModeStore";
 import { mockPortfolio } from "@/lib/mock/portfolioData";
+
+// Dynamic import로 hydration 에러 해결 (i18n 사용)
+const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
+  ssr: false,
+});
 
 /**
  * Portfolio Page

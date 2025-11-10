@@ -106,6 +106,14 @@
       "cash": "현금 보유액",
       "stockCount": "개"
     },
+    "holdings": {
+      "title": "보유 종목",
+      "quantity": "보유 수량",
+      "value": "평가금액",
+      "return": "수익률",
+      "weight": "비중",
+      "empty": "보유 중인 종목이 없습니다"
+    },
     "chartTypeLabel": "차트 타입:",
     "chartTypes": {
       "treemap": "트리맵",

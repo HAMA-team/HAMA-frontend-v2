@@ -236,6 +236,14 @@
                                       "cash":  "Cash",
                                       "stockCount":  ""
                                   },
+                      "holdings":  {
+                                       "title":  "Holdings",
+                                       "quantity":  "Quantity",
+                                       "value":  "Value",
+                                       "return":  "Return",
+                                       "weight":  "Weight",
+                                       "empty":  "No holdings"
+                                   },
                       "chartTypeLabel":  "Chart Type:",
                       "chartTypes":  {
                                          "treemap":  "Treemap",
