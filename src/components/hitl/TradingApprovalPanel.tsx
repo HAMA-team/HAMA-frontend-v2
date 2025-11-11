@@ -5,11 +5,14 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle, DollarSign } from "lucide-react";
 import type { TradingApprovalRequest } from "@/lib/types/chat";
 import { useAppModeStore } from "@/store/appModeStore";
+import { useLNBWidth } from "@/hooks/useLNBWidth";
 
 interface TradingApprovalPanelProps {
   request: TradingApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
+  variant?: "drawer" | "floating";
+  disabled?: boolean;
 }
 
 /**
@@ -25,9 +28,13 @@ export default function TradingApprovalPanel({
   request,
   onApprove,
   onReject,
+  variant = "drawer",
+  disabled = false,
 }: TradingApprovalPanelProps) {
   const { t } = useTranslation();
   const { mode } = useAppModeStore();
+  const { width: lnbWidth } = useLNBWidth();
+  const panelWidth = Math.max(360, Math.min(Math.round((lnbWidth || 240) * 1.5), 720));
 
   const formatCurrency = (amount?: number) => {
     if (typeof amount !== "number" || Number.isNaN(amount)) return "-";
@@ -50,11 +57,17 @@ export default function TradingApprovalPanel({
 
   return (
     <div
-      className="fixed top-0 right-0 h-screen flex flex-col z-50 shadow-2xl transition-transform duration-300"
+      className={
+        variant === "floating"
+          ? "fixed bottom-4 right-4 flex flex-col z-hitl-panel shadow-2xl rounded-xl overflow-hidden transition-transform duration-300"
+          : "fixed top-0 right-0 h-screen flex flex-col z-hitl-panel shadow-2xl transition-transform duration-300"
+      }
       style={{
-        width: "50vw",
+        width: `${panelWidth}px`,
+        maxHeight: variant === "floating" ? "72vh" : undefined,
         backgroundColor: "var(--container-background)",
-        borderLeft: "1px solid var(--border-default)",
+        borderLeft: variant === "floating" ? undefined : "1px solid var(--border-default)",
+        border: variant === "floating" ? "1px solid var(--border-default)" : undefined,
       }}
     >
       {/* Header */}
@@ -250,34 +263,36 @@ export default function TradingApprovalPanel({
       >
         <div className="flex gap-3">
           <button
-            onClick={onReject}
+            onClick={disabled ? undefined : onReject}
+            disabled={disabled}
             className="flex-1 h-12 rounded-lg text-sm font-medium transition-colors duration-150 border"
             style={{
-              backgroundColor: "var(--container-background)",
+              backgroundColor: disabled ? "var(--border-default)" : "var(--container-background)",
               borderColor: "var(--border-emphasis)",
-              color: "var(--lnb-text)",
+              color: disabled ? "var(--text-secondary)" : "var(--lnb-text)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)";
+              if (!disabled) e.currentTarget.style.backgroundColor = "var(--lnb-recent-hover)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--container-background)";
+              if (!disabled) e.currentTarget.style.backgroundColor = "var(--container-background)";
             }}
           >
             {t("hitl.reject")}
           </button>
           <button
-            onClick={onApprove}
+            onClick={disabled ? undefined : onApprove}
+            disabled={disabled}
             className="flex-1 h-12 rounded-lg text-sm font-medium transition-colors duration-150"
             style={{
-              backgroundColor: "var(--primary-500)",
-              color: "var(--lnb-active-text)",
+              backgroundColor: disabled ? "var(--primary-400)" : "var(--primary-500)",
+              color: disabled ? "var(--text-secondary)" : "var(--lnb-active-text)",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--primary-600)";
+              if (!disabled) e.currentTarget.style.backgroundColor = "var(--primary-600)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--primary-500)";
+              if (!disabled) e.currentTarget.style.backgroundColor = "var(--primary-500)";
             }}
           >
             {t("hitl.approve")}

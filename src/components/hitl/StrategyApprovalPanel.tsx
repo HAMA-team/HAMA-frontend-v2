@@ -4,11 +4,14 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Target, TrendingUp, TrendingDown } from "lucide-react";
 import type { StrategyApprovalRequest } from "@/lib/types/chat";
+import { useLNBWidth } from "@/hooks/useLNBWidth";
 
 interface StrategyApprovalPanelProps {
   request: StrategyApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
+  variant?: "drawer" | "floating";
+  disabled?: boolean;
 }
 
 /**
@@ -24,8 +27,12 @@ export default function StrategyApprovalPanel({
   request,
   onApprove,
   onReject,
+  variant = "drawer",
+  disabled = false,
 }: StrategyApprovalPanelProps) {
   const { t } = useTranslation();
+  const { width: lnbWidth } = useLNBWidth();
+  const panelWidth = Math.max(360, Math.min(Math.round((lnbWidth || 240) * 1.5), 720));
 
   const getStrategyLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -71,11 +78,17 @@ export default function StrategyApprovalPanel({
 
   return (
     <div
-      className="fixed top-0 right-0 h-screen flex flex-col z-50 shadow-2xl"
+      className={
+        variant === "floating"
+          ? "fixed bottom-4 right-4 flex flex-col z-hitl-panel shadow-2xl rounded-xl overflow-hidden"
+          : "fixed top-0 right-0 h-screen flex flex-col z-hitl-panel shadow-2xl"
+      }
       style={{
-        width: "50vw",
+        width: `${panelWidth}px`,
+        maxHeight: variant === "floating" ? "72vh" : undefined,
         backgroundColor: "var(--container-background)",
-        borderLeft: "1px solid var(--border-default)",
+        borderLeft: variant === "floating" ? undefined : "1px solid var(--border-default)",
+        border: variant === "floating" ? "1px solid var(--border-default)" : undefined,
       }}
     >
       {/* Header */}
@@ -306,22 +319,24 @@ export default function StrategyApprovalPanel({
         style={{ borderColor: "var(--border-default)" }}
       >
         <button
-          onClick={onReject}
+          onClick={disabled ? undefined : onReject}
+          disabled={disabled}
           className="flex-1 px-6 py-3 rounded-lg font-medium transition-colors"
           style={{
-            backgroundColor: "var(--container-background)",
-            color: "var(--text-secondary)",
+            backgroundColor: disabled ? "var(--border-default)" : "var(--container-background)",
+            color: disabled ? "var(--text-secondary)" : "var(--text-secondary)",
             border: "1px solid var(--border-default)",
           }}
         >
           {t("hitl.reject")}
         </button>
         <button
-          onClick={onApprove}
+          onClick={disabled ? undefined : onApprove}
+          disabled={disabled}
           className="flex-1 px-6 py-3 rounded-lg font-medium transition-colors"
           style={{
-            backgroundColor: "var(--primary-500)",
-            color: "white",
+            backgroundColor: disabled ? "var(--primary-400)" : "var(--primary-500)",
+            color: disabled ? "var(--text-secondary)" : "white",
           }}
         >
           {t("hitl.approve")}

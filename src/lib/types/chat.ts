@@ -42,13 +42,15 @@ export interface Message {
   status?: MessageStatus;
 }
 
+import type { HITLConfig } from "@/types/hitl";
+
 /**
- * Chat API 요청 인터페이스
+ * Chat API 요청 인터페이스 (hitl_config 기반)
  */
 export interface ChatRequest {
   message: string;
-  thread_id: string;
-  automation_level: 1 | 2 | 3; // 어드바이저, 코파일럿, 파일럿
+  conversation_id?: string | null;
+  hitl_config: HITLConfig;
   config?: {
     language?: "ko" | "en";
     max_tokens?: number;

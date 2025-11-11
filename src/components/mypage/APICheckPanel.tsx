@@ -31,7 +31,7 @@ export default function APICheckPanel() {
     () => [
       { key: "artifacts", name: t("mypage.apiStatus.items.artifacts"), path: "/api/v1/artifacts/", run: fetchArtifactsList },
       { key: "approvals", name: t("mypage.apiStatus.items.approvals"), path: "/api/v1/approvals/", run: fetchApprovalsList },
-      { key: "automationLevel", name: t("mypage.apiStatus.items.automationLevel"), path: "/api/v1/settings/automation-level", run: getAutomationLevel },
+      { key: "automationLevel", name: t("mypage.apiStatus.items.automationLevel"), path: "/api/v1/settings/hitl-config", run: getAutomationLevel },
       { key: "portfolioChart", name: t("mypage.apiStatus.items.portfolioChart"), path: "/api/v1/portfolio/chart-data", run: fetchPortfolioChartData },
     ],
     [t]
