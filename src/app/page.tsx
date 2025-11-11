@@ -210,6 +210,15 @@ ${t("chat.receivedResponse")}
                 try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
                 break;
               }
+              // TODO(HITL): 백엔드 이벤트가 `hitl.request`로 표준화되면,
+              // `hitl_interrupt` 분기는 제거하고 `hitl.request`만 유지한다.
+              case "hitl_interrupt": {
+                const req = ev?.data?.approval_request ?? ev?.data;
+                if (req) {
+                  try { openApprovalPanel(req as any); } catch {}
+                }
+                break;
+              }
               case "error": {
                 const msg = ev.data?.message || "Stream error";
                 updateMessage(tempId, { content: msg, status: "error" });
@@ -396,19 +405,26 @@ ${t("chat.receivedResponse")}
                   }
                   break;
                 }
-                case "master_complete": {
-                  const text = typeof ev.data?.message === "string" ? ev.data.message : t("chat.receivedResponse");
-                  console.log("📊 Final message received");
-                  updateMessage(tempId, { content: text, status: "sent" });
-                  const cid = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
-                  if (cid) setCurrentThreadId(String(cid));
-                  break;
+              case "master_complete": {
+                const text = typeof ev.data?.message === "string" ? ev.data.message : t("chat.receivedResponse");
+                console.log("📊 Final message received");
+                updateMessage(tempId, { content: text, status: "sent" });
+                const cid = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+                if (cid) setCurrentThreadId(String(cid));
+                break;
+              }
+              case "hitl_interrupt": {
+                const req = ev?.data?.approval_request ?? ev?.data;
+                if (req) {
+                  try { openApprovalPanel(req as any); } catch {}
                 }
-                case "error": {
-                  const msg = ev.data?.message || "Stream error";
-                  updateMessage(tempId, { content: msg, status: "error" });
-                  break;
-                }
+                break;
+              }
+              case "error": {
+                const msg = ev.data?.message || "Stream error";
+                updateMessage(tempId, { content: msg, status: "error" });
+                break;
+              }
                 default:
                   // 다른 이벤트는 로그만
                   break;

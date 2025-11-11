@@ -104,7 +104,7 @@ export const PRESET_ADVISOR: HITLConfig = {
 // ============================================================================
 
 /**
- * GET /api/v1/settings/automation-level 응답
+ * GET /api/v1/settings/hitl-config 응답 (alias: /settings/automation-level)
  */
 export interface AutomationLevelResponse {
   hitl_config: HITLConfig;
@@ -114,7 +114,7 @@ export interface AutomationLevelResponse {
 }
 
 /**
- * PUT /api/v1/settings/automation-level 응답
+ * PUT /api/v1/settings/hitl-config 응답 (alias: /settings/automation-level)
  */
 export interface AutomationLevelUpdateResponse {
   success: boolean;
