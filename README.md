@@ -1,10 +1,10 @@
-# HAMA Frontend v2
+﻿# HAMA Frontend v2
 
 Human-in-the-Loop AI Investment System - Web Client
 
 ## Overview
 
-HAMA Frontend는 AI와 협업하여 투자 의사결정을 수행하는 Chat 중심의 웹 애플리케이션입니다.
+HAMA Frontend는 AI와 협업하여 투자 의사결정을 수행하는 Chat 중심의 웹 애플리케이션입니다. Human‑in‑the‑Loop(HITL) 원칙을 기반으로, 멀티 에이전트 스트리밍과 승인 패널을 통해 안전하고 투명한 상호작용을 제공합니다.
 
 ## Tech Stack
 
@@ -25,14 +25,20 @@ HAMA Frontend는 AI와 협업하여 투자 의사결정을 수행하는 Chat 중
 src/
 ├── app/                  # Next.js App Router pages
 ├── components/           # React components
-│   ├── Layout/          # Shell, LNB, ChatInput
-│   ├── Chat/            # Chat interface
-│   ├── HITL/            # Human-in-the-Loop components
-│   ├── Artifacts/       # Artifact management
-│   ├── Portfolio/       # Portfolio views
-│   ├── MyPage/          # User settings
-│   ├── Onboarding/      # Onboarding flow
-│   └── Discover/        # Discovery features
+│   ├── layout/          # Shell, LNB, ChatInput
+│   ├── chat/            # Chat interface (messages, thinking, save)
+│   ├── hitl/            # HITL approval panels (5 types)
+│   ├── artifacts/       # Artifact grid/detail
+│   ├── portfolio/       # Portfolio views and charts
+│   ├── mypage/          # Settings (automation/HITL, API checks)
+│   └── common/          # Toast, Dialog, Language/Theme toggles
+├── hooks/               # UI/behavior hooks (e.g., useLNBWidth)
+├── lib/                 # Utilities and API clients
+│   ├── api/             # REST + SSE clients (chat, approvals, settings…)
+│   ├── i18n/            # i18n runtime config
+│   └── types/           # Shared types (chat, portfolio)
+├── store/               # Zustand stores (chat/artifact/user/appMode)
+└── styles/              # Global styles (Tailwind v4)
 ├── lib/                 # Utilities and API client
 │   └── i18n/            # Internationalization config
 └── styles/              # Global styles
@@ -77,6 +83,11 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+Demo/Live toggle:
+- The app supports Demo/Live modes. Use the DevDemoToggle in the LNB header or set initial mode via `useAppModeStore`.
+- Demo: no backend calls; includes HITL test buttons on the empty chat view.
+- Live: uses the configured backend (`NEXT_PUBLIC_API_BASE_URL`).
+
 ### Build
 
 Build for production:
@@ -104,9 +115,12 @@ npx prettier --write .
 ## Design Principles
 
 1. **Chat First**: All major features accessible through chat interface
-2. **Persistent Chat Input**: Chat input fixed at bottom (Chat, Artifact detail, Portfolio)
-3. **HITL Required**: Always display when approval is needed
-4. **Agent Activity Integration**: LangGraph agent activities shown naturally in chat timeline
+2. **Persistent Input**: Bottom‑fixed input (Chat/Artifact/Portfolio) with LNB‑aware centering
+3. **HITL Mandatory**: Approval panels open whenever required; buttons disabled during API in‑flight
+4. **Streaming Transparency**: Multi‑agent thinking/steps surface progressively in the chat
+5. **No Horizontal Scroll**: `html, body, main { overflow-x: hidden }`; main width responds to LNB
+6. **Layering**: Use Tailwind z‑tokens (`z-lnb`, `z-chat-input`, `z-hitl-panel`, `z-modal`, `z-toast`)
+7. **Tailwind v4 constraint**: Avoid CSS variables inside utility brackets (use inline styles or hex)
 
 ## Design References
 
@@ -117,6 +131,48 @@ npx prettier --write .
 - **Overall Theme**: PilePeak.ai Light Mode
 
 See `references/` folder for detailed design references.
+
+## Features (Current)
+
+- Chat UI with Markdown rendering, copy, and artifact saving
+- Multi‑agent SSE streaming client (`POST /api/v1/chat/multi-stream`)
+  - Parses `text/event-stream`, normalizes events, surfaces thinking/steps
+  - Sends `hitl_config` (object) and, for legacy servers, derived `automation_level` (1/2/3)
+- HITL approval panels (Research/Strategy/Portfolio/Risk/Trading)
+  - Trading and others support missing‑field safe rendering; values absent → hidden or “-”
+  - Type normalization: `trade_approval` → `trading`
+  - Buttons disabled while approve/reject API is in flight
+  - Drawer and Floating variants (bottom‑right popup). Width = ~1.5× LNB (clamped 360–720px)
+- Approvals API integration (`POST /api/v1/chat/approve`)
+  - Payload: `thread_id`, `decision: 'approved'|'rejected'|'modified'`, optional `modifications`, `user_notes`, `request_id`
+  - On click: app adds only the decision message (assistant request summary is saved by backend)
+- Settings (Automation/HITL)
+  - Uses `hitl_config` with presets (`pilot`, `copilot`, `advisor`, `custom`) and phase toggles
+  - Client calls new endpoints first and falls back to legacy during migration
+- i18n (ko/en) with runtime hydration; dynamic imports for i18n’d components as needed
+- LNB with recent chats area, sticky headers, hover‑scrollbar
+- Portfolio charts (treemap/pie/bar) and lists; dark/light theme aware
+
+## API Integration
+
+Environment
+- `NEXT_PUBLIC_API_BASE_URL=http://localhost:8000` (ngrok: header `ngrok-skip-browser-warning: true` auto‑attached by stream client)
+
+Endpoints used
+- Chat (fallback): `POST /api/v1/chat/` with `{ message, conversation_id?, hitl_config }`
+- Multi‑stream (SSE): `POST /api/v1/chat/multi-stream`
+  - Request: `{ message, conversation_id?, hitl_config, automation_level (legacy), stream_thinking: true }`
+  - Events handled: `master_*`, `agent_*`, `message/delta`, `hitl_interrupt` (current), `hitl.request` (target), `done`
+- Approve: `POST /api/v1/chat/approve`
+  - Request: `{ thread_id, decision, modifications?, user_notes?, request_id? }`
+- Settings (new first, legacy fallback)
+  - Get: `GET /api/v1/settings/hitl-config` → fallback `GET /api/v1/settings/settings/automation-level`
+  - Put: `PUT /api/v1/settings/hitl-config` (with `{ hitl_config, confirm: true }`) → fallback legacy path
+  - Presets: `GET /api/v1/settings/hitl-config/presets` → fallback legacy presets path
+
+Migration notes
+- Frontend sends both `hitl_config` and derived `automation_level` during the backend migration window.
+- Once backend fully supports `hitl_config` input and emits `hitl.request`, we can remove the legacy code paths.
 
 ## Development Phases
 
@@ -201,6 +257,17 @@ See `references/` folder for detailed design references.
 - `docs/conventions/`: Coding and git conventions
 - `CLAUDE.md`: Claude Code development guide
 
+## Known Caveats (Backend alignment)
+
+- Approve flow: some backend paths may return `None` for LangGraph results; server needs a guard before calling `.get`. Frontend already disables buttons during in‑flight and shows user‑friendly errors.
+- During migration, the server may accept only `automation_level` for streaming; frontend derives it from `hitl_config` and includes both.
+
+## Runbook (Quick)
+
+- Dev: `npm run dev` (Demo mode available via LNB toggle)
+- Live: set `NEXT_PUBLIC_API_BASE_URL` and use the SSE multi‑stream endpoint; verify Settings GET/PUT paths in APICheckPanel
+- Build: `npm run build` (Next config ignores ESLint warnings on build)
+
 ## Contributing
 
 Please follow the conventions in `docs/conventions/`:
@@ -215,3 +282,33 @@ ISC
 ## Contact
 
 HAMA Team - [GitHub](https://github.com/HAMA-team)
+
+## Screenshots
+
+아래 경로의 예시 이미지를 참고하세요(향후 업데이트 예정).
+- eferences/img_references/Claude chat history.png
+- eferences/mockup_references/아티팩트 본문 뷰.png
+- eferences/mockup_references/HITL 승인 패널.png
+- eferences/mockup_references/Portfolio.png
+
+## Shortcuts
+
+- Enter: 메시지 전송
+- Shift+Enter: 줄바꿈
+
+## Troubleshooting
+
+- Backend not running / Stream HTTP error
+  - 서버 실행 여부 확인: NEXT_PUBLIC_API_BASE_URL 점검, API 문서 페이지 접속 확인
+  - SSE는 POST /api/v1/chat/multi-stream 사용. ngrok 사용 시 헤더 
+grok-skip-browser-warning: true 자동 첨부됨
+
+- Approval processing error: 'NoneType' object has no attribute 'get'
+  - 백엔드 승인 처리 경로에서 LangGraph 결과가 None일 때 .get() 호출로 발생. 서버에 None 가드 필요
+  - 프론트는 승인/거절 버튼을 API 응답까지 비활성화하여 중복 클릭을 방지하고 친화적 오류를 표시함
+
+- Settings API 404/405
+  - 마이그레이션 중에는 새 경로(/settings/hitl-config)가 없을 수 있음. 클라이언트가 레거시(/settings/settings/automation-level(s))로 폴백함
+
+- CORS/네트워크 오류
+  - 베이스 URL, 프록시/브라우저 콘솔, 네트워크 탭에서 요청/응답을 확인
