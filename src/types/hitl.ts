@@ -129,6 +129,7 @@ export interface AutomationLevelUpdateResponse {
 export interface ApprovalRequest {
   thread_id: string;
   decision: "approved" | "rejected" | "modified";
+  request_id?: string;
   modifications?: Record<string, any>;
   user_notes?: string;
 }

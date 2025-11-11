@@ -330,14 +330,18 @@ export default function ChatInput({
                   // TODO(HITL): 백엔드 이벤트가 `hitl.request`로 표준화되면,
                   // `hitl_interrupt` 분기는 제거하고 `hitl.request`만 유지한다.
                   case "hitl_interrupt": {
-                    const req = ev?.data?.approval_request ?? ev?.data;
-                    if (req) {
-                      try { openApprovalPanel(req as any); } catch { /* noop */ }
+                    const raw = ev?.data?.approval_request ?? ev?.data;
+                    if (raw) {
+                      const norm: any = { ...raw };
+                      if (norm.type === 'trade_approval') norm.type = 'trading';
+                      try { openApprovalPanel(norm as any); } catch { /* noop */ }
                     }
                     break; }
                   case "hitl.request": {
                     if (ev.data) {
-                      try { openApprovalPanel(ev.data as any); } catch { /* noop */ }
+                      const norm: any = { ...ev.data };
+                      if (norm.type === 'trade_approval') norm.type = 'trading';
+                      try { openApprovalPanel(norm as any); } catch { /* noop */ }
                     }
                     break; }
                   case "error": {

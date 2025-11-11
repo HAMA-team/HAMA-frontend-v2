@@ -4,11 +4,14 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, Shield } from "lucide-react";
 import type { RiskApprovalRequest } from "@/lib/types/chat";
+import { useLNBWidth } from "@/hooks/useLNBWidth";
 
 interface RiskApprovalPanelProps {
   request: RiskApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
+  variant?: "drawer" | "floating";
+  disabled?: boolean;
 }
 
 /**
@@ -24,8 +27,12 @@ export default function RiskApprovalPanel({
   request,
   onApprove,
   onReject,
+  variant = "drawer",
+  disabled = false,
 }: RiskApprovalPanelProps) {
   const { t } = useTranslation();
+  const { width: lnbWidth } = useLNBWidth();
+  const panelWidth = Math.max(360, Math.min(Math.round((lnbWidth || 240) * 1.5), 720));
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -46,11 +53,17 @@ export default function RiskApprovalPanel({
 
   return (
     <div
-      className="fixed top-0 right-0 h-screen flex flex-col z-50 shadow-2xl"
+      className={
+        variant === "floating"
+          ? "fixed bottom-4 right-4 flex flex-col z-hitl-panel shadow-2xl rounded-xl overflow-hidden"
+          : "fixed top-0 right-0 h-screen flex flex-col z-hitl-panel shadow-2xl"
+      }
       style={{
-        width: "50vw",
+        width: `${panelWidth}px`,
+        maxHeight: variant === "floating" ? "72vh" : undefined,
         backgroundColor: "var(--container-background)",
-        borderLeft: "1px solid var(--border-default)",
+        borderLeft: variant === "floating" ? undefined : "1px solid var(--border-default)",
+        border: variant === "floating" ? "1px solid var(--border-default)" : undefined,
       }}
     >
       {/* Header */}
@@ -274,22 +287,24 @@ export default function RiskApprovalPanel({
         style={{ borderColor: "var(--border-default)" }}
       >
         <button
-          onClick={onReject}
+          onClick={disabled ? undefined : onReject}
+          disabled={disabled}
           className="flex-1 px-6 py-3 rounded-lg font-medium transition-colors"
           style={{
-            backgroundColor: "var(--container-background)",
-            color: "var(--text-secondary)",
+            backgroundColor: disabled ? "var(--border-default)" : "var(--container-background)",
+            color: disabled ? "var(--text-secondary)" : "var(--text-secondary)",
             border: "1px solid var(--border-default)",
           }}
         >
           {t("hitl.risk.cancel") || "취소"}
         </button>
         <button
-          onClick={onApprove}
+          onClick={disabled ? undefined : onApprove}
+          disabled={disabled}
           className="flex-1 px-6 py-3 rounded-lg font-medium transition-colors"
           style={{
-            backgroundColor: "#ef4444",
-            color: "white",
+            backgroundColor: disabled ? "#f87171" : "#ef4444",
+            color: disabled ? "var(--text-secondary)" : "white",
           }}
         >
           {t("hitl.risk.proceedAnyway") || "경고 무시하고 진행"}

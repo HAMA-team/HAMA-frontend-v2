@@ -48,6 +48,7 @@ export default function Home() {
   const { addArtifact } = useArtifactStore();
   const { openAlert } = useDialogStore();
   const { hitlConfig } = useUserStore();
+  const [approvalBusy, setApprovalBusy] = React.useState(false);
 
   const handleSuggestionClick = async (prompt: string) => {
     // 사용자 메시지 추가
@@ -213,9 +214,11 @@ ${t("chat.receivedResponse")}
               // TODO(HITL): 백엔드 이벤트가 `hitl.request`로 표준화되면,
               // `hitl_interrupt` 분기는 제거하고 `hitl.request`만 유지한다.
               case "hitl_interrupt": {
-                const req = ev?.data?.approval_request ?? ev?.data;
-                if (req) {
-                  try { openApprovalPanel(req as any); } catch {}
+                const raw = ev?.data?.approval_request ?? ev?.data;
+                if (raw) {
+                  const norm: any = { ...raw };
+                  if (norm.type === 'trade_approval') norm.type = 'trading';
+                  try { openApprovalPanel(norm as any); } catch {}
                 }
                 break;
               }
@@ -569,6 +572,7 @@ ${data.risk_factors?.map((factor: any) =>
 
 ${data.rationale ? `\n---\n\n${data.rationale}` : ""}`;
 
+      case "trade_approval": // backend alias → trading 포맷으로 처리
       case "trading":
         return `## 💰 ${t("hitl.trading.title") || "매매 주문 승인 요청"}
 
@@ -590,20 +594,10 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
   };
 
   const handleApprove = async (messageId: string) => {
+    if (approvalBusy) return;
+    setApprovalBusy(true);
     try {
-      // 1. HITL 승인 요청 내용을 채팅창에 메시지로 추가
-      if (approvalPanel.data) {
-        const approvalRequestMessage: Message = {
-          id: `approval-request-${Date.now()}`,
-          role: "assistant",
-          content: formatApprovalRequest(approvalPanel.data),
-          timestamp: new Date().toISOString(),
-          status: "sent",
-        };
-        addMessage(approvalRequestMessage);
-      }
-
-      // 2. 승인 결정을 사용자 메시지로 추가
+      // 승인 결정을 사용자 메시지로 추가 (요청 요약은 백엔드 자동 저장)
       const approvalDecisionMessage: Message = {
         id: `approval-decision-${Date.now()}`,
         role: "user",
@@ -626,8 +620,10 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
 
       // HITL 패널 데이터에서 거래 정보 추출 (백엔드에서 사용할 수 있도록 전달)
       const modifications: Record<string, any> = {};
+      let requestId: string | undefined;
       if (approvalPanel.data) {
         const data = approvalPanel.data as any;
+        if (data.request_id) requestId = String(data.request_id);
         // Trading Agent의 경우 종목 코드, 수량 등 정보 포함
         if (data.type === "trading" || data.stock_code) {
           modifications.stock_code = data.stock_code;
@@ -644,6 +640,7 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       await approveAction({
         thread_id: currentThreadId,
         decision: "approved",
+        request_id: requestId,
         modifications: Object.keys(modifications).length > 0 ? modifications : undefined,
       });
 
@@ -662,24 +659,16 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `승인 실패: ${serverMsg}`
       });
+    } finally {
+      try { setApprovalBusy(false); } catch {}
     }
   };
 
   const handleReject = async (messageId: string) => {
+    if (approvalBusy) return;
+    setApprovalBusy(true);
     try {
-      // 1. HITL 승인 요청 내용을 채팅창에 메시지로 추가
-      if (approvalPanel.data) {
-        const approvalRequestMessage: Message = {
-          id: `approval-request-${Date.now()}`,
-          role: "assistant",
-          content: formatApprovalRequest(approvalPanel.data),
-          timestamp: new Date().toISOString(),
-          status: "sent",
-        };
-        addMessage(approvalRequestMessage);
-      }
-
-      // 2. 거부 결정을 사용자 메시지로 추가
+      // 거부 결정을 사용자 메시지로 추가 (요청 요약은 백엔드 자동 저장)
       const approvalDecisionMessage: Message = {
         id: `approval-decision-${Date.now()}`,
         role: "user",
@@ -698,9 +687,14 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         return;
       }
       // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
+      let requestId: string | undefined;
+      if (approvalPanel.data && (approvalPanel.data as any).request_id) {
+        requestId = String((approvalPanel.data as any).request_id);
+      }
       await approveAction({
         thread_id: currentThreadId,
-        decision: "rejected"
+        decision: "rejected",
+        request_id: requestId,
       });
 
       console.log("Reject:", messageId, currentThreadId);
@@ -717,6 +711,8 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `거부 실패: ${serverMsg}`
       });
+    } finally {
+      try { setApprovalBusy(false); } catch {}
     }
   };
 
@@ -899,22 +895,15 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       {/* Chat Input - Fixed Bottom */}
       <ChatInput />
 
-      {/* HITL Approval Panel - Overlay + Panel */}
+      {/* HITL Approval Panel - Floating variant (no overlay) */}
       {approvalPanel.isOpen && approvalPanel.data && (
-        <>
-          {/* Overlay - Left Side Dimming */}
-          <div
-            className="fixed top-0 left-0 w-full h-full z-40"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
-          />
-          {/* HITL Panel */}
-          <HITLPanel
-            request={approvalPanel.data}
-            messageId="temp-message-id"
-            onApprove={handleApprove}
-            onReject={handleReject}
-          />
-        </>
+        <HITLPanel
+          request={approvalPanel.data}
+          messageId="temp-message-id"
+          onApprove={handleApprove}
+          onReject={handleReject}
+          variant="floating" disabled={approvalBusy}
+        />
       )}
     </div>
   );

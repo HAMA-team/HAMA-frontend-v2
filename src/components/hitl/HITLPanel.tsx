@@ -13,6 +13,8 @@ interface HITLPanelProps {
   messageId: string;
   onApprove: (messageId: string) => void;
   onReject: (messageId: string) => void;
+  variant?: "drawer" | "floating";
+  disabled?: boolean;
 }
 
 /**
@@ -32,6 +34,8 @@ export default function HITLPanel({
   messageId,
   onApprove,
   onReject,
+  variant = "drawer",
+  disabled = false,
 }: HITLPanelProps) {
   // Agent type에 따른 handlers
   const handleApprove = () => onApprove(messageId);
@@ -45,6 +49,8 @@ export default function HITLPanel({
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}
+          variant={variant}
+          disabled={disabled}
         />
       );
 
@@ -54,6 +60,8 @@ export default function HITLPanel({
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}
+          variant={variant}
+          disabled={disabled}
         />
       );
 
@@ -63,6 +71,8 @@ export default function HITLPanel({
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}
+          variant={variant}
+          disabled={disabled}
         />
       );
 
@@ -72,6 +82,8 @@ export default function HITLPanel({
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}
+          variant={variant}
+          disabled={disabled}
         />
       );
 
@@ -82,6 +94,8 @@ export default function HITLPanel({
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}
+          variant={variant}
+          disabled={disabled}
         />
       );
   }
