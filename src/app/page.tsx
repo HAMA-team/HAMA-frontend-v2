@@ -511,8 +511,10 @@ ${t("chat.receivedResponse")}
   // HITL 승인 요청을 마크다운 메시지로 포맷팅
   const formatApprovalRequest = (request: ApprovalRequest): string => {
     const data = request as any;
+    // Normalize backend alias 'trade_approval' to 'trading' for typing safety
+    const ttype = (data?.type === 'trade_approval' ? 'trading' : (data?.type || request.type)) as 'research' | 'strategy' | 'portfolio' | 'risk' | 'trading';
 
-    switch (request.type) {
+    switch (ttype) {
       case "research":
         return `## 🔍 ${t("hitl.research.title") || "분석 실행 승인 요청"}
 
@@ -572,7 +574,6 @@ ${data.risk_factors?.map((factor: any) =>
 
 ${data.rationale ? `\n---\n\n${data.rationale}` : ""}`;
 
-      case "trade_approval": // backend alias → trading 포맷으로 처리
       case "trading":
         return `## 💰 ${t("hitl.trading.title") || "매매 주문 승인 요청"}
 
