@@ -279,36 +279,23 @@ Please follow the conventions in `docs/conventions/`:
 
 ISC
 
-## Contact
-
-HAMA Team - [GitHub](https://github.com/HAMA-team)
-
-## Screenshots
-
-아래 경로의 예시 이미지를 참고하세요(향후 업데이트 예정).
-- eferences/img_references/Claude chat history.png
-- eferences/mockup_references/아티팩트 본문 뷰.png
-- eferences/mockup_references/HITL 승인 패널.png
-- eferences/mockup_references/Portfolio.png
-
-## Shortcuts
-
-- Enter: 메시지 전송
-- Shift+Enter: 줄바꿈
 
 ## Troubleshooting
 
 - Backend not running / Stream HTTP error
-  - 서버 실행 여부 확인: NEXT_PUBLIC_API_BASE_URL 점검, API 문서 페이지 접속 확인
-  - SSE는 POST /api/v1/chat/multi-stream 사용. ngrok 사용 시 헤더 
-grok-skip-browser-warning: true 자동 첨부됨
+  - 서버 실행 여부 확인: `NEXT_PUBLIC_API_BASE_URL` 점검, API 문서 페이지 접속 확인
+  - SSE는 `POST /api/v1/chat/multi-stream` 사용. ngrok 사용 시 헤더 `ngrok-skip-browser-warning: true` 자동 첨부됨
 
 - Approval processing error: 'NoneType' object has no attribute 'get'
-  - 백엔드 승인 처리 경로에서 LangGraph 결과가 None일 때 .get() 호출로 발생. 서버에 None 가드 필요
-  - 프론트는 승인/거절 버튼을 API 응답까지 비활성화하여 중복 클릭을 방지하고 친화적 오류를 표시함
+  - 백엔드 승인 처리 경로에서 LangGraph 결과가 `None`일 때 `.get()` 호출로 발생. 서버에 None 가드 필요
+  - 프론트는 승인/거절 버튼을 API 응답까지 비활성화하여 중복 클릭을 방지하고, 친화적 오류를 표시합니다.
 
 - Settings API 404/405
-  - 마이그레이션 중에는 새 경로(/settings/hitl-config)가 없을 수 있음. 클라이언트가 레거시(/settings/settings/automation-level(s))로 폴백함
+  - 마이그레이션 중에는 새 경로(`/settings/hitl-config`)가 없을 수 있음. 클라이언트가 레거시(`/settings/settings/automation-level(s)`)로 폴백합니다.
 
 - CORS/네트워크 오류
-  - 베이스 URL, 프록시/브라우저 콘솔, 네트워크 탭에서 요청/응답을 확인
+  - 베이스 URL, 프록시/브라우저 콘솔, 네트워크 탭에서 요청/응답을 확인하세요.
+
+## Contact
+
+HAMA Team - [GitHub](https://github.com/HAMA-team)
