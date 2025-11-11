@@ -48,6 +48,27 @@ export default function Home() {
   const { addArtifact } = useArtifactStore();
   const { openAlert } = useDialogStore();
   const { hitlConfig } = useUserStore();
+
+  // Sanitize noisy agent_thinking payloads (Supervisor raw dumps → concise text)
+  const sanitizeThinkingDelta = (data: any): string => {
+    if (!data) return "";
+    const pick = (s: any) => (typeof s === "string" ? s : "");
+    // Prefer explicit message/content fields
+    const msg = pick(data.message) || pick(data.content) || pick(data.delta?.text);
+    if (msg) {
+      // Drop JSON-looking blobs
+      const trimmed = msg.trim();
+      if (trimmed.startsWith("{") || trimmed.startsWith("[")) return "";
+      return trimmed;
+    }
+    // Tool call chunks → summarize
+    const name = data?.tool_call_chunk?.name || data?.tool_call?.name || data?.name;
+    if (name) return `🔧 Tool: ${String(name)}`;
+    // Invalid tool noise or metadata → ignore
+    const type = String(data?.type || "").toLowerCase();
+    if (type.includes("invalid") || type.includes("metadata")) return "";
+    return "";
+  };
   const [approvalBusy, setApprovalBusy] = React.useState(false);
 
   const handleSuggestionClick = async (prompt: string) => {
@@ -190,14 +211,12 @@ ${t("chat.receivedResponse")}
                 break;
               }
               case "agent_thinking": {
-                // AI 사고 내용을 실시간으로 마지막 thinking step에 추가
-                if (ev.data?.content) {
+                // AI 사고 내용을 실시간으로 마지막 thinking step에 추가 (노이즈 제거)
+                const clean = sanitizeThinkingDelta(ev.data);
+                if (clean) {
                   const { appendThinkingContent } = useChatStore.getState();
-                  appendThinkingContent(tempId, ev.data.content);
-                  // 로그는 너무 많이 나올 수 있으므로 샘플링
-                  if (Math.random() < 0.01) {
-                    console.log("💭 Appending thinking content...");
-                  }
+                  appendThinkingContent(tempId, clean + "\n");
+                  if (Math.random() < 0.02) console.log("💭 thinking:", clean);
                 }
                 break;
               }
@@ -398,13 +417,10 @@ ${t("chat.receivedResponse")}
                   break;
                 }
                 case "agent_thinking": {
-                  // AI 사고 내용을 실시간으로 마지막 thinking step에 추가
-                  if (ev.data?.content) {
+                  const clean = sanitizeThinkingDelta(ev.data);
+                  if (clean) {
                     const { appendThinkingContent } = useChatStore.getState();
-                    appendThinkingContent(tempId, ev.data.content);
-                    if (Math.random() < 0.01) {
-                      console.log("💭 Appending thinking content...");
-                    }
+                    appendThinkingContent(tempId, clean + "\n");
                   }
                   break;
                 }
