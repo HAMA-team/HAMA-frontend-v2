@@ -52,20 +52,43 @@ export default function Home() {
   // Sanitize noisy agent_thinking payloads (Supervisor raw dumps → concise text)
   const sanitizeThinkingDelta = (data: any): string => {
     if (!data) return "";
+
+    // Helper: normalize possible inputs to a candidate string
     const pick = (s: any) => (typeof s === "string" ? s : "");
-    // Prefer explicit message/content fields
-    const msg = pick(data.message) || pick(data.content) || pick(data.delta?.text);
-    if (msg) {
-      // Drop JSON-looking blobs
-      const trimmed = msg.trim();
-      if (trimmed.startsWith("{") || trimmed.startsWith("[")) return "";
-      return trimmed;
+    const candidate = pick((data as any).message) || pick((data as any).content) || pick((data as any).delta?.text) || (typeof data === "string" ? String(data) : "");
+
+    if (candidate) {
+      const raw = candidate.trim();
+      // 1) Pure JSON-ish blobs → drop
+      if (raw.startsWith("{") || raw.startsWith("[")) return "";
+
+      // 2) LangChain/Anthropic repr like:
+      //    content=[{'text': '...'}] additional_kwargs={} response_metadata=...
+      //    Extract only the text tokens
+      if (/content=\[/.test(raw) || /response_metadata=/.test(raw) || /additional_kwargs=/.test(raw) || /id='lc_run-/.test(raw)) {
+        const parts: string[] = [];
+        // 'text': '...'
+        const rxSingle = /'text':\s*'([^']+)'/g;
+        // "text": "..."
+        const rxDouble = /\"text\":\s*\"([^\"]+)\"/g;
+        let m: RegExpExecArray | null;
+        while ((m = rxSingle.exec(raw)) !== null) parts.push(m[1]);
+        while ((m = rxDouble.exec(raw)) !== null) parts.push(m[1]);
+        const joined = parts.join("");
+        return joined.trim();
+      }
+
+      // 3) Otherwise, if it's a short sentence without obvious debug keys, keep it
+      if (/\b(additional_kwargs|response_metadata|tool_call|invalid_tool_call|args:|type:)\b/.test(raw)) return "";
+      return raw;
     }
-    // Tool call chunks → summarize
-    const name = data?.tool_call_chunk?.name || data?.tool_call?.name || data?.name;
+
+    // 4) Tool call chunks → summarize to a short label
+    const name = (data?.tool_call_chunk?.name || data?.tool_call?.name || data?.name) as any;
     if (name) return `🔧 Tool: ${String(name)}`;
-    // Invalid tool noise or metadata → ignore
-    const type = String(data?.type || "").toLowerCase();
+
+    // 5) Invalid tool noise or generic metadata → ignore
+    const type = String((data as any)?.type || "").toLowerCase();
     if (type.includes("invalid") || type.includes("metadata")) return "";
     return "";
   };
