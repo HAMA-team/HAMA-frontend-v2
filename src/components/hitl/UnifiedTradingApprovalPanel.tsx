@@ -8,7 +8,7 @@ interface UnifiedTradingApprovalRequest {
   // Trade Info
   stock_name: string;
   stock_code: string;
-  action: "BUY" | "SELL";
+  action: "BUY" | "SELL" | "buy" | "sell";
   quantity: number;
   price: number;
   total_amount: number;
@@ -71,6 +71,8 @@ export default function UnifiedTradingApprovalPanel({
 
   const hasRiskInfo = request.risk_level && request.risk_warnings && request.risk_warnings.length > 0;
 
+  const isSell = request.action === "SELL" || request.action === "sell";
+
   return (
     <div
       className={
@@ -92,7 +94,7 @@ export default function UnifiedTradingApprovalPanel({
         style={{ borderColor: "var(--border-default)" }}
       >
         <div className="flex items-center gap-3">
-          {request.action === "BUY" ? (
+          {!isSell ? (
             <TrendingUp className="w-6 h-6" style={{ color: "var(--primary-500)" }} />
           ) : (
             <TrendingDown className="w-6 h-6" style={{ color: "#ef4444" }} />
@@ -173,10 +175,10 @@ export default function UnifiedTradingApprovalPanel({
               <span
                 className="text-sm font-semibold"
                 style={{
-                  color: request.action === "SELL" ? "#ef4444" : "var(--primary-500)",
+                  color: isSell ? "#ef4444" : "var(--primary-500)",
                 }}
               >
-                {request.action === "SELL" ? t("hitl.sell") : t("hitl.buy")}
+                {isSell ? t("hitl.sell") : t("hitl.buy")}
               </span>
             </div>
 
