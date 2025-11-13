@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useHITLConfigSync } from "@/hooks/useHITLConfigSync";
 import { useAppModeStore } from "@/store/appModeStore";
 import AutomationLevelSelector from "./AutomationLevelSelector";
+import SimplifiedHITLSettings from "./SimplifiedHITLSettings";
 import InvestmentProfile from "./InvestmentProfile";
 import { Sun, Moon, Globe } from "lucide-react";
 import APICheckPanel from "./APICheckPanel";
@@ -130,6 +131,13 @@ export default function MyPageView() {
       <section>
         <AutomationLevelSelector />
       </section>
+
+      {/* 섹션 2.5: HITL Control */}
+      {mode === "demo" && (
+        <section>
+          <SimplifiedHITLSettings />
+        </section>
+      )}
 
       {/* 섹션 3: 투자 성향 프로필 (Phase 3 구조만) */}
       <section>

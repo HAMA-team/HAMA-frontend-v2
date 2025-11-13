@@ -6,7 +6,7 @@ import ResearchApprovalPanel from "./ResearchApprovalPanel";
 import StrategyApprovalPanel from "./StrategyApprovalPanel";
 import PortfolioApprovalPanel from "./PortfolioApprovalPanel";
 import RiskApprovalPanel from "./RiskApprovalPanel";
-import TradingApprovalPanel from "./TradingApprovalPanel";
+import UnifiedTradingApprovalPanel from "./UnifiedTradingApprovalPanel";
 
 interface HITLPanelProps {
   request: ApprovalRequest;
@@ -90,7 +90,7 @@ export default function HITLPanel({
     case "trading":
     default:
       return (
-        <TradingApprovalPanel
+        <UnifiedTradingApprovalPanel
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}

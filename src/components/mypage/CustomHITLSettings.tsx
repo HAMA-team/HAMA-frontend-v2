@@ -114,7 +114,8 @@ export default function CustomHITLSettings({
           className="w-5 h-5 flex-shrink-0 mt-0.5"
           style={{ color: "var(--primary-500)" }}
         />
-        <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
+        <div className="text-sm"
+        style={{ color: "var(--text-secondary)" }}>
           {t("mypage.customHitl.info") ||
             "Custom 모드는 고급 사용자를 위한 기능입니다. 각 단계에서 AI가 자동으로 진행할지, 사용자 승인을 받을지 세밀하게 제어할 수 있습니다."}
         </div>

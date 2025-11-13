@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { sendChat } from "@/lib/api/chat";
 import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useUserStore } from "@/store/userStore";
+import { MOCK_UNIFIED_TRADING_HIGH_RISK } from "@/lib/mock/unifiedTradingMock";
 
 /**
  * Home Page - Chat Interface
@@ -881,27 +882,7 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       trading: {
         type: "trading",
         agent: "Trading",
-        action: "buy",
-        stock_code: "005930",
-        stock_name: "삼성전자",
-        quantity: 100,
-        price: 70000,
-        total_amount: 7000000,
-        current_weight: 25.0,
-        expected_weight: 43.2,
-        risk_warning: "이 거래는 포트폴리오의 43.2%를 차지하게 되어 과도한 집중 리스크가 발생할 수 있습니다.",
-        alternatives: [
-          {
-            suggestion: "매수 수량을 50주로 조정하여 포트폴리오 비중을 34%로 유지",
-            adjusted_quantity: 50,
-            adjusted_amount: 3500000,
-          },
-          {
-            suggestion: "매수 수량을 30주로 조정하여 포트폴리오 비중을 28%로 유지",
-            adjusted_quantity: 30,
-            adjusted_amount: 2100000,
-          },
-        ],
+        ...MOCK_UNIFIED_TRADING_HIGH_RISK,
       },
     };
 
