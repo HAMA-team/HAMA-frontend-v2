@@ -35,6 +35,32 @@ export default function UnifiedResearchApprovalPanel({
   const [scope, setScope] = React.useState<"narrow" | "balanced" | "broad">("balanced");
   const [perspectives, setPerspectives] = React.useState<string[]>(["macro", "fundamental", "technical"]);
 
+  const depthLabel = (key: string) =>
+    key === "brief"
+      ? t("hitl.research.depth.brief")
+      : key === "detailed"
+      ? t("hitl.research.depth.detailed")
+      : t("hitl.research.depth.comprehensive");
+  const scopeLabel = (key: string) =>
+    key === "narrow"
+      ? t("hitl.researchUnified.scope.narrow")
+      : key === "balanced"
+      ? t("hitl.researchUnified.scope.balanced")
+      : t("hitl.researchUnified.scope.broad");
+  const methodLabel = (key: string) =>
+    key === "qualitative"
+      ? t("hitl.researchUnified.method.qualitative")
+      : key === "quantitative"
+      ? t("hitl.researchUnified.method.quantitative")
+      : t("hitl.researchUnified.method.both");
+
+  const chipStyle = (selected: boolean) => ({
+    backgroundColor: selected ? "var(--primary-100)" : "var(--container-background)",
+    color: selected ? "var(--primary-700)" : "var(--text-secondary)",
+    borderColor: selected ? "var(--primary-300)" : "var(--border-default)",
+    fontWeight: selected ? 600 : 500,
+  } as React.CSSProperties);
+
   const togglePerspective = (key: string) => {
     setPerspectives((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   };
@@ -66,40 +92,43 @@ export default function UnifiedResearchApprovalPanel({
           className="px-3 py-1 text-xs font-semibold rounded-full"
           style={{ backgroundColor: "var(--lnb-background)", color: "var(--text-secondary)" }}
         >
-          {t("chat.pending") || t("pending")}
+          {t("hitl.pending")}
         </span>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-        {/* Summary */}
-        <div className="space-y-2">
-          {request.stock_code && request.stock_name && (
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                {t("chat.unified.stock")}
-              </div>
-              <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-                {request.stock_name} ({request.stock_code})
-              </div>
-            </div>
-          )}
-          <div>
-            <div className="text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>
-              {t("hitl.research.query")}
-            </div>
-            <div className="p-4 rounded-lg" style={{ backgroundColor: "var(--lnb-background)", color: "var(--text-primary)" }}>
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+        {/* Summary Card */}
+        <div className="rounded-lg border p-4" style={{ borderColor: "#fed7aa", backgroundColor: "#fff7ed" }}>
+          <div className="grid gap-y-2 items-start" style={{ display: "grid", gridTemplateColumns: "110px 1fr" }}>
+            {request.stock_code && request.stock_name && (
+              <>
+                <div className="text-sm" style={{ color: "var(--text-secondary)" }}>{t("hitl.unified.stock")}</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {request.stock_name} ({request.stock_code})
+                </div>
+              </>
+            )}
+            <div className="text-sm" style={{ color: "var(--text-secondary)" }}>{t("hitl.research.query")}</div>
+            <div className="text-sm whitespace-pre-wrap break-words" style={{ color: "var(--text-primary)" }}>
               {request.query}
             </div>
           </div>
         </div>
 
-        {/* Plan: Depth / Scope / Perspectives */}
-        <div className="space-y-4">
+        {/* Plan Summary Line */}
+        <div className="flex items-center justify-between py-2 border-b"
+             style={{ borderColor: "var(--border-default)" }}>
           <h3 className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
             {t("hitl.researchUnified.plan.title")}
           </h3>
+          <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
+            {`${depthLabel(depth)} • ${scopeLabel(scope)} • ${methodLabel(subgraph)}`}
+          </div>
+        </div>
 
+        {/* Plan: Depth / Scope / Perspectives */}
+        <div className="space-y-4">
           {/* Depth */}
           <div>
             <div className="text-xs mb-2" style={{ color: "var(--text-secondary)" }}>
@@ -115,11 +144,7 @@ export default function UnifiedResearchApprovalPanel({
                   key={opt.key}
                   onClick={() => setDepth(opt.key as any)}
                   className="px-3 py-2 rounded-lg text-sm border"
-                  style={{
-                    backgroundColor: depth === opt.key ? "var(--primary-100)" : "var(--container-background)",
-                    color: depth === opt.key ? "var(--primary-700)" : "var(--text-secondary)",
-                    borderColor: depth === opt.key ? "var(--primary-300)" : "var(--border-default)",
-                  }}
+                  style={chipStyle(depth === opt.key)}
                 >
                   {opt.label}
                 </button>
@@ -142,11 +167,7 @@ export default function UnifiedResearchApprovalPanel({
                   key={opt.key}
                   onClick={() => setScope(opt.key as any)}
                   className="px-3 py-2 rounded-lg text-sm border"
-                  style={{
-                    backgroundColor: scope === opt.key ? "var(--primary-100)" : "var(--container-background)",
-                    color: scope === opt.key ? "var(--primary-700)" : "var(--text-secondary)",
-                    borderColor: scope === opt.key ? "var(--primary-300)" : "var(--border-default)",
-                  }}
+                  style={chipStyle(scope === opt.key)}
                 >
                   {opt.label}
                 </button>
@@ -165,11 +186,7 @@ export default function UnifiedResearchApprovalPanel({
                   key={key}
                   onClick={() => togglePerspective(key)}
                   className="px-3 py-2 rounded-lg text-sm border"
-                  style={{
-                    backgroundColor: perspectives.includes(key) ? "var(--primary-100)" : "var(--container-background)",
-                    color: perspectives.includes(key) ? "var(--primary-700)" : "var(--text-secondary)",
-                    borderColor: perspectives.includes(key) ? "var(--primary-300)" : "var(--border-default)",
-                  }}
+                  style={chipStyle(perspectives.includes(key))}
                 >
                   {t(`hitl.researchUnified.perspective.${key}`)}
                 </button>
@@ -177,6 +194,9 @@ export default function UnifiedResearchApprovalPanel({
             </div>
           </div>
         </div>
+
+        {/* Divider */}
+        <div className="border-t" style={{ borderColor: "var(--border-default)" }} />
 
         {/* Method: Qualitative / Quantitative / Both */}
         <div className="space-y-3">
@@ -193,11 +213,7 @@ export default function UnifiedResearchApprovalPanel({
                 key={opt.key}
                 onClick={() => setSubgraph(opt.key as any)}
                 className="px-3 py-2 rounded-lg text-sm border"
-                style={{
-                  backgroundColor: subgraph === opt.key ? "var(--primary-100)" : "var(--container-background)",
-                  color: subgraph === opt.key ? "var(--primary-700)" : "var(--text-secondary)",
-                  borderColor: subgraph === opt.key ? "var(--primary-300)" : "var(--border-default)",
-                }}
+                style={chipStyle(subgraph === opt.key)}
               >
                 {opt.label}
               </button>
@@ -218,7 +234,7 @@ export default function UnifiedResearchApprovalPanel({
             border: "1px solid var(--border-default)",
           }}
         >
-          {t("chat.reject")}
+          {t("hitl.reject")}
         </button>
         <button
           onClick={disabled ? undefined : onApprove}
@@ -226,7 +242,7 @@ export default function UnifiedResearchApprovalPanel({
           className="flex-1 px-6 py-3 rounded-lg font-medium"
           style={{ backgroundColor: "var(--primary-500)", color: "var(--lnb-active-text)" }}
         >
-          {t("chat.approve")}
+          {t("hitl.approve")}
         </button>
       </div>
     </div>

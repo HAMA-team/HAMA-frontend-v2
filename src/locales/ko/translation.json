@@ -432,6 +432,36 @@
     "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"
   },
   "hitl": {
+    "approve": "승인",
+    "reject": "거부",
+    "approved": "승인됨",
+    "rejected": "거부됨",
+    "buy": "매수",
+    "sell": "매도",
+    "shares": "주",
+    "pending": "승인 대기 중",
+    "unified": {
+      "title": "매매 승인",
+      "highRiskDetected": "고위험 상황 감지",
+      "reviewCarefully": "거래 정보와 리스크 요인을 신중하게 검토한 후 진행하세요.",
+      "portfolioRisk": "포트폴리오 리스크 평가",
+      "concentration": "집중도",
+      "volatility": "변동성",
+      "maxDrawdown": "최대 낙폭",
+      "tradeDetails": "거래 정보",
+      "stock": "종목",
+      "tradeType": "거래 유형",
+      "quantity": "수량",
+      "price": "주당 가격",
+      "totalAmount": "총 금액",
+      "portfolioImpact": "포트폴리오 영향",
+      "currentWeight": "현재 비중",
+      "expectedWeight": "예상 비중",
+      "riskFactors": "리스크 요인",
+      "recommendations": "권장 조치",
+      "amount": "금액",
+      "approvalNote": "* 승인 시 즉시 거래가 실행됩니다"
+    },
     "researchUnified": {
       "title": "분석 계획 승인",
       "plan": {
@@ -459,6 +489,36 @@
         "strategy": "전략",
         "bull": "상승 시나리오",
         "bear": "하락 시나리오"
+      }
+    },
+    "research": {
+      "title": "분석 실행 승인",
+      "query": "질문",
+      "complexityLabel": "분석 복잡도",
+      "depthLabel": "분석 깊이",
+      "routingReason": "라우팅 이유",
+      "reason": "분석이 필요한 이유",
+      "info": "이 분석은 외부 데이터와 AI 모델을 활용하여 종합적인 인사이트를 제공합니다.",
+      "complexity": {
+        "label": "복잡도",
+        "simple": "단순",
+        "moderate": "중간",
+        "expert": "전문가"
+      },
+      "depth": {
+        "label": "상세도",
+        "brief": "간략",
+        "detailed": "상세",
+        "comprehensive": "종합"
+      }
+    },
+    "demo": {
+      "research": {
+        "query": "삼성전자의 최근 실적과 향후 전망을 분석해주세요",
+        "routingReason": "전문가 수준의 종합 분석이 필요한 복합 질문"
+      },
+      "stocks": {
+        "samsungElectronics": "삼성전자"
       }
     }
   }

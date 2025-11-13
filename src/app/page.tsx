@@ -764,9 +764,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         type: "research",
         agent: "Research",
         stock_code: "005930",
-        stock_name: "삼성전자",
-        query: "삼성전자의 최근 실적과 향후 전망을 분석해주세요",
-        routing_reason: "기업 재무 분석 및 산업 동향 파악 필요",
+        stock_name: t("hitl.demo.stocks.samsungElectronics"),
+        query: t("hitl.demo.research.query"),
+        routing_reason: t("hitl.demo.research.routingReason"),
         query_complexity: "expert",
         depth_level: "comprehensive",
         expected_workers: ["data_collector", "bull_analyst", "bear_analyst"],
@@ -929,6 +929,4 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     </div>
   );
 }
-
-
 

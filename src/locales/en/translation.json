@@ -121,6 +121,8 @@
                  "shares":  "shares",
                  "approve":  "Approve",
                  "reject":  "Reject",
+                 "approved":  "Approved",
+                 "rejected":  "Rejected",
                  "approvalNote":  "* Trade will be executed immediately upon approval",
                  "noDetails":  "No detailed order information was provided",
                  "approved":  "Buy order has been executed",
@@ -249,6 +251,36 @@
         "rejected":  "Rejected"
     },
     "hitl": {
+      "approve":  "Approve",
+      "reject":  "Reject",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "buy": "Buy",
+      "sell": "Sell",
+      "shares": "shares",
+      "pending": "Pending Approval",
+      "unified":  {
+        "title":  "Trade Approval",
+        "highRiskDetected":  "High Risk Detected",
+        "reviewCarefully":  "Please review the trade details and risk factors carefully before proceeding.",
+        "portfolioRisk":  "Portfolio Risk Assessment",
+        "concentration":  "Concentration",
+        "volatility":  "Volatility",
+        "maxDrawdown":  "Max Drawdown",
+        "tradeDetails":  "Trade Information",
+        "stock":  "Stock",
+        "tradeType":  "Trade Type",
+        "quantity":  "Quantity",
+        "price":  "Price per Share",
+        "totalAmount":  "Total Amount",
+        "portfolioImpact":  "Portfolio Impact",
+        "currentWeight":  "Current Weight",
+        "expectedWeight":  "Expected Weight",
+        "riskFactors":  "Risk Factors",
+        "recommendations":  "Recommended Actions",
+        "amount":  "Amount",
+        "approvalNote":  "* Trade will be executed immediately upon approval"
+      },
       "researchUnified": {
         "title": "Research Plan Approval",
         "plan": {
@@ -276,6 +308,36 @@
           "strategy": "Strategy",
           "bull": "Bull case",
           "bear": "Bear case"
+        }
+      },
+      "research": {
+        "title": "Analysis Execution Approval",
+        "query": "Query",
+        "complexityLabel": "Analysis Complexity",
+        "depthLabel": "Analysis Depth",
+        "routingReason": "Routing Reason",
+        "reason": "Rationale",
+        "info": "This analysis utilizes external data sources and AI models to provide comprehensive insights.",
+        "complexity": {
+          "label": "Complexity",
+          "simple": "Simple",
+          "moderate": "Moderate",
+          "expert": "Expert"
+        },
+        "depth": {
+          "label": "Depth",
+          "brief": "Brief",
+          "detailed": "Detailed",
+          "comprehensive": "Comprehensive"
+        }
+      },
+      "demo": {
+        "research": {
+          "query": "Please analyze Samsung Electronics' recent performance and outlook.",
+          "routingReason": "Complex inquiry that benefits from expert-level analysis"
+        },
+        "stocks": {
+          "samsungElectronics": "Samsung Electronics"
         }
       }
     },
