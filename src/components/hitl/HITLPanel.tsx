@@ -3,6 +3,8 @@
 import React from "react";
 import type { ApprovalRequest } from "@/lib/types/chat";
 import ResearchApprovalPanel from "./ResearchApprovalPanel";
+import UnifiedResearchApprovalPanel from "./UnifiedResearchApprovalPanel";
+import { useAppModeStore } from "@/store/appModeStore";
 import StrategyApprovalPanel from "./StrategyApprovalPanel";
 import PortfolioApprovalPanel from "./PortfolioApprovalPanel";
 import RiskApprovalPanel from "./RiskApprovalPanel";
@@ -37,6 +39,9 @@ export default function HITLPanel({
   variant = "drawer",
   disabled = false,
 }: HITLPanelProps) {
+  // Demo/Live 모드에 따라 Research 패널 분기
+  // 데모에서는 개인 투자자 친화 UI(UnifiedResearchApprovalPanel)를 사용
+  const { mode } = useAppModeStore();
   // Agent type에 따른 handlers
   const handleApprove = () => onApprove(messageId);
   const handleReject = () => onReject(messageId);
@@ -44,6 +49,17 @@ export default function HITLPanel({
   // Agent type 기반 라우팅
   switch (request.type) {
     case "research":
+      if (mode === "demo") {
+        return (
+          <UnifiedResearchApprovalPanel
+            request={request}
+            onApprove={handleApprove}
+            onReject={handleReject}
+            variant={variant}
+            disabled={disabled}
+          />
+        );
+      }
       return (
         <ResearchApprovalPanel
           request={request}

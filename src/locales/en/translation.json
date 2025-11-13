@@ -87,7 +87,7 @@
                                                                                "description":  "AI-powered personalized investment ideas",
                                                                                "prompt":  "Please recommend stocks suitable for beginners who are just starting to invest. Focus on stable yet growth-potential stocks from a long-term investment perspective, and also recommend books that can help learn about stock investing."
                                                                            },
-                                                        "risk":  {
+    "risk":  {
                                                                      "title":  "Risk Analysis",
                                                                      "description":  "Review portfolio risk factors",
                                                                      "prompt":  "Please analyze the risk factors in my current portfolio. Evaluate sector concentration, volatility, and potential maximum drawdown, and provide specific improvement measures to reduce risks."
@@ -246,8 +246,39 @@
                                  "approvalNote":  "* Trade will be executed immediately upon approval"
                              },
                  "approved":  "Approved",
-                 "rejected":  "Rejected"
-             },
+        "rejected":  "Rejected"
+    },
+    "hitl": {
+      "researchUnified": {
+        "title": "Research Plan Approval",
+        "plan": {
+          "title": "Analysis Plan",
+          "depth": "Depth",
+          "scope": "Scope",
+          "perspectives": "Perspectives"
+        },
+        "scope": {
+          "narrow": "Key points only",
+          "balanced": "Balanced",
+          "broad": "Wide coverage"
+        },
+        "method": {
+          "title": "Method",
+          "qualitative": "Qualitative",
+          "quantitative": "Quantitative",
+          "both": "Both"
+        },
+        "perspective": {
+          "macro": "Macro",
+          "fundamental": "Fundamental",
+          "technical": "Technical",
+          "flow": "Flow",
+          "strategy": "Strategy",
+          "bull": "Bull case",
+          "bear": "Bear case"
+        }
+      }
+    },
     "portfolio":  {
                       "title":  "Portfolio",
                       "summary":  {

@@ -430,5 +430,36 @@
     "approved": "승인됨",
     "rejected": "거부됨",
     "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"
+  },
+  "hitl": {
+    "researchUnified": {
+      "title": "분석 계획 승인",
+      "plan": {
+        "title": "분석 계획",
+        "depth": "깊이",
+        "scope": "범위",
+        "perspectives": "관점"
+      },
+      "scope": {
+        "narrow": "핵심만",
+        "balanced": "균형",
+        "broad": "넓게"
+      },
+      "method": {
+        "title": "방법",
+        "qualitative": "정성 분석",
+        "quantitative": "정량 분석",
+        "both": "둘 다"
+      },
+      "perspective": {
+        "macro": "거시",
+        "fundamental": "펀더멘털",
+        "technical": "기술적",
+        "flow": "수급",
+        "strategy": "전략",
+        "bull": "상승 시나리오",
+        "bear": "하락 시나리오"
+      }
+    }
   }
 }
