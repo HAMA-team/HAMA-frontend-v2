@@ -185,15 +185,25 @@ ${t("chat.receivedResponse")}
             switch (ev.event) {
               case "master_start": {
                 updateMessage(tempId, { status: "sending" });
-                // "분석을 시작합니다..." 메시지도 thinking에 추가
+                // Master 시작 메시지를 사용자 친화적으로 변환
                 if (ev.data?.message) {
                   const { addThinkingStep } = useChatStore.getState();
+                  const originalMessage = ev.data.message;
+
+                  // "supervisor start" 같은 메시지를 파싱
+                  const parsed = parseAgentMessage(originalMessage);
+                  const finalAgent = ev.data?.agent || parsed.agent || "master";
+                  const finalNode = ev.data?.node || parsed.node;
+
+                  // 사용자 친화적인 메시지 생성
+                  const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
                   addThinkingStep(tempId, {
-                    agent: "planner",
-                    description: ev.data.message,
+                    agent: finalAgent,
+                    description: friendlyMessage,
                     timestamp: now,
                   });
-                  console.log("✅ Added thinking step (master_start):", ev.data.message);
+                  console.log("✅ Master start:", originalMessage, "→", friendlyMessage);
                 }
                 break;
               }
@@ -417,14 +427,25 @@ ${t("chat.receivedResponse")}
               switch (ev.event) {
                 case "master_start": {
                   updateMessage(tempId, { status: "sending" });
+                  // Master 시작 메시지를 사용자 친화적으로 변환
                   if (ev.data?.message) {
                     const { addThinkingStep } = useChatStore.getState();
+                    const originalMessage = ev.data.message;
+
+                    // "supervisor start" 같은 메시지를 파싱
+                    const parsed = parseAgentMessage(originalMessage);
+                    const finalAgent = ev.data?.agent || parsed.agent || "master";
+                    const finalNode = ev.data?.node || parsed.node;
+
+                    // 사용자 친화적인 메시지 생성
+                    const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
                     addThinkingStep(tempId, {
-                      agent: "planner",
-                      description: ev.data.message,
+                      agent: finalAgent,
+                      description: friendlyMessage,
                       timestamp: now,
                     });
-                    console.log("✅ Added thinking step (master_start):", ev.data.message);
+                    console.log("✅ Master start (retry):", originalMessage, "→", friendlyMessage);
                   }
                   break;
                 }

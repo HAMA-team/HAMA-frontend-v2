@@ -26,6 +26,10 @@ const AGENT_LABELS: Record<string, AgentLabel> = {
     ko: "요청을 분석하고 있습니다",
     en: "Analyzing your request",
   },
+  supervisor: {
+    ko: "요청을 분석하고 있습니다",
+    en: "Analyzing your request",
+  },
   planner: {
     ko: "작업 계획을 수립하고 있습니다",
     en: "Planning the workflow",
@@ -92,6 +96,31 @@ const NODE_LABELS: Record<string, AgentLabel> = {
   complete: {
     ko: "작업을 완료했습니다",
     en: "Completed",
+  },
+  // Supervisor/Agent events
+  "supervisor start": {
+    ko: "요청을 분석하고 있습니다",
+    en: "Analyzing your request",
+  },
+  "supervisor complete": {
+    ko: "분석을 완료했습니다",
+    en: "Analysis completed",
+  },
+  "agent start": {
+    ko: "에이전트를 시작합니다",
+    en: "Starting agent",
+  },
+  "agent complete": {
+    ko: "에이전트 작업을 완료했습니다",
+    en: "Agent completed",
+  },
+  "agent LLM start": {
+    ko: "AI 분석을 시작합니다",
+    en: "Starting AI analysis",
+  },
+  "agent LLM end": {
+    ko: "AI 분석을 완료했습니다",
+    en: "AI analysis completed",
   },
 
   // ========== Research Subgraph Nodes (src/subgraphs/research_subgraph/graph.py) ==========
@@ -310,12 +339,33 @@ export function getAgentActivityLabel(
 /**
  * 원본 메시지에서 agent/node 정보를 추출하는 헬퍼
  *
- * @param message - 원본 메시지 (예: "research: planner running")
+ * @param message - 원본 메시지 (예: "research: planner running", "supervisor start", "agent complete: complete")
  * @returns { agent, node } 객체
  */
 export function parseAgentMessage(message: string): { agent?: string; node?: string } {
-  // "research: planner running" 형식
-  const match = message.match(/^(\w+):\s*(\w+)/);
+  if (!message) return {};
+
+  const trimmed = message.trim();
+
+  // 1. "supervisor start" / "supervisor complete" 형식
+  if (trimmed.startsWith("supervisor ")) {
+    return {
+      agent: "supervisor",
+      node: trimmed, // "supervisor start" 전체를 node로
+    };
+  }
+
+  // 2. "agent start" / "agent complete: complete" / "agent LLM start" 형식
+  if (trimmed.startsWith("agent ")) {
+    // "agent complete: complete" → "agent complete"로 정리
+    const cleaned = trimmed.split(":")[0].trim();
+    return {
+      node: cleaned, // "agent start", "agent complete", "agent LLM start" 등
+    };
+  }
+
+  // 3. "research: planner running" 형식
+  const match = trimmed.match(/^(\w+):\s*(\w+)/);
   if (match) {
     return {
       agent: match[1],
@@ -323,8 +373,8 @@ export function parseAgentMessage(message: string): { agent?: string; node?: str
     };
   }
 
-  // "Routing: research, strategy" 형식
-  const routingMatch = message.match(/^Routing:\s*(.+)/i);
+  // 4. "Routing: research, strategy" 형식
+  const routingMatch = trimmed.match(/^Routing:\s*(.+)/i);
   if (routingMatch) {
     return {
       agent: "master",
