@@ -536,6 +536,50 @@
                                       "title":  "Try Investment Profiling",
                                       "description":  "Discover your investment style through 4 questions and get personalized AI service",
                                       "button":  "Start Onboarding"
+                                  },
+                   "hitlControl": {
+                                      "title": "HITL Control",
+                                      "subtitle": "Choose between AI automation and manual approval. Toggle ON to approve actions yourself, or leave OFF for AI to proceed automatically.",
+                                      "masterToggle": {
+                                                         "title": "Manual Approval Mode",
+                                                         "description": "Controls both Research and Portfolio approval together. Trading approval is always required for safety.",
+                                                         "note": "Toggle ON = You approve Research & Portfolio manually. Toggle OFF = AI executes automatically. Trading always requires approval."
+                                                     },
+                                      "badges": {
+                                                    "alwaysRequired": "Always Required",
+                                                    "linkedToToggle": "Linked to Toggle"
+                                                },
+                                      "trading": {
+                                                     "title": "Trading",
+                                                     "description": "Final approval before executing trade orders",
+                                                     "features": {
+                                                                     "reviewRisk": "Review risk analysis results",
+                                                                     "confirmChanges": "Confirm portfolio changes",
+                                                                     "approveOrder": "Approve order quantity and price"
+                                                                 }
+                                                 },
+                                      "research": {
+                                                      "title": "Research",
+                                                      "description": "Approval request before executing stock analysis",
+                                                      "features": {
+                                                                      "setDepth": "Set analysis depth level",
+                                                                      "defineScope": "Define analysis scope",
+                                                                      "selectSources": "Select data sources"
+                                                                  }
+                                                  },
+                                      "portfolio": {
+                                                       "title": "Portfolio Rebalancing",
+                                                       "description": "Approve portfolio rebalancing strategy",
+                                                       "features": {
+                                                                       "adjustIntensity": "Adjust rebalancing intensity",
+                                                                       "determineDirection": "Determine investment direction",
+                                                                       "reflectSectors": "Reflect preferred sectors"
+                                                                   }
+                                                   },
+                                      "status": {
+                                                    "manualApproval": "Manual Approval",
+                                                    "autoExecution": "Auto Execution"
+                                                }
                                   }
                }
 }

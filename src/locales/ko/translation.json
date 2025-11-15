@@ -283,6 +283,50 @@
       "title": "투자 성향 분석 체험하기",
       "description": "4단계 질문으로 나의 투자 성향을 파악하고 맞춤형 AI 서비스를 받아보세요",
       "button": "온보딩 체험하기"
+    },
+    "hitlControl": {
+      "title": "HITL 제어",
+      "subtitle": "AI 자동화와 수동 승인 중 선택하세요. ON으로 토글하면 직접 승인하고, OFF로 두면 AI가 자동으로 진행합니다.",
+      "masterToggle": {
+        "title": "수동 승인 모드",
+        "description": "분석과 리밸런싱 승인을 함께 제어합니다. 매매 승인은 안전을 위해 항상 필요합니다.",
+        "note": "토글 ON = 분석과 리밸런싱을 수동으로 승인합니다. 토글 OFF = AI가 자동으로 실행합니다. 매매는 항상 승인이 필요합니다."
+      },
+      "badges": {
+        "alwaysRequired": "항상 필요",
+        "linkedToToggle": "토글 연동"
+      },
+      "trading": {
+        "title": "매매",
+        "description": "거래 주문 실행 전 최종 승인",
+        "features": {
+          "reviewRisk": "리스크 분석 결과 검토",
+          "confirmChanges": "포트폴리오 변경 확인",
+          "approveOrder": "주문 수량 및 가격 승인"
+        }
+      },
+      "research": {
+        "title": "분석",
+        "description": "주식 분석 실행 전 승인 요청",
+        "features": {
+          "setDepth": "분석 깊이 수준 설정",
+          "defineScope": "분석 범위 정의",
+          "selectSources": "데이터 소스 선택"
+        }
+      },
+      "portfolio": {
+        "title": "리밸런싱",
+        "description": "포트폴리오 리밸런싱 전략 승인",
+        "features": {
+          "adjustIntensity": "리밸런싱 강도 조정",
+          "determineDirection": "투자 방향 결정",
+          "reflectSectors": "선호 섹터 반영"
+        }
+      },
+      "status": {
+        "manualApproval": "수동 승인",
+        "autoExecution": "자동 실행"
+      }
     }
   },
   "hitl": {
