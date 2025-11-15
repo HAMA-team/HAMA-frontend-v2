@@ -3,21 +3,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { PieChart, Send } from "lucide-react";
-
-interface UnifiedPortfolioApprovalRequest {
-  // Minimal info display for now
-  title?: string;
-  description?: string;
-  changes?: Array<{
-    stock_name: string;
-    stock_code: string;
-    current_weight?: number;
-    target_weight?: number;
-  }>;
-}
+import type { PortfolioApprovalRequest } from "@/lib/types/chat";
 
 interface UnifiedPortfolioApprovalPanelProps {
-  request: UnifiedPortfolioApprovalRequest;
+  request: PortfolioApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
   onModify?: (userInput: string) => void;
@@ -84,7 +73,7 @@ export default function UnifiedPortfolioApprovalPanel({
         <div className="flex items-center gap-3">
           <PieChart className="w-6 h-6" style={{ color: "var(--primary-500)" }} />
           <h2 className="text-xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
-            {request.title || t("hitl.portfolio.title")}
+            {t("hitl.portfolio.title") || "포트폴리오 리밸런싱"}
           </h2>
         </div>
         <span
@@ -97,56 +86,60 @@ export default function UnifiedPortfolioApprovalPanel({
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
-        {/* Description */}
-        {request.description && (
+        {/* Rebalancing Info */}
+        {request.rebalancing_needed && (
           <div
             className="rounded-lg p-4"
             style={{
               backgroundColor: isDark ? "#374151" : "#e5e7eb",
             }}
           >
-            <p className="text-sm whitespace-pre-wrap break-words" style={{ color: isDark ? "#e5e7eb" : "#374151" }}>
-              {request.description}
+            <p className="text-sm font-semibold mb-2" style={{ color: isDark ? "#e5e7eb" : "#374151" }}>
+              {t("hitl.portfolio.rebalancingNeeded") || "포트폴리오 리밸런싱이 필요합니다"}
             </p>
           </div>
         )}
 
-        {/* Changes Table */}
-        {request.changes && request.changes.length > 0 && (
+        {/* Proposed Allocation Changes */}
+        {request.proposed_allocation && request.proposed_allocation.length > 0 && (
           <div>
             <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--text-secondary)" }}>
-              {t("hitl.portfolio.changes")}
+              {t("hitl.portfolio.proposedAllocation") || "제안된 배분"}
             </h3>
             <div className="space-y-2">
-              {request.changes.map((change, idx) => (
-                <div
-                  key={idx}
-                  className="p-3 rounded-lg border"
-                  style={{
-                    backgroundColor: "var(--container-background)",
-                    borderColor: "var(--border-default)",
-                  }}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
-                        {change.stock_name} ({change.stock_code})
+              {request.proposed_allocation.map((allocation, idx) => {
+                const currentHolding = request.current_holdings?.find(h => h.stock_code === allocation.stock_code);
+                return (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-lg border"
+                    style={{
+                      backgroundColor: "var(--container-background)",
+                      borderColor: "var(--border-default)",
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
+                          {allocation.stock_name} ({allocation.stock_code})
+                        </div>
+                        <div className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
+                          {allocation.action} {allocation.quantity_change > 0 ? `+${allocation.quantity_change}` : allocation.quantity_change}
+                        </div>
                       </div>
-                    </div>
-                    {change.current_weight !== undefined && change.target_weight !== undefined && (
                       <div className="text-sm flex items-center gap-1">
                         <span style={{ color: "var(--text-secondary)" }}>
-                          {change.current_weight.toFixed(1)}%
+                          {currentHolding ? `${currentHolding.current_weight.toFixed(1)}%` : "0%"}
                         </span>
                         <span style={{ color: "var(--text-muted)" }}>→</span>
                         <span style={{ color: "var(--primary-500)" }}>
-                          {change.target_weight.toFixed(1)}%
+                          {allocation.target_weight.toFixed(1)}%
                         </span>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
