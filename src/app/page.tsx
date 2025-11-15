@@ -44,7 +44,7 @@ const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
 });
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
   const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId } = useChatStore();
   const { addArtifact } = useArtifactStore();
