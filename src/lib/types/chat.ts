@@ -83,9 +83,11 @@ export interface BaseApprovalRequest {
 
 /**
  * 1. Research Agent 승인 요청
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export interface ResearchApprovalRequest extends BaseApprovalRequest {
-  type: "research";
+  type: "research" | "research_plan_approval";
   agent: "Research";
   stock_code?: string;
   stock_name?: string;
@@ -121,9 +123,11 @@ export interface StrategyApprovalRequest extends BaseApprovalRequest {
 
 /**
  * 3. Portfolio Agent 승인 요청
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export interface PortfolioApprovalRequest extends BaseApprovalRequest {
-  type: "portfolio";
+  type: "portfolio" | "rebalance_approval";
   agent: "Portfolio";
   rebalancing_needed: boolean;
   current_holdings: Array<{
@@ -174,10 +178,12 @@ export interface RiskApprovalRequest extends BaseApprovalRequest {
 }
 
 /**
- * 5. Trading Agent 승인 요청 (기존)
+ * 5. Trading Agent 승인 요청
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export interface TradingApprovalRequest extends BaseApprovalRequest {
-  type: "trading";
+  type: "trading" | "trade_approval";
   agent: "Trading";
   action: "buy" | "sell";
   stock_code: string;
