@@ -16,6 +16,7 @@ export const MOCK_UNIFIED_TRADING_LOW_RISK = {
   // Portfolio Impact
   current_weight: 25.0,
   expected_weight: 30.5,
+  quantity_after_trade: 110,
 
   // No risk info (low risk trade)
 };
@@ -32,6 +33,7 @@ export const MOCK_UNIFIED_TRADING_MEDIUM_RISK = {
   // Portfolio Impact
   current_weight: 15.0,
   expected_weight: 28.0,
+  quantity_after_trade: 200,
 
   // Risk Info
   risk_level: "medium" as const,
@@ -53,6 +55,7 @@ export const MOCK_UNIFIED_TRADING_HIGH_RISK = {
   // Portfolio Impact
   current_weight: 20.0,
   expected_weight: 42.0,
+  quantity_after_trade: 370,
 
   // Risk Info
   risk_level: "high" as const,
@@ -75,6 +78,7 @@ export const MOCK_UNIFIED_TRADING_SELL_HIGH_RISK = {
   // Portfolio Impact
   current_weight: 25.0,
   expected_weight: 8.5,
+  quantity_after_trade: 50,
 
   // Risk Info
   risk_level: "medium" as const,

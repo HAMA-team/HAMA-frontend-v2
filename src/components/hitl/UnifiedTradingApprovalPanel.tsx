@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
+import { AlertTriangle, TrendingUp, TrendingDown, Edit2, Layers, DollarSign, Send } from "lucide-react";
 
 interface UnifiedTradingApprovalRequest {
   // Trade Info
@@ -16,6 +16,7 @@ interface UnifiedTradingApprovalRequest {
   // Portfolio Impact
   current_weight?: number;
   expected_weight?: number;
+  quantity_after_trade?: number;
 
   // Risk Info (optional, from backend)
   risk_level?: "high" | "medium" | "low";
@@ -26,6 +27,7 @@ interface UnifiedTradingApprovalPanelProps {
   request: UnifiedTradingApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
+  onModify?: (feedback: string) => void;
   variant?: "drawer" | "floating";
   disabled?: boolean;
 }
@@ -34,13 +36,26 @@ export default function UnifiedTradingApprovalPanel({
   request,
   onApprove,
   onReject,
+  onModify,
   variant = "drawer",
   disabled = false,
 }: UnifiedTradingApprovalPanelProps) {
   const { t } = useTranslation();
+  const [adjustmentRequest, setAdjustmentRequest] = useState("");
+  const [isDark, setIsDark] = useState(false);
+
+  React.useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDarkMode();
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const formatNumber = (num: number) => num.toLocaleString();
-  const formatCurrency = (num: number) => `${num.toLocaleString()}${t("common.won")}`;
+  const formatCurrency = (num: number) => `${num.toLocaleString()} KRW`;
   const formatPercentage = (num: number) => `${num.toFixed(1)}%`;
 
   const getRiskColor = (level?: string) => {
@@ -72,6 +87,13 @@ export default function UnifiedTradingApprovalPanel({
   const hasRiskInfo = request.risk_level && request.risk_warnings && request.risk_warnings.length > 0;
 
   const isSell = request.action === "SELL" || request.action === "sell";
+
+  const handleModify = () => {
+    if (onModify && adjustmentRequest.trim()) {
+      onModify(adjustmentRequest);
+      setAdjustmentRequest("");
+    }
+  };
 
   return (
     <div
@@ -110,8 +132,16 @@ export default function UnifiedTradingApprovalPanel({
           <span
             className="px-3 py-1 text-xs font-semibold rounded-full"
             style={{
-              backgroundColor: getRiskBgColor(request.risk_level),
-              color: getRiskColor(request.risk_level),
+              backgroundColor: isDark
+                ? (request.risk_level === "high" ? "rgba(127, 29, 29, 0.3)" :
+                   request.risk_level === "medium" ? "rgba(120, 53, 15, 0.3)" :
+                   "rgba(20, 83, 45, 0.3)")
+                : getRiskBgColor(request.risk_level),
+              color: isDark
+                ? (request.risk_level === "high" ? "#f87171" :
+                   request.risk_level === "medium" ? "#fbbf24" :
+                   "#4ade80")
+                : getRiskColor(request.risk_level),
             }}
           >
             {request.risk_level.toUpperCase()} RISK
@@ -120,45 +150,19 @@ export default function UnifiedTradingApprovalPanel({
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 whitespace-pre-wrap break-words">
-        {/* Risk Alert (if high risk) */}
-        {hasRiskInfo && request.risk_level === "high" && (
-          <div
-            className="flex gap-3 p-4 rounded-lg border"
-            style={{
-              backgroundColor: "#fef2f2",
-              borderColor: "#ef4444",
-            }}
-          >
-            <AlertTriangle
-              className="w-5 h-5 flex-shrink-0"
-              style={{ color: "#ef4444" }}
-            />
-            <div>
-              <h3
-                className="text-sm font-semibold mb-1"
-                style={{ color: "#dc2626" }}
-              >
-                {t("hitl.unified.highRiskDetected")}
-              </h3>
-              <p className="text-sm" style={{ color: "#7f1d1d" }}>
-                {t("hitl.unified.reviewCarefully")}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Trade Details */}
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 whitespace-pre-wrap break-words">
+        {/* Trade Information */}
         <div>
           <h3
-            className="text-sm font-semibold mb-3"
-            style={{ color: "var(--text-secondary)" }}
+            className="text-lg font-semibold mb-3"
+            style={{ color: "var(--text-primary)" }}
           >
-            {t("hitl.unified.tradeDetails")}
+            {t("hitl.unified.tradeInformation")}
           </h3>
-          <div className="space-y-3">
-            {/* Stock Info */}
-            <div className="flex justify-between">
+
+          {/* Stock & Trade Type */}
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between items-center">
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
                 {t("hitl.unified.stock")}
               </span>
@@ -166,95 +170,166 @@ export default function UnifiedTradingApprovalPanel({
                 {request.stock_name} ({request.stock_code})
               </span>
             </div>
-
-            {/* Trade Type */}
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.unified.tradeType")}
+                {t("hitl.unified.tradingType")}
               </span>
               <span
                 className="text-sm font-semibold"
                 style={{
-                  color: isSell ? "#ef4444" : "var(--primary-500)",
+                  color: isSell ? "#ef4444" : "#2563eb",
                 }}
               >
                 {isSell ? t("hitl.sell") : t("hitl.buy")}
               </span>
             </div>
+          </div>
 
-            {/* Quantity */}
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.unified.quantity")}
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {formatNumber(request.quantity)} {t("hitl.shares")}
-              </span>
-            </div>
-
-            {/* Price */}
-            <div className="flex justify-between">
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.unified.price")}
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                {formatCurrency(request.price)}
-              </span>
-            </div>
-
-            {/* Total Amount */}
+          {/* Grid Cards */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            {/* Quantity Card */}
             <div
-              className="flex justify-between pt-3 border-t"
-              style={{ borderColor: "var(--border-default)" }}
+              className="p-3 rounded-lg border"
+              style={{
+                backgroundColor: "var(--container-background)",
+                borderColor: "var(--border-default)",
+              }}
             >
-              <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-                {t("hitl.unified.totalAmount")}
-              </span>
-              <span className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
-                {formatCurrency(request.total_amount)}
-              </span>
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5" style={{ color: "var(--text-secondary)" }} />
+                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {t("hitl.unified.quantity")}
+                  </span>
+                </div>
+                <button
+                  className="flex items-center gap-1 text-xs px-1.5 py-0.5 rounded"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  <Edit2 className="w-3 h-3" />
+                  <span>{t("common.edit")}</span>
+                </button>
+              </div>
+              <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
+                {formatNumber(request.quantity)} {t("hitl.shares")}
+              </div>
             </div>
+
+            {/* Price/Share Card */}
+            <div
+              className="p-3 rounded-lg border"
+              style={{
+                backgroundColor: "var(--container-background)",
+                borderColor: "var(--border-default)",
+              }}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                  <DollarSign className="w-3.5 h-3.5" style={{ color: "var(--text-secondary)" }} />
+                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {t("hitl.unified.pricePerShare")}
+                  </span>
+                </div>
+                <button
+                  className="flex items-center gap-1 text-xs px-1.5 py-0.5 rounded"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  <Edit2 className="w-3 h-3" />
+                  <span>{t("common.edit")}</span>
+                </button>
+              </div>
+              <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
+                {formatCurrency(request.price)}
+              </div>
+            </div>
+
+            {/* Total Amount Card */}
+            <div
+              className="p-3 rounded-lg border"
+              style={{
+                backgroundColor: "var(--container-background)",
+                borderColor: "var(--border-default)",
+              }}
+            >
+              <div className="flex items-center gap-1.5 mb-1">
+                <DollarSign className="w-3.5 h-3.5" style={{ color: "var(--text-secondary)" }} />
+                <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                  {t("hitl.unified.totalAmount")}
+                </span>
+              </div>
+              <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
+                {formatCurrency(request.total_amount)}
+              </div>
+            </div>
+
+            {/* Quantity After Trading Card */}
+            {request.quantity_after_trade !== undefined && (
+              <div
+                className="p-3 rounded-lg border"
+                style={{
+                  backgroundColor: "var(--container-background)",
+                  borderColor: "var(--border-default)",
+                }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Layers className="w-3.5 h-3.5" style={{ color: "var(--text-secondary)" }} />
+                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {t("hitl.unified.quantityAfterTrade")}
+                  </span>
+                </div>
+                <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
+                  {formatNumber(request.quantity_after_trade)} {t("hitl.shares")}
+                </div>
+              </div>
+            )}
+
+            {/* Portfolio Impact Card */}
+            {request.current_weight !== undefined && request.expected_weight !== undefined && (
+              <div
+                className="p-3 rounded-lg border dark:border-yellow-800/30"
+                style={{
+                  backgroundColor: "var(--container-background)",
+                  borderColor: "var(--border-default)",
+                }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Layers className="w-3.5 h-3.5" style={{ color: "var(--text-secondary)" }} />
+                  <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                    {t("hitl.unified.portfolioImpact")}
+                  </span>
+                </div>
+                <div className="text-base font-bold flex items-center gap-1">
+                  <span className="text-yellow-600 dark:text-yellow-500">{formatPercentage(request.current_weight)}</span>
+                  <span style={{ color: "var(--text-secondary)" }}>→</span>
+                  <span className="text-red-600 dark:text-red-500">{formatPercentage(request.expected_weight)}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Risk Detection Card */}
+            {request.risk_level && (
+              <div
+                className="p-3 rounded-lg border"
+                style={{
+                  backgroundColor: isDark ? "rgba(127, 29, 29, 0.2)" : "#fef2f2",
+                  borderColor: isDark ? "rgba(127, 29, 29, 0.3)" : "#fecaca",
+                }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <AlertTriangle className="w-3.5 h-3.5" style={{ color: isDark ? "#f87171" : "#dc2626" }} />
+                  <span className="text-xs" style={{ color: isDark ? "#f87171" : "#dc2626" }}>
+                    {t("hitl.unified.riskDetection")}
+                  </span>
+                </div>
+                <div className="text-base font-bold" style={{ color: isDark ? "#f87171" : "#dc2626" }}>
+                  {t("hitl.unified.highRiskDetected")}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Portfolio Weight Impact */}
-        {request.current_weight !== undefined && request.expected_weight !== undefined && (
-          <div>
-            <h3
-              className="text-sm font-semibold mb-3"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {t("hitl.unified.portfolioImpact")}
-            </h3>
-            <div className="flex items-center gap-2 text-sm">
-              <span style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.unified.currentWeight")}:
-              </span>
-              <span className="font-medium" style={{ color: "var(--text-primary)" }}>
-                {formatPercentage(request.current_weight)}
-              </span>
-              <span style={{ color: "var(--text-muted)" }}>→</span>
-              <span style={{ color: "var(--text-secondary)" }}>
-                {t("hitl.unified.expectedWeight")}:
-              </span>
-              <span
-                className="font-bold"
-                style={{
-                  color:
-                    request.expected_weight > 40
-                      ? "#ef4444"
-                      : request.expected_weight > 30
-                      ? "#f59e0b"
-                      : "var(--text-primary)",
-                }}
-              >
-                {formatPercentage(request.expected_weight)}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Risk Warnings */}
+        {/* Risk Warnings (원래 있던 요소들) */}
         {request.risk_warnings && request.risk_warnings.length > 0 && (
           <div>
             <h3
@@ -269,11 +344,11 @@ export default function UnifiedTradingApprovalPanel({
                   key={idx}
                   className="p-3 rounded-lg border"
                   style={{
-                    backgroundColor: "#fff7ed", // orange-50
-                    borderColor: "#fed7aa", // orange-200
+                    backgroundColor: isDark ? "rgba(67, 20, 7, 0.2)" : "#fff7ed",
+                    borderColor: isDark ? "rgba(124, 45, 18, 0.3)" : "#fed7aa",
                   }}
                 >
-                  <p className="text-sm break-words" style={{ color: "#7c2d12" }}>
+                  <p className="text-sm break-words" style={{ color: isDark ? "#fdba74" : "#7c2d12" }}>
                     {warning}
                   </p>
                 </div>
@@ -281,6 +356,44 @@ export default function UnifiedTradingApprovalPanel({
             </div>
           </div>
         )}
+
+        {/* Adjustment Request */}
+        <div>
+          <h3
+            className="text-lg font-semibold mb-1"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {t("hitl.unified.adjustmentRequest")}
+          </h3>
+          <p className="text-sm mb-3" style={{ color: "var(--text-secondary)" }}>
+            {t("hitl.unified.adjustmentDescription")}
+          </p>
+          <div className="relative">
+            <textarea
+              value={adjustmentRequest}
+              onChange={(e) => setAdjustmentRequest(e.target.value)}
+              placeholder={t("hitl.unified.adjustmentPlaceholder")}
+              className="w-full px-3 py-2.5 pr-12 rounded-lg border resize-none"
+              style={{
+                backgroundColor: "var(--container-background)",
+                borderColor: "var(--border-default)",
+                color: "var(--text-primary)",
+                minHeight: "80px",
+              }}
+            />
+            <button
+              onClick={handleModify}
+              disabled={!adjustmentRequest.trim()}
+              className="absolute bottom-2.5 right-2.5 p-2 rounded-lg transition-colors disabled:opacity-40"
+              style={{
+                backgroundColor: "#60a5fa",
+                color: "white",
+              }}
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Footer Actions */}
@@ -289,53 +402,74 @@ export default function UnifiedTradingApprovalPanel({
         style={{ borderColor: "var(--border-default)" }}
       >
         <div className="flex gap-3">
+          {/* Reject Button */}
           <button
             onClick={onReject}
             disabled={disabled}
-            className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: "var(--container-background)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border-default)",
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled) {
-                e.currentTarget.style.backgroundColor = "var(--lnb-background)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--container-background)";
-            }}
-          >
-            {t("hitl.reject")}
-          </button>
-          <button
-            onClick={onApprove}
-            disabled={disabled}
-            className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: "var(--primary-500)",
+              backgroundColor: "#ef4444",
               color: "white",
             }}
             onMouseEnter={(e) => {
               if (!disabled) {
-                e.currentTarget.style.backgroundColor = "var(--primary-600)";
+                e.currentTarget.style.backgroundColor = "#dc2626";
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--primary-500)";
+              e.currentTarget.style.backgroundColor = "#ef4444";
+            }}
+          >
+            {t("hitl.reject")}
+          </button>
+
+          {/* Modify Button */}
+          <button
+            onClick={handleModify}
+            disabled={disabled || !adjustmentRequest.trim()}
+            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: adjustmentRequest.trim()
+                ? (isDark ? "#374151" : "#ffffff")
+                : "var(--container-background)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border-default)",
+            }}
+            onMouseEnter={(e) => {
+              if (!disabled && adjustmentRequest.trim()) {
+                e.currentTarget.style.backgroundColor = isDark ? "#4b5563" : "#f9fafb";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = adjustmentRequest.trim()
+                ? (isDark ? "#374151" : "#ffffff")
+                : "var(--container-background)";
+            }}
+          >
+            {t("hitl.unified.modify")}
+          </button>
+
+          {/* Approve Button */}
+          <button
+            onClick={onApprove}
+            disabled={disabled}
+            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: "#2563eb",
+              color: "white",
+            }}
+            onMouseEnter={(e) => {
+              if (!disabled) {
+                e.currentTarget.style.backgroundColor = "#1d4ed8";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#2563eb";
             }}
           >
             {t("hitl.approve")}
           </button>
         </div>
-
-        <p
-          className="text-xs text-center mt-3"
-          style={{ color: "var(--text-muted)" }}
-        >
-          {t("hitl.unified.approvalNote")}
-        </p>
       </div>
     </div>
   );
