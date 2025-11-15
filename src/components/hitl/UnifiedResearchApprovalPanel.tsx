@@ -211,32 +211,64 @@ export default function UnifiedResearchApprovalPanel({
               {t("hitl.researchUnified.plan.perspectives")}
             </div>
             <div className="space-y-2">
-              {/* 첫째 줄: 3개 */}
-              <div className="flex gap-2">
-                {["macro", "fundamental", "technical"].map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => togglePerspective(key)}
-                    className="flex-1 px-3 py-2 rounded-lg text-sm border"
-                    style={chipStyle(perspectives.includes(key))}
-                  >
-                    {t(`hitl.researchUnified.perspective.${key}`)}
-                  </button>
-                ))}
-              </div>
-              {/* 둘째 줄: 4개 */}
-              <div className="flex gap-2">
-                {["flow", "strategy", "bull", "bear"].map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => togglePerspective(key)}
-                    className="flex-1 px-3 py-2 rounded-lg text-sm border"
-                    style={chipStyle(perspectives.includes(key))}
-                  >
-                    {t(`hitl.researchUnified.perspective.${key}`)}
-                  </button>
-                ))}
-              </div>
+              {/* 언어별 레이아웃: 한국어 4-3, 영어 3-4 */}
+              {t("language.ko") === "한국어" ? (
+                // 한국어: 첫째 줄 4개, 둘째 줄 3개
+                <>
+                  <div className="flex gap-2">
+                    {["macro", "fundamental", "technical", "flow"].map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => togglePerspective(key)}
+                        className="flex-1 px-3 py-2 rounded-lg text-sm border"
+                        style={chipStyle(perspectives.includes(key))}
+                      >
+                        {t(`hitl.researchUnified.perspective.${key}`)}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    {["strategy", "bull", "bear"].map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => togglePerspective(key)}
+                        className="flex-1 px-3 py-2 rounded-lg text-sm border"
+                        style={chipStyle(perspectives.includes(key))}
+                      >
+                        {t(`hitl.researchUnified.perspective.${key}`)}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                // 영어: 첫째 줄 3개, 둘째 줄 4개
+                <>
+                  <div className="flex gap-2">
+                    {["macro", "fundamental", "technical"].map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => togglePerspective(key)}
+                        className="flex-1 px-3 py-2 rounded-lg text-sm border"
+                        style={chipStyle(perspectives.includes(key))}
+                      >
+                        {t(`hitl.researchUnified.perspective.${key}`)}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    {["flow", "strategy", "bull", "bear"].map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => togglePerspective(key)}
+                        className="flex-1 px-3 py-2 rounded-lg text-sm border"
+                        style={chipStyle(perspectives.includes(key))}
+                      >
+                        {t(`hitl.researchUnified.perspective.${key}`)}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
