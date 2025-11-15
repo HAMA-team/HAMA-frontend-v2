@@ -181,7 +181,6 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                           lineHeight: "1.5",
                         }}
                       >
-                        {console.log("🔍 [ThinkingSection] Rendering content:", step.content?.substring(0, 100))}
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           components={{
