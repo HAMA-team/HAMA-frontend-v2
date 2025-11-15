@@ -239,7 +239,7 @@ ${t("chat.receivedResponse")}
                 const clean = sanitizeThinkingDelta(ev.data);
                 if (clean) {
                   const { appendThinkingContent } = useChatStore.getState();
-                  appendThinkingContent(tempId, clean + "\n");
+                  appendThinkingContent(tempId, clean);
                   if (Math.random() < 0.02) console.log("💭 thinking:", clean);
                 }
                 break;
@@ -444,7 +444,7 @@ ${t("chat.receivedResponse")}
                   const clean = sanitizeThinkingDelta(ev.data);
                   if (clean) {
                     const { appendThinkingContent } = useChatStore.getState();
-                    appendThinkingContent(tempId, clean + "\n");
+                    appendThinkingContent(tempId, clean);
                   }
                   break;
                 }
