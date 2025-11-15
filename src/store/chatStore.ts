@@ -127,7 +127,10 @@ export const useChatStore = create<ChatStore>((set) => ({
       messages: state.messages.map((m) => {
         if (m.id !== messageId) return m;
         const thinking = m.thinking || [];
-        if (thinking.length === 0) return m;
+        if (thinking.length === 0) {
+          console.warn("⚠️ [appendThinkingContent] No thinking steps found for message:", messageId);
+          return m;
+        }
 
         // 마지막 thinking step의 content에 추가
         const lastIndex = thinking.length - 1;

@@ -259,11 +259,13 @@ ${t("chat.receivedResponse")}
               }
               case "agent_thinking": {
                 // AI 사고 내용을 실시간으로 마지막 thinking step에 추가 (노이즈 제거)
+                console.log("🔍 [DEBUG] agent_thinking received, raw data:", ev.data);
                 const clean = sanitizeThinkingDelta(ev.data);
+                console.log("🔍 [DEBUG] sanitized thinking:", clean ? `"${clean}"` : "(empty)");
                 if (clean) {
                   const { appendThinkingContent } = useChatStore.getState();
                   appendThinkingContent(tempId, clean);
-                  if (Math.random() < 0.02) console.log("💭 thinking:", clean);
+                  console.log("✅ Thinking appended to message:", tempId);
                 }
                 break;
               }
