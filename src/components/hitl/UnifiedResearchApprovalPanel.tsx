@@ -1,14 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Search } from "lucide-react";
+import { Search, Send } from "lucide-react";
 import type { ResearchApprovalRequest } from "@/lib/types/chat";
 
 interface UnifiedResearchApprovalPanelProps {
   request: ResearchApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
+  onModify?: (feedback: string) => void;
   variant?: "drawer" | "floating";
   disabled?: boolean;
 }
@@ -24,16 +25,36 @@ export default function UnifiedResearchApprovalPanel({
   request,
   onApprove,
   onReject,
+  onModify,
   variant = "drawer",
   disabled = false,
 }: UnifiedResearchApprovalPanelProps) {
   const { t } = useTranslation();
+  const [adjustmentRequest, setAdjustmentRequest] = useState("");
+  const [isDark, setIsDark] = useState(false);
+
+  React.useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDarkMode();
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // 선택 상태(데모용 로컬 상태) – 백엔드 권장값이 오면 기본값으로 매핑
   const [subgraph, setSubgraph] = React.useState<"qualitative" | "quantitative" | "both">("both");
   const [depth, setDepth] = React.useState<"brief" | "detailed" | "comprehensive">(request.depth_level || "detailed");
   const [scope, setScope] = React.useState<"narrow" | "balanced" | "broad">("balanced");
   const [perspectives, setPerspectives] = React.useState<string[]>(["macro", "fundamental", "technical"]);
+
+  const handleModify = () => {
+    if (onModify && adjustmentRequest.trim()) {
+      onModify(adjustmentRequest);
+      setAdjustmentRequest("");
+    }
+  };
 
   const depthLabel = (key: string) =>
     key === "brief"
@@ -55,9 +76,9 @@ export default function UnifiedResearchApprovalPanel({
       : t("hitl.researchUnified.method.both");
 
   const chipStyle = (selected: boolean) => ({
-    backgroundColor: selected ? "var(--primary-100)" : "var(--container-background)",
-    color: selected ? "var(--primary-700)" : "var(--text-secondary)",
-    borderColor: selected ? "var(--primary-300)" : "var(--border-default)",
+    backgroundColor: selected ? (isDark ? "#ffffff" : "#000000") : "var(--container-background)",
+    color: selected ? (isDark ? "#000000" : "#ffffff") : "var(--text-secondary)",
+    borderColor: selected ? (isDark ? "#ffffff" : "#000000") : "var(--border-default)",
     fontWeight: selected ? 600 : 500,
   } as React.CSSProperties);
 
@@ -98,19 +119,28 @@ export default function UnifiedResearchApprovalPanel({
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
-        {/* Summary Card */}
-        <div className="rounded-lg border p-4" style={{ borderColor: "#fed7aa", backgroundColor: "#fff7ed" }}>
-          <div className="grid gap-y-2 items-start" style={{ display: "grid", gridTemplateColumns: "110px 1fr" }}>
-            {request.stock_code && request.stock_name && (
-              <>
-                <div className="text-sm" style={{ color: "var(--text-secondary)" }}>{t("hitl.unified.stock")}</div>
-                <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-                  {request.stock_name} ({request.stock_code})
-                </div>
-              </>
-            )}
-            <div className="text-sm" style={{ color: "var(--text-secondary)" }}>{t("hitl.research.query")}</div>
-            <div className="text-sm whitespace-pre-wrap break-words" style={{ color: "var(--text-primary)" }}>
+        {/* Stock & Query */}
+        <div
+          className="rounded-lg p-4 space-y-3"
+          style={{
+            backgroundColor: isDark ? "#374151" : "#e5e7eb",
+          }}
+        >
+          {request.stock_code && request.stock_name && (
+            <div>
+              <div className="text-sm mb-1" style={{ color: isDark ? "#9ca3af" : "#6b7280" }}>
+                {t("hitl.unified.stock")}
+              </div>
+              <div className="text-base font-semibold" style={{ color: isDark ? "#ffffff" : "#000000" }}>
+                {request.stock_name} ({request.stock_code})
+              </div>
+            </div>
+          )}
+          <div>
+            <div className="text-sm mb-1" style={{ color: isDark ? "#9ca3af" : "#6b7280" }}>
+              {t("hitl.research.query")}
+            </div>
+            <div className="text-sm whitespace-pre-wrap break-words" style={{ color: isDark ? "#e5e7eb" : "#374151" }}>
               {request.query}
             </div>
           </div>
@@ -143,7 +173,7 @@ export default function UnifiedResearchApprovalPanel({
                 <button
                   key={opt.key}
                   onClick={() => setDepth(opt.key as any)}
-                  className="px-3 py-2 rounded-lg text-sm border"
+                  className="flex-1 px-3 py-2 rounded-lg text-sm border"
                   style={chipStyle(depth === opt.key)}
                 >
                   {opt.label}
@@ -166,7 +196,7 @@ export default function UnifiedResearchApprovalPanel({
                 <button
                   key={opt.key}
                   onClick={() => setScope(opt.key as any)}
-                  className="px-3 py-2 rounded-lg text-sm border"
+                  className="flex-1 px-3 py-2 rounded-lg text-sm border"
                   style={chipStyle(scope === opt.key)}
                 >
                   {opt.label}
@@ -180,23 +210,36 @@ export default function UnifiedResearchApprovalPanel({
             <div className="text-xs mb-2" style={{ color: "var(--text-secondary)" }}>
               {t("hitl.researchUnified.plan.perspectives")}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {["macro", "fundamental", "technical", "flow", "strategy", "bull", "bear"].map((key) => (
-                <button
-                  key={key}
-                  onClick={() => togglePerspective(key)}
-                  className="px-3 py-2 rounded-lg text-sm border"
-                  style={chipStyle(perspectives.includes(key))}
-                >
-                  {t(`hitl.researchUnified.perspective.${key}`)}
-                </button>
-              ))}
+            <div className="space-y-2">
+              {/* 첫째 줄: 3개 */}
+              <div className="flex gap-2">
+                {["macro", "fundamental", "technical"].map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => togglePerspective(key)}
+                    className="flex-1 px-3 py-2 rounded-lg text-sm border"
+                    style={chipStyle(perspectives.includes(key))}
+                  >
+                    {t(`hitl.researchUnified.perspective.${key}`)}
+                  </button>
+                ))}
+              </div>
+              {/* 둘째 줄: 4개 */}
+              <div className="flex gap-2">
+                {["flow", "strategy", "bull", "bear"].map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => togglePerspective(key)}
+                    className="flex-1 px-3 py-2 rounded-lg text-sm border"
+                    style={chipStyle(perspectives.includes(key))}
+                  >
+                    {t(`hitl.researchUnified.perspective.${key}`)}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Divider */}
-        <div className="border-t" style={{ borderColor: "var(--border-default)" }} />
 
         {/* Method: Qualitative / Quantitative / Both */}
         <div className="space-y-3">
@@ -212,7 +255,7 @@ export default function UnifiedResearchApprovalPanel({
               <button
                 key={opt.key}
                 onClick={() => setSubgraph(opt.key as any)}
-                className="px-3 py-2 rounded-lg text-sm border"
+                className="flex-1 px-3 py-2 rounded-lg text-sm border"
                 style={chipStyle(subgraph === opt.key)}
               >
                 {opt.label}
@@ -220,30 +263,120 @@ export default function UnifiedResearchApprovalPanel({
             ))}
           </div>
         </div>
+
+        {/* Adjustment Request */}
+        <div>
+          <h3
+            className="text-lg font-semibold mb-1"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {t("hitl.unified.adjustmentRequest")}
+          </h3>
+          <p className="text-sm mb-3" style={{ color: "var(--text-secondary)" }}>
+            {t("hitl.unified.adjustmentDescription")}
+          </p>
+          <div className="relative">
+            <textarea
+              value={adjustmentRequest}
+              onChange={(e) => setAdjustmentRequest(e.target.value)}
+              placeholder={t("hitl.unified.adjustmentPlaceholder")}
+              className="w-full px-3 py-2.5 pr-12 rounded-lg border resize-none"
+              style={{
+                backgroundColor: "var(--container-background)",
+                borderColor: "var(--border-default)",
+                color: "var(--text-primary)",
+                minHeight: "80px",
+              }}
+            />
+            <button
+              onClick={handleModify}
+              disabled={!adjustmentRequest.trim()}
+              className="absolute bottom-2.5 right-2.5 p-2 rounded-lg transition-colors disabled:opacity-40"
+              style={{
+                backgroundColor: "#60a5fa",
+                color: "white",
+              }}
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}
-      <div className="flex gap-3 px-6 py-4 border-t" style={{ borderColor: "var(--border-default)" }}>
-        <button
-          onClick={disabled ? undefined : onReject}
-          disabled={disabled}
-          className="flex-1 px-6 py-3 rounded-lg font-medium transition-colors"
-          style={{
-            backgroundColor: disabled ? "var(--border-default)" : "var(--container-background)",
-            color: disabled ? "var(--text-secondary)" : "var(--text-secondary)",
-            border: "1px solid var(--border-default)",
-          }}
-        >
-          {t("hitl.reject")}
-        </button>
-        <button
-          onClick={disabled ? undefined : onApprove}
-          disabled={disabled}
-          className="flex-1 px-6 py-3 rounded-lg font-medium"
-          style={{ backgroundColor: "var(--primary-500)", color: "var(--lnb-active-text)" }}
-        >
-          {t("hitl.approve")}
-        </button>
+      <div
+        className="px-6 py-4 border-t"
+        style={{ borderColor: "var(--border-default)" }}
+      >
+        <div className="flex gap-3">
+          {/* Reject Button */}
+          <button
+            onClick={onReject}
+            disabled={disabled}
+            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: "#ef4444",
+              color: "white",
+            }}
+            onMouseEnter={(e) => {
+              if (!disabled) {
+                e.currentTarget.style.backgroundColor = "#dc2626";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#ef4444";
+            }}
+          >
+            {t("hitl.reject")}
+          </button>
+
+          {/* Modify Button */}
+          <button
+            onClick={handleModify}
+            disabled={disabled || !adjustmentRequest.trim()}
+            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: adjustmentRequest.trim()
+                ? (isDark ? "#374151" : "#ffffff")
+                : "var(--container-background)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border-default)",
+            }}
+            onMouseEnter={(e) => {
+              if (!disabled && adjustmentRequest.trim()) {
+                e.currentTarget.style.backgroundColor = isDark ? "#4b5563" : "#f9fafb";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = adjustmentRequest.trim()
+                ? (isDark ? "#374151" : "#ffffff")
+                : "var(--container-background)";
+            }}
+          >
+            {t("hitl.unified.modify")}
+          </button>
+
+          {/* Approve Button */}
+          <button
+            onClick={onApprove}
+            disabled={disabled}
+            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: "#2563eb",
+              color: "white",
+            }}
+            onMouseEnter={(e) => {
+              if (!disabled) {
+                e.currentTarget.style.backgroundColor = "#1d4ed8";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#2563eb";
+            }}
+          >
+            {t("hitl.approve")}
+          </button>
+        </div>
       </div>
     </div>
   );
