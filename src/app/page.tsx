@@ -16,6 +16,7 @@ import { sendChat } from "@/lib/api/chat";
 import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useUserStore } from "@/store/userStore";
 import { MOCK_UNIFIED_TRADING_HIGH_RISK } from "@/lib/mock/unifiedTradingMock";
+import { getAgentActivityLabel, parseAgentMessage } from "@/lib/agentLabels";
 
 /**
  * Home Page - Chat Interface
@@ -197,40 +198,62 @@ ${t("chat.receivedResponse")}
                 break;
               }
               case "agent_start": {
-                // "PORTFOLIO Agent 실행 중..." 같은 메시지 추가
-                if (ev.data?.message) {
-                  const { addThinkingStep } = useChatStore.getState();
-                  addThinkingStep(tempId, {
-                    agent: ev.data.agent || "unknown",
-                    description: ev.data.message,
-                    timestamp: now,
-                  });
-                  console.log("✅ Added thinking step (agent_start):", ev.data.agent, ev.data.message);
-                }
+                // Agent 시작 메시지를 사용자 친화적으로 변환
+                const { addThinkingStep } = useChatStore.getState();
+                const agent = ev.data?.agent;
+                const node = ev.data?.node;
+                const originalMessage = ev.data?.message;
+
+                // 원본 메시지에서 agent/node 파싱 시도
+                const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                const finalAgent = agent || parsed.agent;
+                const finalNode = node || parsed.node;
+
+                // 사용자 친화적인 메시지 생성
+                const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                addThinkingStep(tempId, {
+                  agent: finalAgent || "unknown",
+                  description: friendlyMessage,
+                  timestamp: now,
+                });
+                console.log("✅ Agent start:", finalAgent, "→", friendlyMessage);
                 break;
               }
               case "agent_node": {
-                // 실시간으로 thinking steps 추가
-                if (ev.data?.status === "complete" && ev.data?.message) {
-                  const { addThinkingStep } = useChatStore.getState();
+                const { addThinkingStep } = useChatStore.getState();
+                const agent = ev.data?.agent;
+                const node = ev.data?.node;
+                const originalMessage = ev.data?.message;
+
+                // 원본 메시지에서 agent/node 파싱
+                const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                const finalAgent = agent || parsed.agent;
+                const finalNode = node || parsed.node;
+
+                // 사용자 친화적인 메시지 생성
+                const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                // complete 상태
+                if (ev.data?.status === "complete") {
                   addThinkingStep(tempId, {
-                    agent: ev.data.node || ev.data.agent || "unknown",
-                    description: ev.data.message,
+                    agent: finalAgent || finalNode || "unknown",
+                    description: friendlyMessage,
                     timestamp: now,
                   });
-                  console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
+                  console.log("✅ Node complete:", finalNode, "→", friendlyMessage);
                 }
-                // agent_node running 상태일 때도 step 추가 (content는 나중에 agent_thinking에서 채움)
-                if (ev.data?.status === "running" && ev.data?.message) {
-                  const { addThinkingStep } = useChatStore.getState();
+
+                // running 상태 (content는 agent_thinking에서 채움)
+                if (ev.data?.status === "running") {
                   addThinkingStep(tempId, {
-                    agent: ev.data.agent || "unknown",
-                    description: ev.data.message,
+                    agent: finalAgent || "unknown",
+                    description: friendlyMessage,
                     timestamp: now,
-                    node: ev.data.node,
-                    content: "", // 초기 빈 content (agent_thinking에서 채워짐)
+                    node: finalNode,
+                    content: "",
                   });
-                  console.log("🔄 Added thinking step (agent_node running):", ev.data.node);
+                  console.log("🔄 Node running:", finalNode, "→", friendlyMessage);
                 }
                 break;
               }
@@ -404,39 +427,53 @@ ${t("chat.receivedResponse")}
                   break;
                 }
                 case "agent_start": {
-                  if (ev.data?.message) {
-                    const { addThinkingStep } = useChatStore.getState();
-                    addThinkingStep(tempId, {
-                      agent: ev.data.agent || "unknown",
-                      description: ev.data.message,
-                      timestamp: now,
-                    });
-                    console.log("✅ Added thinking step (agent_start):", ev.data.agent, ev.data.message);
-                  }
+                  const { addThinkingStep } = useChatStore.getState();
+                  const agent = ev.data?.agent;
+                  const node = ev.data?.node;
+                  const originalMessage = ev.data?.message;
+
+                  const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                  const finalAgent = agent || parsed.agent;
+                  const finalNode = node || parsed.node;
+                  const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                  addThinkingStep(tempId, {
+                    agent: finalAgent || "unknown",
+                    description: friendlyMessage,
+                    timestamp: now,
+                  });
+                  console.log("✅ Agent start (retry):", finalAgent, "→", friendlyMessage);
                   break;
                 }
                 case "agent_node": {
-                  // 실시간으로 thinking steps 추가
-                  if (ev.data?.status === "complete" && ev.data?.message) {
-                    const { addThinkingStep } = useChatStore.getState();
+                  const { addThinkingStep } = useChatStore.getState();
+                  const agent = ev.data?.agent;
+                  const node = ev.data?.node;
+                  const originalMessage = ev.data?.message;
+
+                  const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                  const finalAgent = agent || parsed.agent;
+                  const finalNode = node || parsed.node;
+                  const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                  if (ev.data?.status === "complete") {
                     addThinkingStep(tempId, {
-                      agent: ev.data.node || ev.data.agent || "unknown",
-                      description: ev.data.message,
+                      agent: finalAgent || finalNode || "unknown",
+                      description: friendlyMessage,
                       timestamp: now,
                     });
-                    console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
+                    console.log("✅ Node complete (retry):", finalNode, "→", friendlyMessage);
                   }
-                  // agent_node running 상태일 때도 step 추가
-                  if (ev.data?.status === "running" && ev.data?.message) {
-                    const { addThinkingStep } = useChatStore.getState();
+
+                  if (ev.data?.status === "running") {
                     addThinkingStep(tempId, {
-                      agent: ev.data.agent || "unknown",
-                      description: ev.data.message,
+                      agent: finalAgent || "unknown",
+                      description: friendlyMessage,
                       timestamp: now,
-                      node: ev.data.node,
+                      node: finalNode,
                       content: "",
                     });
-                    console.log("🔄 Added thinking step (agent_node running):", ev.data.node);
+                    console.log("🔄 Node running (retry):", finalNode, "→", friendlyMessage);
                   }
                   break;
                 }
