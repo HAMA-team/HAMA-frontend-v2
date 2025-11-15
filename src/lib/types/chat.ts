@@ -70,8 +70,18 @@ export interface ChatResponse {
 
 /**
  * Agent 타입 (HITL용)
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
-export type HITLAgentType = "research" | "strategy" | "portfolio" | "risk" | "trading";
+export type HITLAgentType =
+  | "research"
+  | "research_plan_approval"
+  | "strategy"
+  | "portfolio"
+  | "rebalance_approval"
+  | "risk"
+  | "trading"
+  | "trade_approval";
 
 /**
  * HITL 승인 요청 베이스
