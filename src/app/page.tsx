@@ -817,6 +817,66 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     }
   };
 
+  const handleModify = async (messageId: string, modifications: Record<string, any>, userInput?: string) => {
+    if (approvalBusy) return;
+    setApprovalBusy(true);
+    try {
+      // 수정 결정을 사용자 메시지로 추가
+      const modificationMessage: Message = {
+        id: `approval-decision-${Date.now()}`,
+        role: "user",
+        content: `✏️ **${t("hitl.unified.modify") || "수정 후 승인"}**${userInput ? `\n\n${userInput}` : ""}`,
+        timestamp: new Date().toISOString(),
+        status: "sent",
+      };
+      addMessage(modificationMessage);
+
+      if (mode === "demo") {
+        closeApprovalPanel();
+        return;
+      }
+      if (!currentThreadId) {
+        openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
+        return;
+      }
+
+      console.log("🔑 Modifying with thread_id:", currentThreadId);
+      console.log("📋 Modifications:", modifications);
+      console.log("📝 User input:", userInput);
+
+      let requestId: string | undefined;
+      if (approvalPanel.data && (approvalPanel.data as any).request_id) {
+        requestId = String((approvalPanel.data as any).request_id);
+      }
+
+      // HITL-MODIFY-PATTERN.md에 따라 decision: "modified" + modifications + user_input 전송
+      await approveAction({
+        thread_id: currentThreadId,
+        decision: "modified",
+        request_id: requestId,
+        modifications: Object.keys(modifications).length > 0 ? modifications : undefined,
+        user_input: userInput,
+      });
+
+      console.log("Modify:", messageId, currentThreadId);
+      closeApprovalPanel();
+
+    } catch (error) {
+      console.error("Modification error:", error);
+      closeApprovalPanel();
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const axiosError = error as any;
+      const serverMsg = axiosError?.response?.data?.detail || axiosError?.response?.data?.message || errorMsg;
+      console.error("Server error detail:", serverMsg);
+      openAlert({
+        title: t('common.error'),
+        message: `수정 실패: ${serverMsg}`
+      });
+    } finally {
+      try { setApprovalBusy(false); } catch {}
+    }
+  };
+
   // TEST: HITL 패널 테스트용 함수 (개발 완료 후 제거)
   const handleTestHITL = (agentType: string) => {
     const testData: Record<string, any> = {
@@ -983,7 +1043,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
           messageId="temp-message-id"
           onApprove={handleApprove}
           onReject={handleReject}
-          variant="floating" disabled={approvalBusy}
+          onModify={handleModify}
+          variant="floating"
+          disabled={approvalBusy}
         />
       )}
     </div>

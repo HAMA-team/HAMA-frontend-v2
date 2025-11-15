@@ -9,7 +9,7 @@ interface UnifiedResearchApprovalPanelProps {
   request: ResearchApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
-  onModify?: (feedback: string) => void;
+  onModify?: (modifications: { depth?: string; scope?: string; perspectives?: string[] }, userInput?: string) => void;
   variant?: "drawer" | "floating";
   disabled?: boolean;
 }
@@ -50,8 +50,26 @@ export default function UnifiedResearchApprovalPanel({
   const [perspectives, setPerspectives] = React.useState<string[]>(["macro", "fundamental", "technical"]);
 
   const handleModify = () => {
-    if (onModify && adjustmentRequest.trim()) {
-      onModify(adjustmentRequest);
+    if (onModify) {
+      // 구조화된 수정사항 생성
+      const modifications: { depth?: string; scope?: string; perspectives?: string[] } = {};
+
+      // 변경된 값만 포함
+      if (depth !== request.depth_level) {
+        modifications.depth = depth;
+      }
+      // scope는 request에 없으므로 항상 포함
+      modifications.scope = scope;
+      // perspectives 변경 확인
+      const originalPerspectives = (request as any).perspectives || [];
+      if (JSON.stringify(perspectives.sort()) !== JSON.stringify(originalPerspectives.sort())) {
+        modifications.perspectives = perspectives;
+      }
+
+      // user_input은 선택사항
+      const userInput = adjustmentRequest.trim() || undefined;
+
+      onModify(modifications, userInput);
       setAdjustmentRequest("");
     }
   };

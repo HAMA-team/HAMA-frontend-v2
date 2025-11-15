@@ -125,12 +125,18 @@ export interface AutomationLevelUpdateResponse {
 
 /**
  * POST /api/v1/chat/approve 요청
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export interface ApprovalRequest {
   thread_id: string;
   decision: "approved" | "rejected" | "modified";
   request_id?: string;
+  /** 구조화된 수정사항 (decision: "modified"일 때 사용) */
   modifications?: Record<string, any>;
+  /** 자유 텍스트 입력 (선택사항, decision: "modified" 또는 "rejected"일 때 사용) */
+  user_input?: string;
+  /** @deprecated Use user_input instead */
   user_notes?: string;
 }
 

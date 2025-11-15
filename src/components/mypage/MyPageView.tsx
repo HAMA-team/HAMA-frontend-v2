@@ -127,17 +127,17 @@ export default function MyPageView() {
         </div>
       </section>
 
-      {/* 섹션 2: 자동화 레벨 설정 ⭐ Phase 2 */}
-      <section>
-        <AutomationLevelSelector />
-      </section>
-
-      {/* 섹션 2.5: HITL Control */}
+      {/* 섹션 2: 자동화 레벨 설정 ⭐ Phase 2 (Demo 모드에서만 표시) */}
       {mode === "demo" && (
         <section>
-          <SimplifiedHITLSettings />
+          <AutomationLevelSelector />
         </section>
       )}
+
+      {/* 섹션 2.5: HITL Control (Live 모드: AutomationLevel 대신 이것만 표시) */}
+      <section>
+        <SimplifiedHITLSettings />
+      </section>
 
       {/* 섹션 3: 투자 성향 프로필 (Phase 3 구조만) */}
       <section>

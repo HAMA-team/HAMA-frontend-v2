@@ -27,7 +27,7 @@ interface UnifiedTradingApprovalPanelProps {
   request: UnifiedTradingApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
-  onModify?: (feedback: string) => void;
+  onModify?: (modifications: { quantity?: number; price?: number; action?: string }, userInput?: string) => void;
   variant?: "drawer" | "floating";
   disabled?: boolean;
 }
@@ -89,8 +89,12 @@ export default function UnifiedTradingApprovalPanel({
   const isSell = request.action === "SELL" || request.action === "sell";
 
   const handleModify = () => {
-    if (onModify && adjustmentRequest.trim()) {
-      onModify(adjustmentRequest);
+    if (onModify) {
+      // TODO: 현재는 user_input만 지원. 향후 quantity/price/action 수정 UI 추가 필요
+      const modifications: { quantity?: number; price?: number; action?: string } = {};
+      const userInput = adjustmentRequest.trim() || undefined;
+
+      onModify(modifications, userInput);
       setAdjustmentRequest("");
     }
   };
