@@ -202,6 +202,7 @@ ${t("chat.receivedResponse")}
                     agent: finalAgent,
                     description: friendlyMessage,
                     timestamp: now,
+                    reasoning_event: ev.data?.reasoning_event,
                   });
                   console.log("✅ Master start:", originalMessage, "→", friendlyMessage);
                 }
@@ -226,6 +227,7 @@ ${t("chat.receivedResponse")}
                   agent: finalAgent || "unknown",
                   description: friendlyMessage,
                   timestamp: now,
+                  reasoning_event: ev.data?.reasoning_event,
                 });
                 console.log("✅ Agent start:", finalAgent, "→", friendlyMessage);
                 break;
@@ -250,6 +252,7 @@ ${t("chat.receivedResponse")}
                     agent: finalAgent || finalNode || "unknown",
                     description: friendlyMessage,
                     timestamp: now,
+                    reasoning_event: ev.data?.reasoning_event,
                   });
                   console.log("✅ Node complete:", finalNode, "→", friendlyMessage);
                 }
@@ -262,6 +265,7 @@ ${t("chat.receivedResponse")}
                     timestamp: now,
                     node: finalNode,
                     content: "",
+                    reasoning_event: ev.data?.reasoning_event,
                   });
                   console.log("🔄 Node running:", finalNode, "→", friendlyMessage);
                 }
