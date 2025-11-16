@@ -75,8 +75,11 @@ export default function UnifiedTradingApprovalPanel({
 
   const hasRiskInfo = request.risk_level && request.risk_warnings && request.risk_warnings.length > 0;
 
-  const isSell = request.action === "SELL" || request.action === "sell";
-  const isEdited = editedQuantity !== request.quantity || editedPrice !== request.price || editedAction !== request.action;
+  const isSell = (request.action || "buy").toLowerCase() === "sell";
+  const isEdited =
+    editedQuantity !== request.quantity ||
+    editedPrice !== request.price ||
+    editedAction.toLowerCase() !== request.action;
 
   // 수정된 총 금액 계산
   const editedTotalAmount = editedQuantity * editedPrice;
