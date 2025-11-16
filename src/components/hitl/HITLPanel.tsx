@@ -2,17 +2,17 @@
 
 import React from "react";
 import type { ApprovalRequest } from "@/lib/types/chat";
-import ResearchApprovalPanel from "./ResearchApprovalPanel";
+import UnifiedResearchApprovalPanel from "./UnifiedResearchApprovalPanel";
+import UnifiedTradingApprovalPanel from "./UnifiedTradingApprovalPanel";
+import UnifiedPortfolioApprovalPanel from "./UnifiedPortfolioApprovalPanel";
 import StrategyApprovalPanel from "./StrategyApprovalPanel";
-import PortfolioApprovalPanel from "./PortfolioApprovalPanel";
-import RiskApprovalPanel from "./RiskApprovalPanel";
-import TradingApprovalPanel from "./TradingApprovalPanel";
 
 interface HITLPanelProps {
   request: ApprovalRequest;
   messageId: string;
   onApprove: (messageId: string) => void;
   onReject: (messageId: string) => void;
+  onModify?: (messageId: string, modifications: Record<string, any>, userInput?: string) => void;
   variant?: "drawer" | "floating";
   disabled?: boolean;
 }
@@ -20,35 +20,67 @@ interface HITLPanelProps {
 /**
  * HITLPanel Router Component
  *
- * Agent type에 따라 적절한 승인 패널을 렌더링합니다.
- * - Research Agent: 분석 실행 승인
- * - Strategy Agent: 투자 전략 승인
- * - Portfolio Agent: 포트폴리오 리밸런싱 승인
- * - Risk Agent: 리스크 경고 확인
- * - Trading Agent: 매매 주문 승인
+ * HITL 승인 요청 타입에 따라 적절한 Unified 패널을 렌더링합니다.
+ * - research_plan_approval: UnifiedResearchApprovalPanel
+ * - trade_approval: UnifiedTradingApprovalPanel
+ * - rebalance_approval: UnifiedPortfolioApprovalPanel
+ * - strategy: StrategyApprovalPanel (legacy)
  *
- * @see docs/HITL_Panel_Specifications.md
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export default function HITLPanel({
   request,
   messageId,
   onApprove,
   onReject,
+  onModify,
   variant = "drawer",
   disabled = false,
 }: HITLPanelProps) {
-  // Agent type에 따른 handlers
   const handleApprove = () => onApprove(messageId);
   const handleReject = () => onReject(messageId);
+  const handleModify = (modifications: Record<string, any>, userInput?: string) => {
+    if (onModify) {
+      onModify(messageId, modifications, userInput);
+    }
+  };
 
-  // Agent type 기반 라우팅
+  // HITL-MODIFY-PATTERN.md에 따른 타입 라우팅
   switch (request.type) {
     case "research":
+    case "research_plan_approval":
       return (
-        <ResearchApprovalPanel
+        <UnifiedResearchApprovalPanel
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}
+          onModify={handleModify}
+          variant={variant}
+          disabled={disabled}
+        />
+      );
+
+    case "trading":
+    case "trade_approval":
+      return (
+        <UnifiedTradingApprovalPanel
+          request={request}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onModify={handleModify}
+          variant={variant}
+          disabled={disabled}
+        />
+      );
+
+    case "portfolio":
+    case "rebalance_approval":
+      return (
+        <UnifiedPortfolioApprovalPanel
+          request={request}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onModify={handleModify}
           variant={variant}
           disabled={disabled}
         />
@@ -65,38 +97,72 @@ export default function HITLPanel({
         />
       );
 
-    case "portfolio":
-      return (
-        <PortfolioApprovalPanel
-          request={request}
-          onApprove={handleApprove}
-          onReject={handleReject}
-          variant={variant}
-          disabled={disabled}
-        />
-      );
-
     case "risk":
-      return (
-        <RiskApprovalPanel
-          request={request}
-          onApprove={handleApprove}
-          onReject={handleReject}
-          variant={variant}
-          disabled={disabled}
-        />
-      );
-
-    case "trading":
     default:
+      // Risk 또는 지원하지 않는 타입 - 간단한 승인/거부 UI
+      console.warn("Unsupported or legacy approval request type:", request.type);
       return (
-        <TradingApprovalPanel
-          request={request}
-          onApprove={handleApprove}
-          onReject={handleReject}
-          variant={variant}
-          disabled={disabled}
-        />
+        <div
+          className={
+            variant === "floating"
+              ? "fixed bottom-4 right-4 z-hitl-panel shadow-2xl rounded-xl overflow-hidden"
+              : "fixed top-0 right-0 h-screen z-hitl-panel shadow-2xl overflow-hidden"
+          }
+          style={{
+            width: "min(90vw, 500px)",
+            maxHeight: variant === "floating" ? "80vh" : undefined,
+            backgroundColor: "var(--container-background)",
+            borderLeft: variant === "floating" ? undefined : "1px solid var(--border-default)",
+            border: variant === "floating" ? "1px solid var(--border-default)" : undefined,
+          }}
+        >
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="px-6 py-4 border-b" style={{ borderColor: "var(--border-default)" }}>
+              <h2 className="text-xl font-semibold" style={{ color: "var(--text-primary)" }}>
+                Approval Required
+              </h2>
+              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                Type: {request.type}
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-6">
+              <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                This approval type does not have a dedicated panel. Please review the request and approve or reject.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t" style={{ borderColor: "var(--border-default)" }}>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleReject}
+                  disabled={disabled}
+                  className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                  style={{
+                    backgroundColor: "#ef4444",
+                    color: "white",
+                  }}
+                >
+                  Reject
+                </button>
+                <button
+                  onClick={handleApprove}
+                  disabled={disabled}
+                  className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                  style={{
+                    backgroundColor: "#2563eb",
+                    color: "white",
+                  }}
+                >
+                  Approve
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       );
   }
 }

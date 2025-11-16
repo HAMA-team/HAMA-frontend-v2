@@ -6,6 +6,7 @@
                    "delete":  "Delete",
                    "rename":  "Rename",
                    "edit":  "Edit",
+                   "modified": "Modified",
                    "close":  "Close",
                    "loading":  "Loading...",
                    "error":  "An error occurred",
@@ -21,7 +22,7 @@
                 "portfolio":  "Portfolio",
                 "artifacts":  "Artifacts",
                 "mypage":  "My Page",
-                "discover":  "Discover",
+                "about":  "About",
                 "newChat":  "New Chat",
                 "recentChats":  "Recent Chats",
                 "collapseMenu":  "Collapse sidebar",
@@ -87,7 +88,7 @@
                                                                                "description":  "AI-powered personalized investment ideas",
                                                                                "prompt":  "Please recommend stocks suitable for beginners who are just starting to invest. Focus on stable yet growth-potential stocks from a long-term investment perspective, and also recommend books that can help learn about stock investing."
                                                                            },
-                                                        "risk":  {
+    "risk":  {
                                                                      "title":  "Risk Analysis",
                                                                      "description":  "Review portfolio risk factors",
                                                                      "prompt":  "Please analyze the risk factors in my current portfolio. Evaluate sector concentration, volatility, and potential maximum drawdown, and provide specific improvement measures to reduce risks."
@@ -118,10 +119,11 @@
                  "currentWeight":  "Current",
                  "expectedWeight":  "Expected",
                  "riskWarning":  "Risk Warning",
-                 "alternatives":  "Recommended Alternatives",
                  "shares":  "shares",
                  "approve":  "Approve",
                  "reject":  "Reject",
+                 "approved":  "Approved",
+                 "rejected":  "Rejected",
                  "approvalNote":  "* Trade will be executed immediately upon approval",
                  "noDetails":  "No detailed order information was provided",
                  "approved":  "Buy order has been executed",
@@ -224,9 +226,131 @@
                                  "expectedWeight":  "Expected Weight",
                                  "riskWarning":  "Risk Warning"
                              },
+                 "unified":  {
+                                 "title":  "Trade Approval",
+                                 "highRiskDetected":  "High Risk Detected",
+                                 "reviewCarefully":  "Please review the trade details and risk factors carefully before proceeding.",
+                                 "portfolioRisk":  "Portfolio Risk Assessment",
+                                 "concentration":  "Concentration",
+                                 "volatility":  "Volatility",
+                                 "maxDrawdown":  "Max Drawdown",
+                                 "tradeDetails":  "Trade Information",
+                                 "stock":  "Stock",
+                                 "tradeType":  "Trade Type",
+                                 "quantity":  "Quantity",
+                                 "price":  "Price per Share",
+                                 "totalAmount":  "Total Amount",
+                                 "portfolioImpact":  "Portfolio Impact",
+                                 "currentWeight":  "Current Weight",
+                                 "expectedWeight":  "Expected Weight",
+                                 "riskFactors":  "Risk Factors",
+                                 "recommendations":  "Recommended Actions",
+                                 "amount":  "Amount",
+                                 "approvalNote":  "* Trade will be executed immediately upon approval"
+                             },
                  "approved":  "Approved",
-                 "rejected":  "Rejected"
-             },
+        "rejected":  "Rejected"
+    },
+    "hitl": {
+      "approve":  "Approve",
+      "reject":  "Reject",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "buy": "Buy",
+      "sell": "Sell",
+      "shares": "shares",
+      "pending": "Pending Approval",
+      "unified":  {
+        "title":  "Trade Approval",
+        "tradeInformation": "Trade Information",
+        "tradingType": "Trading Type",
+        "stock":  "Stock",
+        "quantity":  "Quantity",
+        "pricePerShare":  "Price/Share",
+        "totalAmount":  "Total Amount",
+        "quantityAfterTrade": "Quantity After trading",
+        "portfolioImpact":  "Portfolio Impact",
+        "riskDetection": "Risk Detection",
+        "highRiskDetected":  "High Risk Detected",
+        "reviewCarefully":  "Please review the trade details and risk factors carefully before proceeding.",
+        "adjustmentRequest": "Adjustment Request",
+        "adjustmentDescription": "Share your feedback or request adjustments to this trade.",
+        "adjustmentPlaceholder": "Type your message here...",
+        "modify": "Modify",
+        "portfolioRisk":  "Portfolio Risk Assessment",
+        "concentration":  "Concentration",
+        "volatility":  "Volatility",
+        "maxDrawdown":  "Max Drawdown",
+        "tradeDetails":  "Trade Information",
+        "tradeType":  "Trade Type",
+        "price":  "Price per Share",
+        "currentWeight":  "Current Weight",
+        "expectedWeight":  "Expected Weight",
+        "riskFactors":  "Risk Factors",
+        "recommendations":  "Recommended Actions",
+        "amount":  "Amount",
+        "approvalNote":  "* Trade will be executed immediately upon approval"
+      },
+      "researchUnified": {
+        "title": "Research Plan Approval",
+        "plan": {
+          "title": "Analysis Plan",
+          "depth": "Depth",
+          "scope": "Scope",
+          "perspectives": "Perspectives"
+        },
+        "scope": {
+          "narrow": "Key points only",
+          "balanced": "Balanced",
+          "broad": "Wide coverage"
+        },
+        "method": {
+          "title": "Method",
+          "qualitative": "Qualitative",
+          "quantitative": "Quantitative",
+          "both": "Both"
+        },
+        "perspective": {
+          "macro": "Macro",
+          "fundamental": "Fundamental",
+          "technical": "Technical",
+          "flow": "Flow",
+          "strategy": "Strategy",
+          "bull": "Bull case",
+          "bear": "Bear case"
+        }
+      },
+      "research": {
+        "title": "Analysis Execution Approval",
+        "query": "Query",
+        "complexityLabel": "Analysis Complexity",
+        "depthLabel": "Analysis Depth",
+        "routingReason": "Routing Reason",
+        "reason": "Rationale",
+        "info": "This analysis utilizes external data sources and AI models to provide comprehensive insights.",
+        "complexity": {
+          "label": "Complexity",
+          "simple": "Simple",
+          "moderate": "Moderate",
+          "expert": "Expert"
+        },
+        "depth": {
+          "label": "Depth",
+          "brief": "Brief",
+          "detailed": "Detailed",
+          "comprehensive": "Comprehensive"
+        }
+      },
+      "demo": {
+        "research": {
+          "query": "Please analyze Samsung Electronics' recent performance and outlook.",
+          "routingReason": "Complex inquiry that benefits from expert-level analysis"
+        },
+        "stocks": {
+          "samsungElectronics": "Samsung Electronics"
+        }
+      }
+    },
     "portfolio":  {
                       "title":  "Portfolio",
                       "summary":  {
@@ -413,6 +537,59 @@
                                       "title":  "Try Investment Profiling",
                                       "description":  "Discover your investment style through 4 questions and get personalized AI service",
                                       "button":  "Start Onboarding"
+                                  },
+                   "hitlControl": {
+                                      "title": "HITL Control",
+                                      "subtitle": "Choose between AI automation and manual approval. Toggle ON to approve actions yourself, or leave OFF for AI to proceed automatically.",
+                                      "masterToggle": {
+                                                         "title": "Manual Approval Mode",
+                                                         "description": "Controls both Research and Portfolio approval together. Trading approval is always required for safety.",
+                                                         "note": "Toggle ON = You approve Research & Portfolio manually. Toggle OFF = AI executes automatically. Trading always requires approval."
+                                                     },
+                                      "badges": {
+                                                    "alwaysRequired": "Always Required",
+                                                    "linkedToToggle": "Linked to Toggle"
+                                                },
+                                      "trading": {
+                                                     "title": "Trading",
+                                                     "description": "Final approval before executing trade orders",
+                                                     "features": {
+                                                                     "reviewRisk": "Review risk analysis results",
+                                                                     "confirmChanges": "Confirm portfolio changes",
+                                                                     "approveOrder": "Approve order quantity and price"
+                                                                 }
+                                                 },
+                                      "research": {
+                                                      "title": "Research",
+                                                      "description": "Approval request before executing stock analysis",
+                                                      "features": {
+                                                                      "setDepth": "Set analysis depth level",
+                                                                      "defineScope": "Define analysis scope",
+                                                                      "selectSources": "Select data sources"
+                                                                  }
+                                                  },
+                                      "portfolio": {
+                                                       "title": "Portfolio Rebalancing",
+                                                       "description": "Approve portfolio rebalancing strategy",
+                                                       "features": {
+                                                                       "adjustIntensity": "Adjust rebalancing intensity",
+                                                                       "determineDirection": "Determine investment direction",
+                                                                       "reflectSectors": "Reflect preferred sectors"
+                                                                   }
+                                                   },
+                                      "status": {
+                                                    "manualApproval": "Manual Approval",
+                                                    "autoExecution": "Auto Execution"
+                                                },
+                                      "simulator": {
+                                                      "portfolioChanges": "Portfolio Changes",
+                                                      "riskChanges": "Risk Changes",
+                                                      "cashBalance": "Cash",
+                                                      "weight": "Weight",
+                                                      "volatility": "Volatility",
+                                                      "maxDrawdown": "Max Drawdown",
+                                                      "recalculation": "The server will recalculate with modified values and provide updated before/after data."
+                                                  }
                                   }
                }
 }

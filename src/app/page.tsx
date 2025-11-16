@@ -15,6 +15,8 @@ import { useTranslation } from "react-i18next";
 import { sendChat } from "@/lib/api/chat";
 import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useUserStore } from "@/store/userStore";
+import { MOCK_UNIFIED_TRADING_HIGH_RISK } from "@/lib/mock/unifiedTradingMock";
+import { getAgentActivityLabel, parseAgentMessage } from "@/lib/agentLabels";
 
 /**
  * Home Page - Chat Interface
@@ -42,12 +44,56 @@ const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
 });
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
   const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId } = useChatStore();
   const { addArtifact } = useArtifactStore();
   const { openAlert } = useDialogStore();
   const { hitlConfig } = useUserStore();
+
+  // Sanitize noisy agent_thinking payloads (Supervisor raw dumps → concise text)
+  const sanitizeThinkingDelta = (data: any): string => {
+    if (!data) return "";
+
+    // Helper: normalize possible inputs to a candidate string
+    const pick = (s: any) => (typeof s === "string" ? s : "");
+    const candidate = pick((data as any).message) || pick((data as any).content) || pick((data as any).delta?.text) || (typeof data === "string" ? String(data) : "");
+
+    if (candidate) {
+      const raw = candidate.trim();
+      // 1) Pure JSON-ish blobs → drop
+      if (raw.startsWith("{") || raw.startsWith("[")) return "";
+
+      // 2) LangChain/Anthropic repr like:
+      //    content=[{'text': '...'}] additional_kwargs={} response_metadata=...
+      //    Extract only the text tokens
+      if (/content=\[/.test(raw) || /response_metadata=/.test(raw) || /additional_kwargs=/.test(raw) || /id='lc_run-/.test(raw)) {
+        const parts: string[] = [];
+        // 'text': '...'
+        const rxSingle = /'text':\s*'([^']+)'/g;
+        // "text": "..."
+        const rxDouble = /\"text\":\s*\"([^\"]+)\"/g;
+        let m: RegExpExecArray | null;
+        while ((m = rxSingle.exec(raw)) !== null) parts.push(m[1]);
+        while ((m = rxDouble.exec(raw)) !== null) parts.push(m[1]);
+        const joined = parts.join(" ");
+        return joined;
+      }
+
+      // 3) Otherwise, if it's a short sentence without obvious debug keys, keep it
+      if (/\b(additional_kwargs|response_metadata|tool_call|invalid_tool_call|args:|type:)\b/.test(raw)) return "";
+      return raw;
+    }
+
+    // 4) Tool call chunks → summarize to a short label
+    const name = (data?.tool_call_chunk?.name || data?.tool_call?.name || data?.name) as any;
+    if (name) return `🔧 Tool: ${String(name)}`;
+
+    // 5) Invalid tool noise or generic metadata → ignore
+    const type = String((data as any)?.type || "").toLowerCase();
+    if (type.includes("invalid") || type.includes("metadata")) return "";
+    return "";
+  };
   const [approvalBusy, setApprovalBusy] = React.useState(false);
 
   const handleSuggestionClick = async (prompt: string) => {
@@ -139,65 +185,130 @@ ${t("chat.receivedResponse")}
             switch (ev.event) {
               case "master_start": {
                 updateMessage(tempId, { status: "sending" });
-                // "분석을 시작합니다..." 메시지도 thinking에 추가
+                // Master 시작 메시지를 사용자 친화적으로 변환
                 if (ev.data?.message) {
                   const { addThinkingStep } = useChatStore.getState();
+                  const originalMessage = ev.data.message;
+
+                  // "supervisor start" 같은 메시지를 파싱
+                  const parsed = parseAgentMessage(originalMessage);
+                  const finalAgent = ev.data?.agent || parsed.agent || "master";
+                  const finalNode = ev.data?.node || parsed.node;
+
+                  // 사용자 친화적인 메시지 생성
+                  const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
                   addThinkingStep(tempId, {
-                    agent: "planner",
-                    description: ev.data.message,
+                    agent: finalAgent,
+                    description: friendlyMessage,
                     timestamp: now,
+                    reasoning_event: ev.data?.reasoning_event,
                   });
-                  console.log("✅ Added thinking step (master_start):", ev.data.message);
+                  console.log("✅ Master start:", originalMessage, "→", friendlyMessage);
                 }
                 break;
               }
               case "agent_start": {
-                // "PORTFOLIO Agent 실행 중..." 같은 메시지 추가
-                if (ev.data?.message) {
-                  const { addThinkingStep } = useChatStore.getState();
-                  addThinkingStep(tempId, {
-                    agent: ev.data.agent || "unknown",
-                    description: ev.data.message,
-                    timestamp: now,
-                  });
-                  console.log("✅ Added thinking step (agent_start):", ev.data.agent, ev.data.message);
-                }
+                // Agent 시작 메시지를 사용자 친화적으로 변환
+                const { addThinkingStep } = useChatStore.getState();
+                const agent = ev.data?.agent;
+                const node = ev.data?.node;
+                const originalMessage = ev.data?.message;
+
+                // 원본 메시지에서 agent/node 파싱 시도
+                const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                const finalAgent = agent || parsed.agent;
+                const finalNode = node || parsed.node;
+
+                // 사용자 친화적인 메시지 생성
+                const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                addThinkingStep(tempId, {
+                  agent: finalAgent || "unknown",
+                  description: friendlyMessage,
+                  timestamp: now,
+                  reasoning_event: ev.data?.reasoning_event,
+                });
+                console.log("✅ Agent start:", finalAgent, "→", friendlyMessage);
                 break;
               }
               case "agent_node": {
-                // 실시간으로 thinking steps 추가
-                if (ev.data?.status === "complete" && ev.data?.message) {
-                  const { addThinkingStep } = useChatStore.getState();
+                const { addThinkingStep } = useChatStore.getState();
+                const agent = ev.data?.agent;
+                const node = ev.data?.node;
+                const originalMessage = ev.data?.message;
+
+                // 원본 메시지에서 agent/node 파싱
+                const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                const finalAgent = agent || parsed.agent;
+                const finalNode = node || parsed.node;
+
+                // 사용자 친화적인 메시지 생성
+                const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                // complete 상태
+                if (ev.data?.status === "complete") {
                   addThinkingStep(tempId, {
-                    agent: ev.data.node || ev.data.agent || "unknown",
-                    description: ev.data.message,
+                    agent: finalAgent || finalNode || "unknown",
+                    description: friendlyMessage,
                     timestamp: now,
+                    reasoning_event: ev.data?.reasoning_event,
                   });
-                  console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
+                  console.log("✅ Node complete:", finalNode, "→", friendlyMessage);
                 }
-                // agent_node running 상태일 때도 step 추가 (content는 나중에 agent_thinking에서 채움)
-                if (ev.data?.status === "running" && ev.data?.message) {
-                  const { addThinkingStep } = useChatStore.getState();
+
+                // running 상태 (content는 agent_thinking에서 채움)
+                if (ev.data?.status === "running") {
                   addThinkingStep(tempId, {
-                    agent: ev.data.agent || "unknown",
-                    description: ev.data.message,
+                    agent: finalAgent || "unknown",
+                    description: friendlyMessage,
                     timestamp: now,
-                    node: ev.data.node,
-                    content: "", // 초기 빈 content (agent_thinking에서 채워짐)
+                    node: finalNode,
+                    content: "",
+                    reasoning_event: ev.data?.reasoning_event,
                   });
-                  console.log("🔄 Added thinking step (agent_node running):", ev.data.node);
+                  console.log("🔄 Node running:", finalNode, "→", friendlyMessage);
+                }
+                break;
+              }
+              case "agent_complete": {
+                // HITL: agent_complete에서 requires_approval 체크 (호환 경로)
+                const result = (ev as any)?.data?.result;
+                if (result && (result.requires_approval || result.status === "pending")) {
+                  const agentType = String((ev as any)?.data?.agent || "").toLowerCase();
+                  // Trading Agent HITL 처리
+                  if (agentType === "trading") {
+                    const hitlData = {
+                      type: "trading" as const,
+                      agent: "Trading" as const,
+                      action: (result.action || "buy") as "buy" | "sell",
+                      stock_code: result.stock_code || "000000",
+                      stock_name: result.stock_name || "종목명",
+                      quantity: result.quantity || 0,
+                      price: result.price || 0,
+                      total_amount: result.total_amount || 0,
+                      current_weight: result.current_weight || 0,
+                      expected_weight: result.expected_weight || 0,
+                      order_id: result.order_id,
+                      rationale: result.summary || "매수 주문이 생성되었습니다.",
+                      risk_warning: result.risk_warning || "",
+                      alternatives: result.alternatives || [],
+                    };
+                    try { openApprovalPanel(hitlData as any); } catch {}
+                  }
+                  // TODO: 다른 Agent 타입 처리 필요 시 추가 (portfolio, strategy 등)
                 }
                 break;
               }
               case "agent_thinking": {
-                // AI 사고 내용을 실시간으로 마지막 thinking step에 추가
-                if (ev.data?.content) {
+                // AI 사고 내용을 실시간으로 마지막 thinking step에 추가 (노이즈 제거)
+                console.log("🔍 [DEBUG] agent_thinking received, raw data:", ev.data);
+                const clean = sanitizeThinkingDelta(ev.data);
+                console.log("🔍 [DEBUG] sanitized thinking:", clean ? `"${clean}"` : "(empty)");
+                if (clean) {
                   const { appendThinkingContent } = useChatStore.getState();
-                  appendThinkingContent(tempId, ev.data.content);
-                  // 로그는 너무 많이 나올 수 있으므로 샘플링
-                  if (Math.random() < 0.01) {
-                    console.log("💭 Appending thinking content...");
-                  }
+                  appendThinkingContent(tempId, clean);
+                  console.log("✅ Thinking appended to message:", tempId);
                 }
                 break;
               }
@@ -217,6 +328,14 @@ ${t("chat.receivedResponse")}
                 const raw = ev?.data?.approval_request ?? ev?.data;
                 if (raw) {
                   const norm: any = { ...raw };
+                  if (norm.type === 'trade_approval') norm.type = 'trading';
+                  try { openApprovalPanel(norm as any); } catch {}
+                }
+                break;
+              }
+              case "hitl.request": {
+                if (ev.data) {
+                  const norm: any = { ...(ev as any).data };
                   if (norm.type === 'trade_approval') norm.type = 'trading';
                   try { openApprovalPanel(norm as any); } catch {}
                 }
@@ -349,62 +468,111 @@ ${t("chat.receivedResponse")}
               switch (ev.event) {
                 case "master_start": {
                   updateMessage(tempId, { status: "sending" });
+                  // Master 시작 메시지를 사용자 친화적으로 변환
                   if (ev.data?.message) {
                     const { addThinkingStep } = useChatStore.getState();
+                    const originalMessage = ev.data.message;
+
+                    // "supervisor start" 같은 메시지를 파싱
+                    const parsed = parseAgentMessage(originalMessage);
+                    const finalAgent = ev.data?.agent || parsed.agent || "master";
+                    const finalNode = ev.data?.node || parsed.node;
+
+                    // 사용자 친화적인 메시지 생성
+                    const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
                     addThinkingStep(tempId, {
-                      agent: "planner",
-                      description: ev.data.message,
+                      agent: finalAgent,
+                      description: friendlyMessage,
                       timestamp: now,
                     });
-                    console.log("✅ Added thinking step (master_start):", ev.data.message);
+                    console.log("✅ Master start (retry):", originalMessage, "→", friendlyMessage);
                   }
                   break;
                 }
                 case "agent_start": {
-                  if (ev.data?.message) {
-                    const { addThinkingStep } = useChatStore.getState();
-                    addThinkingStep(tempId, {
-                      agent: ev.data.agent || "unknown",
-                      description: ev.data.message,
-                      timestamp: now,
-                    });
-                    console.log("✅ Added thinking step (agent_start):", ev.data.agent, ev.data.message);
-                  }
+                  const { addThinkingStep } = useChatStore.getState();
+                  const agent = ev.data?.agent;
+                  const node = ev.data?.node;
+                  const originalMessage = ev.data?.message;
+
+                  const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                  const finalAgent = agent || parsed.agent;
+                  const finalNode = node || parsed.node;
+                  const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                  addThinkingStep(tempId, {
+                    agent: finalAgent || "unknown",
+                    description: friendlyMessage,
+                    timestamp: now,
+                  });
+                  console.log("✅ Agent start (retry):", finalAgent, "→", friendlyMessage);
                   break;
                 }
                 case "agent_node": {
-                  // 실시간으로 thinking steps 추가
-                  if (ev.data?.status === "complete" && ev.data?.message) {
-                    const { addThinkingStep } = useChatStore.getState();
+                  const { addThinkingStep } = useChatStore.getState();
+                  const agent = ev.data?.agent;
+                  const node = ev.data?.node;
+                  const originalMessage = ev.data?.message;
+
+                  const parsed = originalMessage ? parseAgentMessage(originalMessage) : {};
+                  const finalAgent = agent || parsed.agent;
+                  const finalNode = node || parsed.node;
+                  const friendlyMessage = getAgentActivityLabel(finalAgent, finalNode, i18n.language as "ko" | "en");
+
+                  if (ev.data?.status === "complete") {
                     addThinkingStep(tempId, {
-                      agent: ev.data.node || ev.data.agent || "unknown",
-                      description: ev.data.message,
+                      agent: finalAgent || finalNode || "unknown",
+                      description: friendlyMessage,
                       timestamp: now,
                     });
-                    console.log("✅ Added thinking step (agent_node):", ev.data.node, ev.data.message);
+                    console.log("✅ Node complete (retry):", finalNode, "→", friendlyMessage);
                   }
-                  // agent_node running 상태일 때도 step 추가
-                  if (ev.data?.status === "running" && ev.data?.message) {
-                    const { addThinkingStep } = useChatStore.getState();
+
+                  if (ev.data?.status === "running") {
                     addThinkingStep(tempId, {
-                      agent: ev.data.agent || "unknown",
-                      description: ev.data.message,
+                      agent: finalAgent || "unknown",
+                      description: friendlyMessage,
                       timestamp: now,
-                      node: ev.data.node,
+                      node: finalNode,
                       content: "",
                     });
-                    console.log("🔄 Added thinking step (agent_node running):", ev.data.node);
+                    console.log("🔄 Node running (retry):", finalNode, "→", friendlyMessage);
+                  }
+                  break;
+                }
+                case "agent_complete": {
+                  // HITL: agent_complete에서 requires_approval 체크 (호환 경로)
+                  const result = (ev as any)?.data?.result;
+                  if (result && (result.requires_approval || result.status === "pending")) {
+                    const agentType = String((ev as any)?.data?.agent || "").toLowerCase();
+                    if (agentType === "trading") {
+                      const hitlData = {
+                        type: "trading" as const,
+                        agent: "Trading" as const,
+                        action: (result.action || "buy") as "buy" | "sell",
+                        stock_code: result.stock_code || "000000",
+                        stock_name: result.stock_name || "종목명",
+                        quantity: result.quantity || 0,
+                        price: result.price || 0,
+                        total_amount: result.total_amount || 0,
+                        current_weight: result.current_weight || 0,
+                        expected_weight: result.expected_weight || 0,
+                        order_id: result.order_id,
+                        rationale: result.summary || "매수 주문이 생성되었습니다.",
+                        risk_warning: result.risk_warning || "",
+                        alternatives: result.alternatives || [],
+                      };
+                      try { openApprovalPanel(hitlData as any); } catch {}
+                    }
                   }
                   break;
                 }
                 case "agent_thinking": {
-                  // AI 사고 내용을 실시간으로 마지막 thinking step에 추가
-                  if (ev.data?.content) {
+                  const clean = sanitizeThinkingDelta(ev.data);
+                  if (clean) {
                     const { appendThinkingContent } = useChatStore.getState();
-                    appendThinkingContent(tempId, ev.data.content);
-                    if (Math.random() < 0.01) {
-                      console.log("💭 Appending thinking content...");
-                    }
+                    appendThinkingContent(tempId, clean);
                   }
                   break;
                 }
@@ -416,14 +584,22 @@ ${t("chat.receivedResponse")}
                 if (cid) setCurrentThreadId(String(cid));
                 break;
               }
-              case "hitl_interrupt": {
-                const req = ev?.data?.approval_request ?? ev?.data;
-                if (req) {
-                  try { openApprovalPanel(req as any); } catch {}
+                case "hitl_interrupt": {
+                  const req = ev?.data?.approval_request ?? ev?.data;
+                  if (req) {
+                    try { openApprovalPanel(req as any); } catch {}
+                  }
+                  break;
                 }
-                break;
-              }
-              case "error": {
+                case "hitl.request": {
+                  if (ev.data) {
+                    const norm: any = { ...(ev as any).data };
+                    if (norm.type === 'trade_approval') norm.type = 'trading';
+                    try { openApprovalPanel(norm as any); } catch {}
+                  }
+                  break;
+                }
+                case "error": {
                 const msg = ev.data?.message || "Stream error";
                 updateMessage(tempId, { content: msg, status: "error" });
                 break;
@@ -717,6 +893,66 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     }
   };
 
+  const handleModify = async (messageId: string, modifications: Record<string, any>, userInput?: string) => {
+    if (approvalBusy) return;
+    setApprovalBusy(true);
+    try {
+      // 수정 결정을 사용자 메시지로 추가
+      const modificationMessage: Message = {
+        id: `approval-decision-${Date.now()}`,
+        role: "user",
+        content: `✏️ **${t("hitl.unified.modify") || "수정 후 승인"}**${userInput ? `\n\n${userInput}` : ""}`,
+        timestamp: new Date().toISOString(),
+        status: "sent",
+      };
+      addMessage(modificationMessage);
+
+      if (mode === "demo") {
+        closeApprovalPanel();
+        return;
+      }
+      if (!currentThreadId) {
+        openAlert({ title: t('common.error'), message: t('hitl.noActiveThread') });
+        return;
+      }
+
+      console.log("🔑 Modifying with thread_id:", currentThreadId);
+      console.log("📋 Modifications:", modifications);
+      console.log("📝 User input:", userInput);
+
+      let requestId: string | undefined;
+      if (approvalPanel.data && (approvalPanel.data as any).request_id) {
+        requestId = String((approvalPanel.data as any).request_id);
+      }
+
+      // HITL-MODIFY-PATTERN.md에 따라 decision: "modified" + modifications + user_input 전송
+      await approveAction({
+        thread_id: currentThreadId,
+        decision: "modified",
+        request_id: requestId,
+        modifications: Object.keys(modifications).length > 0 ? modifications : undefined,
+        user_input: userInput,
+      });
+
+      console.log("Modify:", messageId, currentThreadId);
+      closeApprovalPanel();
+
+    } catch (error) {
+      console.error("Modification error:", error);
+      closeApprovalPanel();
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const axiosError = error as any;
+      const serverMsg = axiosError?.response?.data?.detail || axiosError?.response?.data?.message || errorMsg;
+      console.error("Server error detail:", serverMsg);
+      openAlert({
+        title: t('common.error'),
+        message: `수정 실패: ${serverMsg}`
+      });
+    } finally {
+      try { setApprovalBusy(false); } catch {}
+    }
+  };
+
   // TEST: HITL 패널 테스트용 함수 (개발 완료 후 제거)
   const handleTestHITL = (agentType: string) => {
     const testData: Record<string, any> = {
@@ -724,9 +960,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         type: "research",
         agent: "Research",
         stock_code: "005930",
-        stock_name: "삼성전자",
-        query: "삼성전자의 최근 실적과 향후 전망을 분석해주세요",
-        routing_reason: "기업 재무 분석 및 산업 동향 파악 필요",
+        stock_name: t("hitl.demo.stocks.samsungElectronics"),
+        query: t("hitl.demo.research.query"),
+        routing_reason: t("hitl.demo.research.routingReason"),
         query_complexity: "expert",
         depth_level: "comprehensive",
         expected_workers: ["data_collector", "bull_analyst", "bear_analyst"],
@@ -842,27 +1078,7 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       trading: {
         type: "trading",
         agent: "Trading",
-        action: "buy",
-        stock_code: "005930",
-        stock_name: "삼성전자",
-        quantity: 100,
-        price: 70000,
-        total_amount: 7000000,
-        current_weight: 25.0,
-        expected_weight: 43.2,
-        risk_warning: "이 거래는 포트폴리오의 43.2%를 차지하게 되어 과도한 집중 리스크가 발생할 수 있습니다.",
-        alternatives: [
-          {
-            suggestion: "매수 수량을 50주로 조정하여 포트폴리오 비중을 34%로 유지",
-            adjusted_quantity: 50,
-            adjusted_amount: 3500000,
-          },
-          {
-            suggestion: "매수 수량을 30주로 조정하여 포트폴리오 비중을 28%로 유지",
-            adjusted_quantity: 30,
-            adjusted_amount: 2100000,
-          },
-        ],
+        ...MOCK_UNIFIED_TRADING_HIGH_RISK,
       },
     };
 
@@ -903,12 +1119,11 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
           messageId="temp-message-id"
           onApprove={handleApprove}
           onReject={handleReject}
-          variant="floating" disabled={approvalBusy}
+          onModify={handleModify}
+          variant="floating"
+          disabled={approvalBusy}
         />
       )}
     </div>
   );
 }
-
-
-

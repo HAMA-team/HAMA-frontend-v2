@@ -44,6 +44,9 @@
     --border-input-focus: #3b82f6;
     --border-card: #e5e7eb;
 
+    /* ===== Code Background ===== */
+    --code-bg: #f3f4f6;
+
     /* ===== Primary Colors ===== */
     --primary-50: #eff6ff;
     --primary-100: #dbeafe;
@@ -148,6 +151,9 @@
     --border-input: #3f3f46;
     --border-input-focus: #60a5fa;
     --border-card: #27272a;
+
+    /* Code Background - Dark Mode */
+    --code-bg: #27272a;
 
     /* Primary Colors - Dark Mode */
     --primary-50: #1e3a8a;
@@ -259,6 +265,19 @@
 
   input, textarea {
     font-family: inherit;
+  }
+
+  /* ===== Placeholder Styles ===== */
+
+  ::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  textarea::placeholder,
+  input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
   }
 }
 

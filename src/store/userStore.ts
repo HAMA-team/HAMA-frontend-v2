@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { HITLConfig, HITLPhases } from '@/types/hitl';
-import { PRESET_COPILOT, migrateAutomationLevel } from '@/types/hitl';
+import { PRESET_COPILOT, migrateAutomationLevel, normalizeHITLConfig } from '@/types/hitl';
 
 /**
  * User Store (Zustand + Persist)
@@ -86,11 +86,12 @@ export const useUserStore = create<UserStore>()(
         }),
 
       setHITLConfig: (config) => {
+        const normalized = normalizeHITLConfig(config);
         // Custom 모드로 설정 시 phases를 기억
-        if (config.preset === 'custom') {
+        if (normalized.preset === 'custom') {
           set({
-            hitlConfig: config,
-            customModePhases: config.phases,
+            hitlConfig: normalized,
+            customModePhases: normalized.phases,
           });
           return;
         }
@@ -99,13 +100,13 @@ export const useUserStore = create<UserStore>()(
         // LocalStorage 에러 처리
         try {
           set({
-            hitlConfig: config,
+            hitlConfig: normalized,
           });
         } catch (error) {
           console.error('Failed to save HITL config to LocalStorage:', error);
           // QuotaExceededError 등 - 메모리에만 저장하고 계속 진행
           set({
-            hitlConfig: config,
+            hitlConfig: normalized,
           });
         }
       },
@@ -127,7 +128,7 @@ export const useUserStore = create<UserStore>()(
 
       setLastSyncedConfig: (config) =>
         set({
-          lastSyncedConfig: config,
+          lastSyncedConfig: normalizeHITLConfig(config),
         }),
 
       rollbackHITLConfig: () => {
@@ -161,6 +162,11 @@ export const useUserStore = create<UserStore>()(
         // hitlConfig가 없으면 기본값 설정 (방어 코드)
         if (!persistedState.hitlConfig) {
           persistedState.hitlConfig = PRESET_COPILOT;
+        } else {
+          // 저장된 설정 정규화
+          persistedState.hitlConfig = normalizeHITLConfig(
+            persistedState.hitlConfig as HITLConfig,
+          );
         }
 
         return persistedState as UserStore;

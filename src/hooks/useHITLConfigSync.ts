@@ -27,15 +27,16 @@ export function useHITLConfigSync() {
       setLoading(true);
       try {
         const response = await getAutomationLevel();
+        const serverConfig = response.hitl_config;
 
         // 서버 설정이 로컬과 다르면 서버 우선
-        if (JSON.stringify(response.hitl_config) !== JSON.stringify(hitlConfig)) {
+        if (JSON.stringify(serverConfig) !== JSON.stringify(hitlConfig)) {
           console.log('[Sync] Server config differs from local, updating to server config');
-          setHITLConfig(response.hitl_config);
-          setLastSyncedConfig(response.hitl_config);
+          setHITLConfig(serverConfig);
+          setLastSyncedConfig(serverConfig);
         } else {
           // 같으면 lastSyncedConfig만 업데이트
-          setLastSyncedConfig(response.hitl_config);
+          setLastSyncedConfig(serverConfig);
         }
 
         hasInitialSyncRef.current = true;

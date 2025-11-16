@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Paperclip, ArrowUp } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { usePathname, useRouter } from "next/navigation";
 import { useChatStore } from "@/store/chatStore";
@@ -13,7 +13,6 @@ import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useAppModeStore } from "@/store/appModeStore";
 import { useArtifactStore } from "@/store/artifactStore";
 import { ThinkingStep } from "@/lib/types/chat";
-import { PRESET_ADVISOR } from "@/types/hitl";
 
 interface ChatInputProps {
   placeholder?: string;
@@ -129,8 +128,8 @@ export default function ChatInput({
               .replace(/\b(\d{6})\b/g, (_m: string, g1: string) => g1.split("").join(" "))
               .replace(/\bA(\d{6})\b/g, (_m: string, g1: string) => `A ${g1.split("").join(" ")}`);
             composedForLLM = `${preamble}\n\n\`\`\`context\n${maskedCtx}\n\`\`\`\n\n---\n${sep}\n\n${userMessageContent}`;
-            // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해 Advisor 모드로 유도
-            desiredConfig = PRESET_ADVISOR;
+            // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해
+            // 추후 백엔드 정책에 맞춰 HITL 설정을 조정할 수 있음
           }
         }
 
@@ -193,15 +192,65 @@ export default function ChatInput({
               message: composedForLLM,
               conversation_id: conversationIdForRequest,
               hitl_config: desiredConfig,
-              onEvent: (ev) => {
-                const now = new Date().toISOString();
-                // 스트림 중 서버가 thread/conversation id를 제공하면 즉시 저장하여 LNB 갱신 유도
-                try {
-                  const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
-                  if (providedId && !useChatStore.getState().currentThreadId) {
-                    setCurrentThreadId(String(providedId));
+                onEvent: (ev) => {
+                  const now = new Date().toISOString();
+
+                  // 스트림 중 서버가 thread/conversation id를 제공하면 즉시 저장하여 LNB 갱신 유도
+                  try {
+                    const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
+                    if (providedId && !useChatStore.getState().currentThreadId) {
+                      setCurrentThreadId(String(providedId));
+                    }
+                  } catch {}
+
+                  // Reasoning Event Guide 기반 HITL 감지
+                  try {
+                    const reasoning = ev.data?.reasoning_event;
+                    if (reasoning) {
+                      // 최소 로그: 어떤 이벤트에서 어떤 HITL phase가 왔는지
+                      // eslint-disable-next-line no-console
+                      console.log("[HITL][reasoning]", {
+                        event: ev.event,
+                        phase: reasoning.phase,
+                        status: reasoning.status,
+                        label: reasoning.event_label,
+                          message: reasoning.message,
+                          hasApprovalRequest: !!ev.data?.approval_request,
+                      });
+                    }
+
+                    const hasApprovalRequest = !!ev.data?.approval_request;
+
+                      // 1) phase === "hitl" 이거나
+                      // 2) agent_complete + approval_request 가 함께 온 경우
+                      const isHitlPhase = reasoning.phase === "hitl";
+                      const isSupervisorHitl =
+                        ev.event === "agent_complete" &&
+                        reasoning.phase === "supervision" &&
+                        hasApprovalRequest;
+
+                      if ((isHitlPhase || isSupervisorHitl) && !useChatStore.getState().approvalPanel.isOpen) {
+                        const raw = ev.data?.approval_request;
+                        if (raw) {
+                          const norm: any = { ...raw };
+                          if (norm.type === "trade_approval") norm.type = "trading";
+                          // eslint-disable-next-line no-console
+                          console.log("[HITL][open-panel][reasoning]", {
+                            type: norm.type,
+                            keys: Object.keys(norm || {}),
+                          });
+                          openApprovalPanel(norm as any);
+                        } else {
+                          // eslint-disable-next-line no-console
+                        console.log("[HITL][missing-approval-request]", {
+                          event: ev.event,
+                          phase: reasoning.phase,
+                        });
+                      }
+                    }
+                  } catch {
+                    // reasoning_event 파싱 오류는 무시
                   }
-                } catch {}
                 switch (ev.event) {
                   case "master_start":
                     updateMessage(tempId, { status: "sending" });
@@ -238,8 +287,29 @@ export default function ChatInput({
                       timestamp: now,
                     });
                     break; }
-                  case "agent_complete": {
-                    const summary = ev.data?.result ? String(ev.data.result).slice(0, 120) : "complete";
+                    case "agent_complete": {
+                    const result = ev.data?.result;
+
+                    // Trading 에이전트용 요약 디버그 로그 (HITL 여부 확인)
+                    try {
+                      const agentName = String(ev.data?.agent || "").toLowerCase();
+                      if (agentName.includes("trading")) {
+                        // eslint-disable-next-line no-console
+                        console.log("[SSE][trading][agent_complete]", {
+                          agent: ev.data?.agent,
+                          requires_approval: result?.requires_approval,
+                          status: result?.status,
+                          keys: result ? Object.keys(result) : [],
+                          result,
+                        });
+                      }
+                    } catch {}
+
+                    try {
+                      // eslint-disable-next-line no-console
+                      console.log("[SSE][agent_complete]", ev);
+                    } catch {}
+                    const summary = result ? String(result).slice(0, 120) : "complete";
                     useChatStore.getState().addThinkingStep(tempId, {
                       agent: "researcher",
                       description: `${ev.data?.agent || "Agent"} complete: ${summary}`,
@@ -247,7 +317,6 @@ export default function ChatInput({
                     });
 
                     // HITL: agent_complete에서 requires_approval 체크
-                    const result = ev.data?.result;
                     if (result && (result.requires_approval || result.status === "pending")) {
                       const agentType = String(ev.data?.agent || "").toLowerCase();
 
@@ -329,21 +398,26 @@ export default function ChatInput({
                   break; }
                   // TODO(HITL): 백엔드 이벤트가 `hitl.request`로 표준화되면,
                   // `hitl_interrupt` 분기는 제거하고 `hitl.request`만 유지한다.
-                  case "hitl_interrupt": {
-                    const raw = ev?.data?.approval_request ?? ev?.data;
-                    if (raw) {
-                      const norm: any = { ...raw };
-                      if (norm.type === 'trade_approval') norm.type = 'trading';
-                      try { openApprovalPanel(norm as any); } catch { /* noop */ }
-                    }
-                    break; }
-                  case "hitl.request": {
-                    if (ev.data) {
-                      const norm: any = { ...ev.data };
-                      if (norm.type === 'trade_approval') norm.type = 'trading';
-                      try { openApprovalPanel(norm as any); } catch { /* noop */ }
-                    }
-                    break; }
+                    case "hitl_interrupt":
+                    case "hitl.request": {
+                      const raw = ev?.data?.approval_request ?? ev?.data;
+                      // eslint-disable-next-line no-console
+                      console.log("[HITL][stream-event]", ev.event, {
+                        hasApprovalRequest: !!raw,
+                        type: raw?.type,
+                      });
+                      if (raw && !useChatStore.getState().approvalPanel.isOpen) {
+                        const norm: any = { ...raw };
+                        if (norm.type === "trade_approval") norm.type = "trading";
+                        // eslint-disable-next-line no-console
+                        console.log("[HITL][open-panel][stream-event]", {
+                          event: ev.event,
+                          type: norm.type,
+                          keys: Object.keys(norm || {}),
+                        });
+                        try { openApprovalPanel(norm as any); } catch { /* noop */ }
+                      }
+                      break; }
                   case "error": {
                     const msg = ev.data?.message || "Stream error";
                     updateMessage(tempId, { content: msg, status: "error" });
@@ -440,18 +514,6 @@ export default function ChatInput({
               borderColor: message.trim() ? "var(--border-input-focus)" : "var(--border-input)",
             }}
           >
-            {/* Attach Button */}
-            <button
-              type="button"
-              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150 mb-0"
-              style={{ backgroundColor: "transparent" }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)"}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-              aria-label={t("chat.attachFile")}
-            >
-              <Paperclip className="w-5 h-5" style={{ color: "var(--text-secondary)" }} />
-            </button>
-
             {/* Textarea */}
             <textarea
               ref={textareaRef}

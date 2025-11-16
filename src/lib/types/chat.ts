@@ -20,6 +20,19 @@ export type MessageStatus = "sending" | "sent" | "error";
 export type AgentType = "planner" | "researcher" | "strategy";
 
 /**
+ * Reasoning Event (ReasoningEventStreamGuide 기반)
+ */
+export interface ReasoningEvent {
+  event_label: string;
+  phase: string; // planning, data_collection, llm, tool, finalization 등
+  status: string; // start, in_progress, complete, error
+  depth: number; // 들여쓰기 레벨
+  message?: string;
+  lineage: string[];
+  metadata?: Record<string, any>;
+}
+
+/**
  * Thinking Step 인터페이스
  */
 export interface ThinkingStep {
@@ -28,6 +41,7 @@ export interface ThinkingStep {
   timestamp: string;
   content?: string; // 실시간 사고 내용 (agent_thinking 이벤트)
   node?: string; // 현재 실행 중인 노드명
+  reasoning_event?: ReasoningEvent; // ReasoningEventStreamGuide 메타데이터
 }
 
 /**
@@ -70,8 +84,18 @@ export interface ChatResponse {
 
 /**
  * Agent 타입 (HITL용)
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
-export type HITLAgentType = "research" | "strategy" | "portfolio" | "risk" | "trading";
+export type HITLAgentType =
+  | "research"
+  | "research_plan_approval"
+  | "strategy"
+  | "portfolio"
+  | "rebalance_approval"
+  | "risk"
+  | "trading"
+  | "trade_approval";
 
 /**
  * HITL 승인 요청 베이스
@@ -79,13 +103,31 @@ export type HITLAgentType = "research" | "strategy" | "portfolio" | "risk" | "tr
 export interface BaseApprovalRequest {
   type: HITLAgentType;
   agent: string;
+  /** 백엔드 승인 요청 식별자 (옵션) */
+  request_id?: string;
+  /** 표준 이벤트에서 동봉되는 승인 플래그 (옵션) */
+  requires_approval?: boolean;
+  /**
+   * 수정 가능한 필드 목록
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md
+   */
+  modifiable_fields?: string[];
+  /**
+   * 자유 텍스트 입력 지원 여부
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md
+   */
+  supports_user_input?: boolean;
 }
 
 /**
  * 1. Research Agent 승인 요청
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export interface ResearchApprovalRequest extends BaseApprovalRequest {
-  type: "research";
+  type: "research" | "research_plan_approval";
   agent: "Research";
   stock_code?: string;
   stock_name?: string;
@@ -94,6 +136,28 @@ export interface ResearchApprovalRequest extends BaseApprovalRequest {
   query_complexity: "simple" | "moderate" | "expert";
   depth_level: "brief" | "detailed" | "comprehensive";
   expected_workers?: string[];
+  /**
+   * Research Plan 상세 정보 (옵션)
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md - Scenario 1
+   */
+  plan?: {
+    depth: string;
+    depth_name?: string;
+    scope: string;
+    perspectives: string[];
+    estimated_time?: string;
+  };
+  /**
+   * Research Plan 옵션 정보 (옵션)
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md - Scenario 1
+   */
+  options?: {
+    depths?: string[];
+    scopes?: string[];
+    perspectives?: string[];
+  };
 }
 
 /**
@@ -121,9 +185,11 @@ export interface StrategyApprovalRequest extends BaseApprovalRequest {
 
 /**
  * 3. Portfolio Agent 승인 요청
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export interface PortfolioApprovalRequest extends BaseApprovalRequest {
-  type: "portfolio";
+  type: "portfolio" | "rebalance_approval";
   agent: "Portfolio";
   rebalancing_needed: boolean;
   current_holdings: Array<{
@@ -174,10 +240,12 @@ export interface RiskApprovalRequest extends BaseApprovalRequest {
 }
 
 /**
- * 5. Trading Agent 승인 요청 (기존)
+ * 5. Trading Agent 승인 요청
+ *
+ * @see docs/HITL-MODIFY-PATTERN.md
  */
 export interface TradingApprovalRequest extends BaseApprovalRequest {
-  type: "trading";
+  type: "trading" | "trade_approval";
   agent: "Trading";
   action: "buy" | "sell";
   stock_code: string;
@@ -189,6 +257,19 @@ export interface TradingApprovalRequest extends BaseApprovalRequest {
   expected_weight: number;
   risk_warning?: string;
   alternatives?: Alternative[];
+  /** 위험 레벨(옵션) */
+  risk_level?: "high" | "medium" | "low";
+  /** 위험 경고 목록(옵션) */
+  risk_warnings?: string[];
+  /** 체결 후 보유 수량(옵션) */
+  quantity_after_trade?: number;
+
+  /** 포트폴리오 전/후 비교(옵션) */
+  portfolio_before?: PortfolioSnapshot;
+  portfolio_after?: PortfolioSnapshot;
+  /** 리스크 지표 전/후 비교(옵션) */
+  risk_before?: RiskMetrics;
+  risk_after?: RiskMetrics;
 }
 
 /**
@@ -209,6 +290,31 @@ export type ApprovalRequest =
   | PortfolioApprovalRequest
   | RiskApprovalRequest
   | TradingApprovalRequest;
+
+/**
+ * Portfolio Simulator 패턴: 포트폴리오 스냅샷
+ */
+export interface PortfolioSnapshot {
+  total_value: number;
+  cash_balance: number;
+  holdings: Array<{
+    stock_code: string;
+    stock_name: string;
+    quantity: number;
+    weight: number;
+    market_value: number;
+  }>;
+}
+
+/**
+ * Portfolio Simulator 패턴: 리스크 메트릭
+ */
+export interface RiskMetrics {
+  portfolio_volatility: number; // 0-1
+  var_95: number; // 음수 비율(손실)
+  sharpe_ratio: number;
+  max_drawdown_estimate: number; // 0-1
+}
 
 /**
  * Chat API 응답 인터페이스 (HITL 필요)

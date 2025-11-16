@@ -6,6 +6,7 @@
     "delete": "삭제",
     "rename": "이름 바꾸기",
     "edit": "수정",
+    "modified": "수정됨",
     "close": "닫기",
     "loading": "로딩 중...",
     "error": "오류가 발생했습니다",
@@ -21,7 +22,7 @@
     "portfolio": "포트폴리오",
     "artifacts": "저장된 분석",
     "mypage": "마이페이지",
-    "discover": "발견하기",
+    "about": "소개",
     "newChat": "새 채팅",
     "recentChats": "최근 채팅",
     "collapseMenu": "사이드바 접기",
@@ -283,6 +284,50 @@
       "title": "투자 성향 분석 체험하기",
       "description": "4단계 질문으로 나의 투자 성향을 파악하고 맞춤형 AI 서비스를 받아보세요",
       "button": "온보딩 체험하기"
+    },
+    "hitlControl": {
+      "title": "HITL 제어",
+      "subtitle": "AI 자동화와 수동 승인 중 선택하세요. ON으로 토글하면 직접 승인하고, OFF로 두면 AI가 자동으로 진행합니다.",
+      "masterToggle": {
+        "title": "수동 승인 모드",
+        "description": "분석과 리밸런싱 승인을 함께 제어합니다. 매매 승인은 안전을 위해 항상 필요합니다.",
+        "note": "토글 ON = 분석과 리밸런싱을 수동으로 승인합니다. 토글 OFF = AI가 자동으로 실행합니다. 매매는 항상 승인이 필요합니다."
+      },
+      "badges": {
+        "alwaysRequired": "항상 필요",
+        "linkedToToggle": "토글 연동"
+      },
+      "trading": {
+        "title": "매매",
+        "description": "거래 주문 실행 전 최종 승인",
+        "features": {
+          "reviewRisk": "리스크 분석 결과 검토",
+          "confirmChanges": "포트폴리오 변경 확인",
+          "approveOrder": "주문 수량 및 가격 승인"
+        }
+      },
+      "research": {
+        "title": "분석",
+        "description": "주식 분석 실행 전 승인 요청",
+        "features": {
+          "setDepth": "분석 깊이 수준 설정",
+          "defineScope": "분석 범위 정의",
+          "selectSources": "데이터 소스 선택"
+        }
+      },
+      "portfolio": {
+        "title": "리밸런싱",
+        "description": "포트폴리오 리밸런싱 전략 승인",
+        "features": {
+          "adjustIntensity": "리밸런싱 강도 조정",
+          "determineDirection": "투자 방향 결정",
+          "reflectSectors": "선호 섹터 반영"
+        }
+      },
+      "status": {
+        "manualApproval": "수동 승인",
+        "autoExecution": "자동 실행"
+      }
     }
   },
   "hitl": {
@@ -307,7 +352,6 @@
     "portfolioWeightChange": "포트폴리오 비중 변화",
     "currentWeight": "현재",
     "expectedWeight": "예상",
-    "alternatives": "대안 제안",
     "approvalNote": "* 승인 시 거래가 즉시 실행됩니다",
     "research": {
       "title": "분석 실행 승인",
@@ -406,8 +450,139 @@
       "expectedWeight": "예상 비중",
       "riskWarning": "리스크 경고"
     },
+    "unified": {
+      "title": "매매 승인",
+      "highRiskDetected": "고위험 상황 감지",
+      "reviewCarefully": "거래 정보와 리스크 요인을 신중하게 검토한 후 진행하세요.",
+      "portfolioRisk": "포트폴리오 리스크 평가",
+      "concentration": "집중도",
+      "volatility": "변동성",
+      "maxDrawdown": "최대 낙폭",
+      "tradeDetails": "거래 정보",
+      "stock": "종목",
+      "tradeType": "거래 유형",
+      "quantity": "수량",
+      "price": "주당 가격",
+      "totalAmount": "총 금액",
+      "portfolioImpact": "포트폴리오 영향",
+      "currentWeight": "현재 비중",
+      "expectedWeight": "예상 비중",
+      "riskFactors": "리스크 요인",
+      "recommendations": "권장 조치",
+      "amount": "금액",
+      "approvalNote": "* 승인 시 즉시 거래가 실행됩니다"
+    },
     "approved": "승인됨",
     "rejected": "거부됨",
     "noActiveThread": "활성 대화가 없습니다. 메시지를 먼저 전송하세요"
+  },
+  "hitl": {
+    "approve": "승인",
+    "reject": "거부",
+    "approved": "승인됨",
+    "rejected": "거부됨",
+    "buy": "매수",
+    "sell": "매도",
+    "shares": "주",
+    "pending": "승인 대기 중",
+    "unified": {
+      "title": "매매 승인",
+      "tradeInformation": "매매 정보",
+      "tradingType": "거래 유형",
+      "stock": "종목",
+      "quantity": "수량",
+      "pricePerShare": "주당 가격",
+      "totalAmount": "총 금액",
+      "quantityAfterTrade": "거래 후 수량",
+      "portfolioImpact": "포트폴리오 영향",
+      "riskDetection": "리스크 감지",
+      "highRiskDetected": "고위험 감지",
+      "reviewCarefully": "거래 정보와 리스크 요인을 신중하게 검토한 후 진행하세요.",
+      "adjustmentRequest": "조정 요청",
+      "adjustmentDescription": "이 거래에 대한 피드백이나 조정 요청을 작성하세요.",
+      "adjustmentPlaceholder": "메시지를 입력하세요...",
+      "modify": "수정",
+      "portfolioRisk": "포트폴리오 리스크 평가",
+      "concentration": "집중도",
+      "volatility": "변동성",
+      "maxDrawdown": "최대 낙폭",
+      "tradeDetails": "거래 정보",
+      "tradeType": "거래 유형",
+      "price": "주당 가격",
+      "currentWeight": "현재 비중",
+      "expectedWeight": "예상 비중",
+      "riskFactors": "리스크 요인",
+      "recommendations": "권장 조치",
+      "amount": "금액",
+      "approvalNote": "* 승인 시 즉시 거래가 실행됩니다"
+    },
+    "researchUnified": {
+      "title": "분석 계획 승인",
+      "plan": {
+        "title": "분석 계획",
+        "depth": "깊이",
+        "scope": "범위",
+        "perspectives": "관점"
+      },
+      "scope": {
+        "narrow": "핵심만",
+        "balanced": "균형",
+        "broad": "넓게"
+      },
+      "method": {
+        "title": "방법",
+        "qualitative": "정성 분석",
+        "quantitative": "정량 분석",
+        "both": "둘 다"
+      },
+      "perspective": {
+        "macro": "거시",
+        "fundamental": "펀더멘털",
+        "technical": "기술적",
+        "flow": "수급",
+        "strategy": "전략",
+        "bull": "상승 시나리오",
+        "bear": "하락 시나리오"
+      }
+    },
+    "research": {
+      "title": "분석 실행 승인",
+      "query": "질문",
+      "complexityLabel": "분석 복잡도",
+      "depthLabel": "분석 깊이",
+      "routingReason": "라우팅 이유",
+      "reason": "분석이 필요한 이유",
+      "info": "이 분석은 외부 데이터와 AI 모델을 활용하여 종합적인 인사이트를 제공합니다.",
+      "complexity": {
+        "label": "복잡도",
+        "simple": "단순",
+        "moderate": "중간",
+        "expert": "전문가"
+      },
+      "depth": {
+        "label": "상세도",
+        "brief": "간략",
+        "detailed": "상세",
+        "comprehensive": "종합"
+      }
+    },
+    "demo": {
+      "research": {
+        "query": "삼성전자의 최근 실적과 향후 전망을 분석해주세요",
+        "routingReason": "전문가 수준의 종합 분석이 필요한 복합 질문"
+      },
+      "stocks": {
+        "samsungElectronics": "삼성전자"
+      }
+    },
+    "simulator": {
+      "portfolioChanges": "포트폴리오 변화",
+      "riskChanges": "리스크 변화",
+      "cashBalance": "현금",
+      "weight": "비중",
+      "volatility": "변동성",
+      "maxDrawdown": "최대 낙폭",
+      "recalculation": "수정 후 서버에서 재계산하여 새로운 전/후 비교 데이터를 제공합니다."
+    }
   }
 }

@@ -30,7 +30,7 @@ import { getChatSessions, getChatHistory, deleteChatHistory } from "@/lib/api/ch
  * - 라이트/다크 테마 지원 (CSS 변수 사용)
  * - 상단: 로고 + 접기 버튼
  * - + 새 채팅 버튼
- * - 주요 내비게이션: 채팅, 아티팩트, 포트폴리오, 마이페이지, 디스커버
+ * - 주요 내비게이션: 채팅, 아티팩트, 포트폴리오, About, 마이페이지
  * - 최근 채팅 (스크롤 영역)
  * - 하단: 언어 선택, 다크모드 토글, 사용자 정보
  *
@@ -267,8 +267,8 @@ export default function LNB() {
     { href: "/", icon: MessageSquare, label: t("nav.chat") },
     { href: "/artifacts", icon: FileText, label: t("nav.artifacts") },
     { href: "/portfolio", icon: PieChart, label: t("nav.portfolio") },
+    { href: "/about", icon: Sparkles, label: t("nav.about") },
     { href: "/settings", icon: User, label: t("nav.mypage") },
-    { href: "/discover", icon: Sparkles, label: t("nav.discover") },
   ];
 
   // 새 채팅 시작
