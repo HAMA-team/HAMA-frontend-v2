@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Paperclip, ArrowUp } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { useLNBWidth } from "@/hooks/useLNBWidth";
 import { usePathname, useRouter } from "next/navigation";
 import { useChatStore } from "@/store/chatStore";
@@ -440,18 +440,6 @@ export default function ChatInput({
               borderColor: message.trim() ? "var(--border-input-focus)" : "var(--border-input)",
             }}
           >
-            {/* Attach Button */}
-            <button
-              type="button"
-              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg transition-colors duration-150 mb-0"
-              style={{ backgroundColor: "transparent" }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)"}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-              aria-label={t("chat.attachFile")}
-            >
-              <Paperclip className="w-5 h-5" style={{ color: "var(--text-secondary)" }} />
-            </button>
-
             {/* Textarea */}
             <textarea
               ref={textareaRef}

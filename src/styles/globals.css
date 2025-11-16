@@ -260,6 +260,19 @@
   input, textarea {
     font-family: inherit;
   }
+
+  /* ===== Placeholder Styles ===== */
+
+  ::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  textarea::placeholder,
+  input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
 }
 
 /* =============================================================================
