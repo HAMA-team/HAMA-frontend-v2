@@ -3,7 +3,18 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatRelativeTime, formatAbsoluteDate } from "@/lib/utils";
-import { ChevronDown, FileText, Search, Lightbulb } from "lucide-react";
+import {
+  ChevronDown,
+  FileText,
+  Search,
+  Lightbulb,
+  Database,
+  Wrench,
+  Cpu,
+  CheckCircle,
+  Loader2,
+  AlertCircle
+} from "lucide-react";
 import { ThinkingStep, AgentType } from "@/lib/types/chat";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -12,13 +23,11 @@ import remarkGfm from "remark-gfm";
  * ThinkingSection Component
  *
  * AI 사고 과정을 접기/펼치기 가능한 Accordion으로 표시
- * - Claude 스타일 디자인
- * - 기본 접힘 상태
- * - 각 Step: 아이콘 + 제목 + 설명 + 시간
+ * - ReasoningEventStreamGuide 기반 Phase별 색상/아이콘
+ * - Depth 기반 들여쓰기
+ * - Status별 시각적 구분
  *
- * @see DesignSystem.md - Section 11.3 Thinking Section
- * @see references/mockup_references/AI 생각 과정 뷰.png
- * @see references/img_references/Claude LLM Thinking.png
+ * @see docs/reasoningEentStreamGuide.md
  * @see DESIGN_RULES.md - 모든 색상은 CSS 변수 사용 필수
  */
 
@@ -26,8 +35,78 @@ interface ThinkingSectionProps {
   steps: ThinkingStep[];
 }
 
+type ReasoningPhase =
+  | "supervision"
+  | "planning"
+  | "routing"
+  | "agent_execution"
+  | "data_collection"
+  | "tool"
+  | "llm"
+  | "hitl"
+  | "finalization"
+  | "system";
+
+type ReasoningStatus = "start" | "in_progress" | "complete" | "info" | "error";
+
 /**
- * 에이전트 타입별 아이콘 매핑
+ * Phase별 색상 매핑 (ReasoningEventStreamGuide 권장)
+ */
+const getPhaseColor = (phase: string): string => {
+  const phaseColors: Record<string, string> = {
+    planning: "#3b82f6",      // 파랑
+    data_collection: "#06b6d4", // 청록
+    llm: "#8b5cf6",           // 보라
+    tool: "#f59e0b",          // 주황
+    finalization: "#9ca3af",  // 회색
+    supervision: "#10b981",   // 녹색
+    routing: "#3b82f6",       // 파랑
+    agent_execution: "#6366f1", // 인디고
+    hitl: "#ef4444",          // 빨강
+    system: "#71717a",        // 회색
+  };
+  return phaseColors[phase] || "#9ca3af";
+};
+
+/**
+ * Phase별 아이콘 매핑
+ */
+const getPhaseIcon = (phase: string) => {
+  const phaseIcons: Record<string, any> = {
+    planning: FileText,
+    data_collection: Database,
+    llm: Cpu,
+    tool: Wrench,
+    finalization: CheckCircle,
+    supervision: CheckCircle,
+    routing: FileText,
+    agent_execution: Search,
+    hitl: AlertCircle,
+    system: FileText,
+  };
+  return phaseIcons[phase] || FileText;
+};
+
+/**
+ * Status별 아이콘 매핑
+ */
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case "start":
+      return null;
+    case "in_progress":
+      return Loader2;
+    case "complete":
+      return CheckCircle;
+    case "error":
+      return AlertCircle;
+    default:
+      return null;
+  }
+};
+
+/**
+ * 에이전트 타입별 아이콘 매핑 (Fallback)
  */
 const getAgentIcon = (agent: AgentType) => {
   switch (agent) {
@@ -45,11 +124,8 @@ const getAgentIcon = (agent: AgentType) => {
 /**
  * 에이전트 타입별 번역 키
  */
-const getAgentNameKey = (agent: string): string => {
-  // agent 문자열을 소문자로 변환하여 매핑
-  const agentLower = agent.toLowerCase();
-
-  // 알려진 에이전트 타입
+const getAgentNameKey = (agent: string | undefined | null): string => {
+  const agentLower = (agent || "").toLowerCase();
   const knownAgents = ["planner", "researcher", "strategy", "portfolio", "risk", "trading"];
 
   if (knownAgents.includes(agentLower)) {
@@ -137,8 +213,25 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
       >
         <div className="px-3 pb-3 pt-1">
           {steps.map((step, index) => {
-            const Icon = getAgentIcon(step.agent);
+            // ReasoningEvent 우선 사용, 없으면 fallback
+            const reasoning = step.reasoning_event;
+            const phase = reasoning?.phase || "agent_execution";
+            const status = reasoning?.status || "complete";
+            const depth = reasoning?.depth || 0;
+
+            // Phase 기반 아이콘/색상
+            const PhaseIcon = getPhaseIcon(phase);
+            const phaseColor = getPhaseColor(phase);
+            const StatusIcon = getStatusIcon(status);
+
+            // Fallback: agent 기반 아이콘
+            const FallbackIcon = getAgentIcon(step.agent);
+            const Icon = PhaseIcon || FallbackIcon;
+
             const agentNameKey = getAgentNameKey(step.agent);
+
+            // Depth 기반 들여쓰기 (8px per level)
+            const indentation = depth * 8;
 
             return (
               <div
@@ -147,18 +240,27 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                 style={{
                   borderBottom:
                     index < steps.length - 1 ? "1px solid var(--border-default)" : "none",
+                  paddingLeft: `${indentation}px`,
                 }}
               >
                 {/* Step Header */}
                 <div className="flex items-center gap-2">
+                  {/* Phase 아이콘 (색상 적용) */}
                   <div className="flex-shrink-0">
-                    <Icon className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
+                    <Icon
+                      className={`w-4 h-4 ${status === "in_progress" ? "animate-spin" : ""}`}
+                      style={{ color: phaseColor }}
+                      strokeWidth={1.5}
+                    />
                   </div>
-                  <div className="flex-1 min-w-0 flex items-center justify-between">
-                    <div className="text-xs flex items-baseline gap-1" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
-                      <span className="font-medium flex-shrink-0" style={{ color: "var(--text-secondary)" }}>{t(agentNameKey)}</span>
-                      <span className="flex-shrink-0"> · </span>
-                      <div className="flex-1 min-w-0">
+
+                  <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                    <div className="text-xs flex items-baseline gap-1 flex-1 min-w-0" style={{ lineHeight: "18px" }}>
+                      <span className="font-medium flex-shrink-0" style={{ color: phaseColor }}>
+                        {t(agentNameKey)}
+                      </span>
+                      <span className="flex-shrink-0" style={{ color: "var(--text-muted)" }}> · </span>
+                      <div className="flex-1 min-w-0" style={{ color: "var(--text-primary)" }}>
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           components={{
@@ -185,8 +287,21 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                         </ReactMarkdown>
                       </div>
                     </div>
+
+                    {/* Status 아이콘 (우측) */}
+                    {StatusIcon && (
+                      <div className="flex-shrink-0">
+                        <StatusIcon
+                          className={`w-3 h-3 ${status === "in_progress" ? "animate-spin" : ""}`}
+                          style={{ color: status === "error" ? "var(--error-500)" : "var(--text-muted)" }}
+                          strokeWidth={1.5}
+                        />
+                      </div>
+                    )}
+
+                    {/* 시간 */}
                     <div
-                      className="text-[11px] ml-3 whitespace-nowrap"
+                      className="text-[11px] whitespace-nowrap flex-shrink-0"
                       style={{ color: "var(--text-muted)" }}
                       title={formatAbsoluteDate(step.timestamp, i18n?.language || 'en')}
                     >

@@ -20,6 +20,19 @@ export type MessageStatus = "sending" | "sent" | "error";
 export type AgentType = "planner" | "researcher" | "strategy";
 
 /**
+ * Reasoning Event (ReasoningEventStreamGuide 기반)
+ */
+export interface ReasoningEvent {
+  event_label: string;
+  phase: string; // planning, data_collection, llm, tool, finalization 등
+  status: string; // start, in_progress, complete, error
+  depth: number; // 들여쓰기 레벨
+  message?: string;
+  lineage: string[];
+  metadata?: Record<string, any>;
+}
+
+/**
  * Thinking Step 인터페이스
  */
 export interface ThinkingStep {
@@ -28,6 +41,7 @@ export interface ThinkingStep {
   timestamp: string;
   content?: string; // 실시간 사고 내용 (agent_thinking 이벤트)
   node?: string; // 현재 실행 중인 노드명
+  reasoning_event?: ReasoningEvent; // ReasoningEventStreamGuide 메타데이터
 }
 
 /**
