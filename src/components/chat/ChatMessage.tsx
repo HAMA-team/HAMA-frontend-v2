@@ -301,7 +301,7 @@ export default function ChatMessage({
             ),
           }}
         >
-          {message.content}
+          {message.content.replace(/\\n/g, '\n')}
         </ReactMarkdown>
       </div>
 

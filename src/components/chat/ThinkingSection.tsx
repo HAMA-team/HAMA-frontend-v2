@@ -155,9 +155,35 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                     <Icon className="w-4 h-4" style={{ color: "var(--text-secondary)" }} strokeWidth={1.5} />
                   </div>
                   <div className="flex-1 min-w-0 flex items-center justify-between">
-                    <div className="text-xs" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
-                      <span className="font-medium" style={{ color: "var(--text-secondary)" }}>{t(agentNameKey)}</span>
-                      <span> · {step.description}</span>
+                    <div className="text-xs flex items-baseline gap-1" style={{ color: "var(--text-primary)", lineHeight: "18px" }}>
+                      <span className="font-medium flex-shrink-0" style={{ color: "var(--text-secondary)" }}>{t(agentNameKey)}</span>
+                      <span className="flex-shrink-0"> · </span>
+                      <div className="flex-1 min-w-0">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ node, ...props }) => <span {...props} />,
+                            strong: ({ node, ...props }) => <strong style={{ fontWeight: 600 }} {...props} />,
+                            em: ({ node, ...props }) => <em {...props} />,
+                            code: ({ node, className, children, ...props }) => (
+                              <code
+                                style={{
+                                  backgroundColor: "var(--code-bg)",
+                                  padding: "1px 3px",
+                                  borderRadius: "2px",
+                                  fontSize: "0.9em",
+                                  fontFamily: "monospace",
+                                }}
+                                {...props}
+                              >
+                                {children}
+                              </code>
+                            ),
+                          }}
+                        >
+                          {step.description}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                     <div
                       className="text-[11px] ml-3 whitespace-nowrap"
@@ -268,7 +294,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                             ),
                           }}
                         >
-                          {step.content}
+                          {step.content.replace(/\\n/g, '\n')}
                         </ReactMarkdown>
                       </div>
                     </div>

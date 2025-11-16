@@ -76,8 +76,8 @@ export default function Home() {
         let m: RegExpExecArray | null;
         while ((m = rxSingle.exec(raw)) !== null) parts.push(m[1]);
         while ((m = rxDouble.exec(raw)) !== null) parts.push(m[1]);
-        const joined = parts.join("");
-        return joined.trim();
+        const joined = parts.join(" ");
+        return joined;
       }
 
       // 3) Otherwise, if it's a short sentence without obvious debug keys, keep it
