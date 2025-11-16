@@ -213,6 +213,8 @@ export interface TradingApprovalRequest extends BaseApprovalRequest {
   risk_level?: "high" | "medium" | "low";
   /** 위험 경고 목록(옵션) */
   risk_warnings?: string[];
+  /** 체결 후 보유 수량(옵션) */
+  quantity_after_trade?: number;
 
   /** 포트폴리오 전/후 비교(옵션) */
   portfolio_before?: PortfolioSnapshot;
