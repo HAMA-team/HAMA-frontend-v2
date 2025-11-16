@@ -1,6 +1,5 @@
 import { apiClient } from "@/lib/api";
-import type { HITLConfig, HITLPreset } from "@/types/hitl";
-import { matchPreset } from "@/types/hitl";
+import type { HITLConfig } from "@/types/hitl";
 
 export type StreamEvent = {
   event: string;
@@ -45,22 +44,15 @@ export async function startMultiAgentStream({
       message,
       conversation_id,
       hitl_config,
-      // TODO(HITL): 백엔드가 hitl_config를 직접 수신하도록 전환되면
-      // 아래 legacy automation_level 동봉을 제거한다.
-      // 호환: 백엔드가 legacy automation_level(int)만 수신하는 경우 대비
-      // preset → level 매핑: pilot=1, copilot=2, advisor=3, custom/불명확=2
-      automation_level: (() => {
-        const preset: HITLPreset | null = matchPreset(hitl_config.phases) ?? hitl_config.preset;
-        switch (preset) {
-          case "pilot":
-            return 1;
-          case "advisor":
-            return 3;
-          case "copilot":
-          default:
-            return 2;
-        }
-      })(),
+      // 최신 ChatRequest 스펙: intervention_required 플래그 추가
+      // 비-매매 단계 중 하나라도 HITL이면 true, 아니면 false (매매만 HITL)
+      intervention_required: Boolean(
+        hitl_config?.phases &&
+          (hitl_config.phases.data_collection ||
+            hitl_config.phases.analysis ||
+            hitl_config.phases.portfolio ||
+            hitl_config.phases.risk),
+      ),
       stream_thinking: true, // Agent thinking trace 활성화
     }),
     signal,

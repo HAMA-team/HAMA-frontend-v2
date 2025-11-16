@@ -1,8 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ShieldCheck, Search, TrendingUp, Lock, Link2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useUserStore, useHydration } from "@/store/userStore";
+import { useAppModeStore } from "@/store/appModeStore";
+import { useToastStore } from "@/store/toastStore";
+import { updateAutomationLevel } from "@/lib/api/settings";
+import type { HITLConfig, HITLPhases } from "@/types/hitl";
 
 interface SimplifiedHITLSettingsProps {
   className?: string;
@@ -13,18 +18,108 @@ interface SimplifiedHITLSettingsProps {
  *
  * 3-stage system:
  * - Trading: Always enabled (fixed) - 시각적으로 고정됨을 표시
- * - Research: On/Off toggle (토글과 연동)
- * - Portfolio Rebalancing: On/Off toggle (토글과 연동, Research와 함께 제어)
+ * - Research: On/Off toggle (분석 단계 HITL)
+ * - Portfolio Rebalancing: On/Off toggle (포트폴리오 단계 HITL)
+ *
+ * 실제 설정은 HITLConfig(phases)를 통해 저장/동기화된다.
  */
 export default function SimplifiedHITLSettings({
   className = "",
 }: SimplifiedHITLSettingsProps) {
   const { t } = useTranslation();
-  // Research and Portfolio are linked via master switch
-  const [isHITLEnabled, setIsHITLEnabled] = useState(false);
+  const hasHydrated = useHydration();
+  const {
+    hitlConfig,
+    setHITLConfig,
+    setLastSyncedConfig,
+    setLoading,
+    isLoading: globalLoading,
+  } = useUserStore();
+  const { mode } = useAppModeStore();
+  const { showToast } = useToastStore();
 
-  const handleMasterToggle = () => {
-    setIsHITLEnabled(!isHITLEnabled);
+  // Research & Portfolio HITL 상태와 연동된 마스터 토글
+  const [isHITLEnabled, setIsHITLEnabled] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Hydration + 서버 설정 기준으로 토글 초기 상태 동기화
+  useEffect(() => {
+    if (!hasHydrated || !hitlConfig) return;
+    const phases = hitlConfig.phases;
+    const enabled = Boolean(phases.analysis || phases.portfolio);
+    setIsHITLEnabled(enabled);
+  }, [hasHydrated, hitlConfig]);
+
+  const applyToggleToConfig = (enable: boolean, current: HITLConfig): HITLConfig => {
+    const phases: HITLPhases = {
+      ...current.phases,
+      analysis: enable,
+      portfolio: enable,
+    };
+    return {
+      ...current,
+      preset: "custom",
+      phases,
+    };
+  };
+
+  const handleMasterToggle = async () => {
+    if (!hasHydrated || !hitlConfig) return;
+    if (isUpdating || globalLoading) {
+      showToast(t("mypage.automation.updateInProgress") || "다른 설정이 업데이트 중입니다", "error");
+      return;
+    }
+
+    const nextEnabled = !isHITLEnabled;
+    const previousConfig = hitlConfig;
+    const newConfig = applyToggleToConfig(nextEnabled, previousConfig);
+
+    // 변경 없음이면 스킵
+    if (JSON.stringify(newConfig.phases) === JSON.stringify(previousConfig.phases)) {
+      setIsHITLEnabled(nextEnabled);
+      return;
+    }
+
+    setIsUpdating(true);
+    setLoading(true);
+
+    // 낙관적 UI 업데이트
+    setIsHITLEnabled(nextEnabled);
+    try {
+      setHITLConfig(newConfig);
+    } catch (error) {
+      console.error("Failed to set HITL config (LocalStorage full?):", error);
+      showToast(t("mypage.automation.changeFailed") || "설정 저장에 실패했습니다", "error");
+      setIsHITLEnabled(!nextEnabled);
+      setIsUpdating(false);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      if (mode === "live") {
+        await updateAutomationLevel(newConfig);
+        setLastSyncedConfig(newConfig);
+      } else {
+        // Demo 모드에서는 로컬만 업데이트 (시뮬레이션)
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        setLastSyncedConfig(newConfig);
+      }
+      showToast(t("mypage.automation.changeSuccess"), "success");
+    } catch (error) {
+      console.error("Failed to update intervention settings:", error);
+      // 롤백
+      try {
+        setHITLConfig(previousConfig);
+      } catch (rollbackError) {
+        console.error("Failed to rollback HITL config:", rollbackError);
+      }
+      setIsHITLEnabled(Boolean(previousConfig.phases.analysis || previousConfig.phases.portfolio));
+      showToast(t("mypage.automation.changeFailed") || "설정 저장에 실패했습니다", "error");
+    } finally {
+      setIsUpdating(false);
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,10 +158,11 @@ export default function SimplifiedHITLSettings({
         </div>
         <button
           onClick={handleMasterToggle}
-          className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors flex-shrink-0 ml-4"
+          className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors flex-shrink-0 ml-4 disabled:opacity-50"
           style={{
             backgroundColor: isHITLEnabled ? "var(--primary-500)" : "#d1d5db"
           }}
+          disabled={isUpdating || globalLoading}
         >
           <span
             className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${

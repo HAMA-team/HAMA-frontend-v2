@@ -24,7 +24,21 @@ export interface ChatAPIResponse {
 }
 
 export async function sendChat(payload: SendChatPayload) {
-  const { data } = await apiClient.post<ChatAPIResponse>('/api/v1/chat/', payload);
+  const { hitl_config, ...rest } = payload;
+  const phases = hitl_config?.phases;
+  const intervention_required = Boolean(
+    phases &&
+      (phases.data_collection ||
+        phases.analysis ||
+        phases.portfolio ||
+        phases.risk),
+  );
+
+  const { data } = await apiClient.post<ChatAPIResponse>('/api/v1/chat/', {
+    ...rest,
+    hitl_config,
+    intervention_required,
+  });
   return data;
 }
 

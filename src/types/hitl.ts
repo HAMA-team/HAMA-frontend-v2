@@ -104,7 +104,7 @@ export const PRESET_ADVISOR: HITLConfig = {
 // ============================================================================
 
 /**
- * GET /api/v1/settings/hitl-config 응답 (alias: /settings/automation-level)
+ * GET /api/v1/settings/intervention 응답
  */
 export interface AutomationLevelResponse {
   hitl_config: HITLConfig;
@@ -114,7 +114,7 @@ export interface AutomationLevelResponse {
 }
 
 /**
- * PUT /api/v1/settings/hitl-config 응답 (alias: /settings/automation-level)
+ * PUT /api/v1/settings/intervention 응답
  */
 export interface AutomationLevelUpdateResponse {
   success: boolean;
@@ -253,4 +253,26 @@ export function matchPreset(phases: HITLPhases): HITLPreset | null {
 
   // 일치하는 프리셋 없음 → Custom
   return null;
+}
+
+/**
+ * HITLConfig 정규화
+ *
+ * 백엔드/프론트 설계 기준에 맞게 최소한의 안전값만 강제합니다.
+ * - trade: 항상 HITL 대상 (false로 내려오면 true로 보정)
+ */
+export function normalizeHITLConfig(config: HITLConfig): HITLConfig {
+  const phases: HITLPhases = {
+    ...config.phases,
+  };
+
+  // 매매 단계는 항상 HITL 대상
+  if (phases.trade === false) {
+    phases.trade = true;
+  }
+
+  return {
+    ...config,
+    phases,
+  };
 }
