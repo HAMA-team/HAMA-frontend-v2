@@ -33,6 +33,12 @@ export default function UnifiedTradingApprovalPanel({
   const [editedQuantity, setEditedQuantity] = useState(request.quantity);
   const [editedPrice, setEditedPrice] = useState(request.price);
 
+  const modifiableFields = request.modifiable_fields ?? ["quantity", "price", "action"];
+  const supportsUserInput = request.supports_user_input ?? false;
+  const canEditQuantity = modifiableFields.includes("quantity");
+  const canEditPrice = modifiableFields.includes("price");
+  const canEditAction = modifiableFields.includes("action");
+
   React.useEffect(() => {
     const checkDarkMode = () => {
       setIsDark(document.documentElement.classList.contains('dark'));
@@ -90,18 +96,18 @@ export default function UnifiedTradingApprovalPanel({
       const modifications: { quantity?: number; price?: number; action?: string } = {};
 
       // 변경된 값만 포함
-      if (editedQuantity !== request.quantity) {
+      if (canEditQuantity && editedQuantity !== request.quantity) {
         modifications.quantity = editedQuantity;
       }
-      if (editedPrice !== request.price) {
+      if (canEditPrice && editedPrice !== request.price) {
         modifications.price = editedPrice;
       }
-      if (editedAction !== request.action) {
+      if (canEditAction && editedAction !== request.action) {
         modifications.action = editedAction.toLowerCase();
       }
 
-      // user_input은 선택사항
-      const userInput = adjustmentRequest.trim() || undefined;
+      // user_input은 선택사항 (supports_user_input 기준)
+      const userInput = supportsUserInput ? adjustmentRequest.trim() || undefined : undefined;
 
       // 수정사항이 있거나 텍스트 입력이 있을 때만 전송
       if (Object.keys(modifications).length > 0 || userInput) {
@@ -195,7 +201,10 @@ export default function UnifiedTradingApprovalPanel({
               </span>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setEditedAction(editedAction.toUpperCase() === "BUY" ? "BUY" : "buy")}
+                  onClick={() => {
+                    if (!canEditAction || disabled) return;
+                    setEditedAction(editedAction.toUpperCase() === "BUY" ? "BUY" : "buy");
+                  }}
                   className="px-3 py-1 text-xs font-semibold rounded transition-colors"
                   style={{
                     backgroundColor: editedAction.toUpperCase() === "BUY" ? "#2563eb" : "transparent",
@@ -206,7 +215,10 @@ export default function UnifiedTradingApprovalPanel({
                   {t("hitl.buy")}
                 </button>
                 <button
-                  onClick={() => setEditedAction(editedAction.toUpperCase() === "SELL" ? "SELL" : "sell")}
+                  onClick={() => {
+                    if (!canEditAction || disabled) return;
+                    setEditedAction(editedAction.toUpperCase() === "SELL" ? "SELL" : "sell");
+                  }}
                   className="px-3 py-1 text-xs font-semibold rounded transition-colors"
                   style={{
                     backgroundColor: editedAction.toUpperCase() === "SELL" ? "#ef4444" : "transparent",
@@ -623,6 +635,7 @@ export default function UnifiedTradingApprovalPanel({
             <textarea
               value={adjustmentRequest}
               onChange={(e) => setAdjustmentRequest(e.target.value)}
+              disabled={!supportsUserInput || disabled}
               placeholder={t("hitl.unified.adjustmentPlaceholder")}
               className="w-full px-3 py-2.5 pr-12 rounded-lg border resize-none"
               style={{
@@ -634,7 +647,7 @@ export default function UnifiedTradingApprovalPanel({
             />
             <button
               onClick={handleModify}
-              disabled={!adjustmentRequest.trim()}
+              disabled={disabled || !supportsUserInput || !adjustmentRequest.trim()}
               className="absolute bottom-2.5 right-2.5 p-2 rounded-lg transition-colors disabled:opacity-40"
               style={{
                 backgroundColor: "#60a5fa",

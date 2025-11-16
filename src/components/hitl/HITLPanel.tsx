@@ -80,7 +80,7 @@ export default function HITLPanel({
           request={request}
           onApprove={handleApprove}
           onReject={handleReject}
-          onModify={handleModify as any} // Portfolio only uses string userInput
+          onModify={handleModify}
           variant={variant}
           disabled={disabled}
         />

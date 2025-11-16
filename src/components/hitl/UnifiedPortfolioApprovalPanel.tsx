@@ -9,7 +9,7 @@ interface UnifiedPortfolioApprovalPanelProps {
   request: PortfolioApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
-  onModify?: (userInput: string) => void;
+  onModify?: (modifications: Record<string, any>, userInput?: string) => void;
   variant?: "drawer" | "floating";
   disabled?: boolean;
 }
@@ -42,15 +42,17 @@ export default function UnifiedPortfolioApprovalPanel({
     return () => observer.disconnect();
   }, []);
 
+  const supportsUserInput = request.supports_user_input ?? true;
+
   const handleModify = () => {
-    if (onModify) {
-      // Portfolio Rebalancing은 user_input만 지원 (HITL-MODIFY-PATTERN.md 참고)
-      const userInputText = userInput.trim() || undefined;
-      if (userInputText) {
-        onModify(userInputText);
-        setUserInput("");
-      }
-    }
+    if (!onModify) return;
+    if (!supportsUserInput) return;
+    // Portfolio Rebalancing은 user_input만 지원 (HITL-MODIFY-PATTERN.md 참고)
+    const userInputText = userInput.trim() || undefined;
+    if (!userInputText) return;
+    // Portfolio Modify는 modifications 없이 user_input만 전송
+    onModify({}, userInputText);
+    setUserInput("");
   };
 
   return (
@@ -159,6 +161,7 @@ export default function UnifiedPortfolioApprovalPanel({
             <textarea
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
+              disabled={!supportsUserInput || disabled}
               placeholder={t("hitl.unified.adjustmentPlaceholder")}
               className="w-full px-3 py-2.5 pr-12 rounded-lg border resize-none"
               style={{
@@ -170,7 +173,7 @@ export default function UnifiedPortfolioApprovalPanel({
             />
             <button
               onClick={handleModify}
-              disabled={!userInput.trim()}
+              disabled={disabled || !supportsUserInput || !userInput.trim()}
               className="absolute bottom-2.5 right-2.5 p-2 rounded-lg transition-colors disabled:opacity-40"
               style={{
                 backgroundColor: "#60a5fa",

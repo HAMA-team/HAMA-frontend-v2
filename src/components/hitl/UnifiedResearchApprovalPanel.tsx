@@ -49,25 +49,37 @@ export default function UnifiedResearchApprovalPanel({
   const [scope, setScope] = React.useState<"narrow" | "balanced" | "broad">("balanced");
   const [perspectives, setPerspectives] = React.useState<string[]>(["macro", "fundamental", "technical"]);
 
+  const modifiableFields = request.modifiable_fields ?? ["depth", "scope", "perspectives"];
+  const supportsUserInput = request.supports_user_input ?? true;
+  const canModifyDepth = modifiableFields.includes("depth");
+  const canModifyScope = modifiableFields.includes("scope");
+  const canModifyPerspectives = modifiableFields.includes("perspectives");
+
   const handleModify = () => {
     if (onModify) {
-      // 구조화된 수정사항 생성
+      // 구조화된 수정사항 생성 (HITL-MODIFY-PATTERN.md)
       const modifications: { depth?: string; scope?: string; perspectives?: string[] } = {};
 
-      // 변경된 값만 포함
-      if (depth !== request.depth_level) {
+      // 변경된 값만 포함 (modifiable_fields 기준)
+      if (canModifyDepth && depth !== request.depth_level) {
         modifications.depth = depth;
       }
-      // scope는 request에 없으므로 항상 포함
-      modifications.scope = scope;
+      if (canModifyScope) {
+        modifications.scope = scope;
+      }
       // perspectives 변경 확인
       const originalPerspectives = (request as any).perspectives || [];
-      if (JSON.stringify(perspectives.sort()) !== JSON.stringify(originalPerspectives.sort())) {
+      if (canModifyPerspectives && JSON.stringify(perspectives.sort()) !== JSON.stringify(originalPerspectives.sort())) {
         modifications.perspectives = perspectives;
       }
 
-      // user_input은 선택사항
-      const userInput = adjustmentRequest.trim() || undefined;
+      // user_input은 선택사항 (supports_user_input 기준)
+      const userInput = supportsUserInput ? adjustmentRequest.trim() || undefined : undefined;
+
+      // 수정사항/텍스트가 모두 없으면 호출하지 않음
+      if (!userInput && Object.keys(modifications).length === 0) {
+        return;
+      }
 
       onModify(modifications, userInput);
       setAdjustmentRequest("");
@@ -190,7 +202,10 @@ export default function UnifiedResearchApprovalPanel({
               ] as const).map((opt) => (
                 <button
                   key={opt.key}
-                  onClick={() => setDepth(opt.key as any)}
+                  onClick={() => {
+                    if (!canModifyDepth || disabled) return;
+                    setDepth(opt.key as any);
+                  }}
                   className="flex-1 px-3 py-2 rounded-lg text-sm border"
                   style={chipStyle(depth === opt.key)}
                 >
@@ -213,7 +228,10 @@ export default function UnifiedResearchApprovalPanel({
               ] as const).map((opt) => (
                 <button
                   key={opt.key}
-                  onClick={() => setScope(opt.key as any)}
+                  onClick={() => {
+                    if (!canModifyScope || disabled) return;
+                    setScope(opt.key as any);
+                  }}
                   className="flex-1 px-3 py-2 rounded-lg text-sm border"
                   style={chipStyle(scope === opt.key)}
                 >
@@ -237,7 +255,10 @@ export default function UnifiedResearchApprovalPanel({
                     {["macro", "fundamental", "technical", "flow"].map((key) => (
                       <button
                         key={key}
-                        onClick={() => togglePerspective(key)}
+                        onClick={() => {
+                          if (!canModifyPerspectives || disabled) return;
+                          togglePerspective(key);
+                        }}
                         className="flex-1 px-3 py-2 rounded-lg text-sm border"
                         style={chipStyle(perspectives.includes(key))}
                       >
@@ -249,7 +270,10 @@ export default function UnifiedResearchApprovalPanel({
                     {["strategy", "bull", "bear"].map((key) => (
                       <button
                         key={key}
-                        onClick={() => togglePerspective(key)}
+                        onClick={() => {
+                          if (!canModifyPerspectives || disabled) return;
+                          togglePerspective(key);
+                        }}
                         className="flex-1 px-3 py-2 rounded-lg text-sm border"
                         style={chipStyle(perspectives.includes(key))}
                       >
@@ -265,7 +289,10 @@ export default function UnifiedResearchApprovalPanel({
                     {["macro", "fundamental", "technical"].map((key) => (
                       <button
                         key={key}
-                        onClick={() => togglePerspective(key)}
+                        onClick={() => {
+                          if (!canModifyPerspectives || disabled) return;
+                          togglePerspective(key);
+                        }}
                         className="flex-1 px-3 py-2 rounded-lg text-sm border"
                         style={chipStyle(perspectives.includes(key))}
                       >
@@ -277,7 +304,10 @@ export default function UnifiedResearchApprovalPanel({
                     {["flow", "strategy", "bull", "bear"].map((key) => (
                       <button
                         key={key}
-                        onClick={() => togglePerspective(key)}
+                        onClick={() => {
+                          if (!canModifyPerspectives || disabled) return;
+                          togglePerspective(key);
+                        }}
                         className="flex-1 px-3 py-2 rounded-lg text-sm border"
                         style={chipStyle(perspectives.includes(key))}
                       >
@@ -329,6 +359,7 @@ export default function UnifiedResearchApprovalPanel({
             <textarea
               value={adjustmentRequest}
               onChange={(e) => setAdjustmentRequest(e.target.value)}
+              disabled={!supportsUserInput || disabled}
               placeholder={t("hitl.unified.adjustmentPlaceholder")}
               className="w-full px-3 py-2.5 pr-12 rounded-lg border resize-none"
               style={{
@@ -340,7 +371,7 @@ export default function UnifiedResearchApprovalPanel({
             />
             <button
               onClick={handleModify}
-              disabled={!adjustmentRequest.trim()}
+              disabled={disabled || !supportsUserInput || !adjustmentRequest.trim()}
               className="absolute bottom-2.5 right-2.5 p-2 rounded-lg transition-colors disabled:opacity-40"
               style={{
                 backgroundColor: "#60a5fa",
@@ -383,7 +414,7 @@ export default function UnifiedResearchApprovalPanel({
           {/* Modify Button */}
           <button
             onClick={handleModify}
-            disabled={disabled || !adjustmentRequest.trim()}
+            disabled={disabled}
             className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: adjustmentRequest.trim()

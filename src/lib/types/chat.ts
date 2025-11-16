@@ -93,6 +93,18 @@ export interface BaseApprovalRequest {
   request_id?: string;
   /** 표준 이벤트에서 동봉되는 승인 플래그 (옵션) */
   requires_approval?: boolean;
+  /**
+   * 수정 가능한 필드 목록
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md
+   */
+  modifiable_fields?: string[];
+  /**
+   * 자유 텍스트 입력 지원 여부
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md
+   */
+  supports_user_input?: boolean;
 }
 
 /**
@@ -110,6 +122,28 @@ export interface ResearchApprovalRequest extends BaseApprovalRequest {
   query_complexity: "simple" | "moderate" | "expert";
   depth_level: "brief" | "detailed" | "comprehensive";
   expected_workers?: string[];
+  /**
+   * Research Plan 상세 정보 (옵션)
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md - Scenario 1
+   */
+  plan?: {
+    depth: string;
+    depth_name?: string;
+    scope: string;
+    perspectives: string[];
+    estimated_time?: string;
+  };
+  /**
+   * Research Plan 옵션 정보 (옵션)
+   *
+   * @see docs/HITL-MODIFY-PATTERN.md - Scenario 1
+   */
+  options?: {
+    depths?: string[];
+    scopes?: string[];
+    perspectives?: string[];
+  };
 }
 
 /**
