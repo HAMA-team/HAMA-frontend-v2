@@ -128,8 +128,8 @@ export default function ChatInput({
               .replace(/\b(\d{6})\b/g, (_m: string, g1: string) => g1.split("").join(" "))
               .replace(/\bA(\d{6})\b/g, (_m: string, g1: string) => `A ${g1.split("").join(" ")}`);
             composedForLLM = `${preamble}\n\n\`\`\`context\n${maskedCtx}\n\`\`\`\n\n---\n${sep}\n\n${userMessageContent}`;
-            // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해 Advisor 모드로 유도
-            desiredConfig = PRESET_ADVISOR;
+            // 외부 컨텍스트 기반 질의는 도구 호출을 피하기 위해
+            // 추후 백엔드 정책에 맞춰 HITL 설정을 조정할 수 있음
           }
         }
 
@@ -214,12 +214,12 @@ export default function ChatInput({
                         phase: reasoning.phase,
                         status: reasoning.status,
                         label: reasoning.event_label,
-                        message: reasoning.message,
-                          hasApprovalRequest: !!(ev.data?.approval_request ?? ev.data),
-                        });
-                      }
+                          message: reasoning.message,
+                          hasApprovalRequest: !!ev.data?.approval_request,
+                      });
+                    }
 
-                      const hasApprovalRequest = !!(ev.data?.approval_request ?? ev.data);
+                    const hasApprovalRequest = !!ev.data?.approval_request;
 
                       // 1) phase === "hitl" 이거나
                       // 2) agent_complete + approval_request 가 함께 온 경우
@@ -230,7 +230,7 @@ export default function ChatInput({
                         hasApprovalRequest;
 
                       if ((isHitlPhase || isSupervisorHitl) && !useChatStore.getState().approvalPanel.isOpen) {
-                        const raw = ev.data?.approval_request ?? ev.data;
+                        const raw = ev.data?.approval_request;
                         if (raw) {
                           const norm: any = { ...raw };
                           if (norm.type === "trade_approval") norm.type = "trading";
