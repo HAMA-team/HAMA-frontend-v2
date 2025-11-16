@@ -89,6 +89,10 @@ export type HITLAgentType =
 export interface BaseApprovalRequest {
   type: HITLAgentType;
   agent: string;
+  /** 백엔드 승인 요청 식별자 (옵션) */
+  request_id?: string;
+  /** 표준 이벤트에서 동봉되는 승인 플래그 (옵션) */
+  requires_approval?: boolean;
 }
 
 /**
@@ -205,6 +209,17 @@ export interface TradingApprovalRequest extends BaseApprovalRequest {
   expected_weight: number;
   risk_warning?: string;
   alternatives?: Alternative[];
+  /** 위험 레벨(옵션) */
+  risk_level?: "high" | "medium" | "low";
+  /** 위험 경고 목록(옵션) */
+  risk_warnings?: string[];
+
+  /** 포트폴리오 전/후 비교(옵션) */
+  portfolio_before?: PortfolioSnapshot;
+  portfolio_after?: PortfolioSnapshot;
+  /** 리스크 지표 전/후 비교(옵션) */
+  risk_before?: RiskMetrics;
+  risk_after?: RiskMetrics;
 }
 
 /**
@@ -225,6 +240,31 @@ export type ApprovalRequest =
   | PortfolioApprovalRequest
   | RiskApprovalRequest
   | TradingApprovalRequest;
+
+/**
+ * Portfolio Simulator 패턴: 포트폴리오 스냅샷
+ */
+export interface PortfolioSnapshot {
+  total_value: number;
+  cash_balance: number;
+  holdings: Array<{
+    stock_code: string;
+    stock_name: string;
+    quantity: number;
+    weight: number;
+    market_value: number;
+  }>;
+}
+
+/**
+ * Portfolio Simulator 패턴: 리스크 메트릭
+ */
+export interface RiskMetrics {
+  portfolio_volatility: number; // 0-1
+  var_95: number; // 음수 비율(손실)
+  sharpe_ratio: number;
+  max_drawdown_estimate: number; // 0-1
+}
 
 /**
  * Chat API 응답 인터페이스 (HITL 필요)

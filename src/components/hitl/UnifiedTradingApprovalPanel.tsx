@@ -3,54 +3,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, TrendingUp, TrendingDown, Edit2, Layers, DollarSign, Send } from "lucide-react";
-
-// Portfolio Simulator 패턴 타입 정의 (HITL-MODIFY-PATTERN.md)
-interface PortfolioSnapshot {
-  total_value: number;
-  cash_balance: number;
-  holdings: Array<{
-    stock_code: string;
-    stock_name: string;
-    quantity: number;
-    weight: number;
-    market_value: number;
-  }>;
-}
-
-interface RiskMetrics {
-  portfolio_volatility: number;  // 포트폴리오 변동성 (0-1)
-  var_95: number;                // 95% VaR
-  sharpe_ratio: number;          // 샤프 비율
-  max_drawdown_estimate: number; // 최대 낙폭 추정 (0-1)
-}
-
-interface UnifiedTradingApprovalRequest {
-  // Trade Info
-  stock_name: string;
-  stock_code: string;
-  action: "BUY" | "SELL" | "buy" | "sell";
-  quantity: number;
-  price: number;
-  total_amount: number;
-
-  // Portfolio Impact (레거시)
-  current_weight?: number;
-  expected_weight?: number;
-  quantity_after_trade?: number;
-
-  // Risk Info (optional, from backend)
-  risk_level?: "high" | "medium" | "low";
-  risk_warnings?: string[]; // Backend provides simple string array
-
-  // Portfolio Simulator 패턴 (2025-11-16 추가)
-  portfolio_before?: PortfolioSnapshot;
-  portfolio_after?: PortfolioSnapshot;
-  risk_before?: RiskMetrics;
-  risk_after?: RiskMetrics;
-}
+import type { TradingApprovalRequest } from "@/lib/types/chat";
 
 interface UnifiedTradingApprovalPanelProps {
-  request: UnifiedTradingApprovalRequest;
+  request: TradingApprovalRequest;
   onApprove: () => void;
   onReject: () => void;
   onModify?: (modifications: { quantity?: number; price?: number; action?: string }, userInput?: string) => void;
