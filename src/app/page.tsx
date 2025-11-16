@@ -267,6 +267,35 @@ ${t("chat.receivedResponse")}
                 }
                 break;
               }
+              case "agent_complete": {
+                // HITL: agent_complete에서 requires_approval 체크 (호환 경로)
+                const result = (ev as any)?.data?.result;
+                if (result && (result.requires_approval || result.status === "pending")) {
+                  const agentType = String((ev as any)?.data?.agent || "").toLowerCase();
+                  // Trading Agent HITL 처리
+                  if (agentType === "trading") {
+                    const hitlData = {
+                      type: "trading" as const,
+                      agent: "Trading" as const,
+                      action: (result.action || "buy") as "buy" | "sell",
+                      stock_code: result.stock_code || "000000",
+                      stock_name: result.stock_name || "종목명",
+                      quantity: result.quantity || 0,
+                      price: result.price || 0,
+                      total_amount: result.total_amount || 0,
+                      current_weight: result.current_weight || 0,
+                      expected_weight: result.expected_weight || 0,
+                      order_id: result.order_id,
+                      rationale: result.summary || "매수 주문이 생성되었습니다.",
+                      risk_warning: result.risk_warning || "",
+                      alternatives: result.alternatives || [],
+                    };
+                    try { openApprovalPanel(hitlData as any); } catch {}
+                  }
+                  // TODO: 다른 Agent 타입 처리 필요 시 추가 (portfolio, strategy 등)
+                }
+                break;
+              }
               case "agent_thinking": {
                 // AI 사고 내용을 실시간으로 마지막 thinking step에 추가 (노이즈 제거)
                 console.log("🔍 [DEBUG] agent_thinking received, raw data:", ev.data);
@@ -295,6 +324,14 @@ ${t("chat.receivedResponse")}
                 const raw = ev?.data?.approval_request ?? ev?.data;
                 if (raw) {
                   const norm: any = { ...raw };
+                  if (norm.type === 'trade_approval') norm.type = 'trading';
+                  try { openApprovalPanel(norm as any); } catch {}
+                }
+                break;
+              }
+              case "hitl.request": {
+                if (ev.data) {
+                  const norm: any = { ...(ev as any).data };
                   if (norm.type === 'trade_approval') norm.type = 'trading';
                   try { openApprovalPanel(norm as any); } catch {}
                 }
@@ -500,6 +537,33 @@ ${t("chat.receivedResponse")}
                   }
                   break;
                 }
+                case "agent_complete": {
+                  // HITL: agent_complete에서 requires_approval 체크 (호환 경로)
+                  const result = (ev as any)?.data?.result;
+                  if (result && (result.requires_approval || result.status === "pending")) {
+                    const agentType = String((ev as any)?.data?.agent || "").toLowerCase();
+                    if (agentType === "trading") {
+                      const hitlData = {
+                        type: "trading" as const,
+                        agent: "Trading" as const,
+                        action: (result.action || "buy") as "buy" | "sell",
+                        stock_code: result.stock_code || "000000",
+                        stock_name: result.stock_name || "종목명",
+                        quantity: result.quantity || 0,
+                        price: result.price || 0,
+                        total_amount: result.total_amount || 0,
+                        current_weight: result.current_weight || 0,
+                        expected_weight: result.expected_weight || 0,
+                        order_id: result.order_id,
+                        rationale: result.summary || "매수 주문이 생성되었습니다.",
+                        risk_warning: result.risk_warning || "",
+                        alternatives: result.alternatives || [],
+                      };
+                      try { openApprovalPanel(hitlData as any); } catch {}
+                    }
+                  }
+                  break;
+                }
                 case "agent_thinking": {
                   const clean = sanitizeThinkingDelta(ev.data);
                   if (clean) {
@@ -516,14 +580,22 @@ ${t("chat.receivedResponse")}
                 if (cid) setCurrentThreadId(String(cid));
                 break;
               }
-              case "hitl_interrupt": {
-                const req = ev?.data?.approval_request ?? ev?.data;
-                if (req) {
-                  try { openApprovalPanel(req as any); } catch {}
+                case "hitl_interrupt": {
+                  const req = ev?.data?.approval_request ?? ev?.data;
+                  if (req) {
+                    try { openApprovalPanel(req as any); } catch {}
+                  }
+                  break;
                 }
-                break;
-              }
-              case "error": {
+                case "hitl.request": {
+                  if (ev.data) {
+                    const norm: any = { ...(ev as any).data };
+                    if (norm.type === 'trade_approval') norm.type = 'trading';
+                    try { openApprovalPanel(norm as any); } catch {}
+                  }
+                  break;
+                }
+                case "error": {
                 const msg = ev.data?.message || "Stream error";
                 updateMessage(tempId, { content: msg, status: "error" });
                 break;
@@ -1051,4 +1123,3 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     </div>
   );
 }
-
