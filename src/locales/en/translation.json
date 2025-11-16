@@ -6,6 +6,7 @@
                    "delete":  "Delete",
                    "rename":  "Rename",
                    "edit":  "Edit",
+                   "modified": "Modified",
                    "close":  "Close",
                    "loading":  "Loading...",
                    "error":  "An error occurred",
@@ -579,7 +580,16 @@
                                       "status": {
                                                     "manualApproval": "Manual Approval",
                                                     "autoExecution": "Auto Execution"
-                                                }
+                                                },
+                                      "simulator": {
+                                                      "portfolioChanges": "Portfolio Changes",
+                                                      "riskChanges": "Risk Changes",
+                                                      "cashBalance": "Cash",
+                                                      "weight": "Weight",
+                                                      "volatility": "Volatility",
+                                                      "maxDrawdown": "Max Drawdown",
+                                                      "recalculation": "The server will recalculate with modified values and provide updated before/after data."
+                                                  }
                                   }
                }
 }

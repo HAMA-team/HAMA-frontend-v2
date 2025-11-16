@@ -6,6 +6,7 @@
     "delete": "삭제",
     "rename": "이름 바꾸기",
     "edit": "수정",
+    "modified": "수정됨",
     "close": "닫기",
     "loading": "로딩 중...",
     "error": "오류가 발생했습니다",
@@ -573,6 +574,15 @@
       "stocks": {
         "samsungElectronics": "삼성전자"
       }
+    },
+    "simulator": {
+      "portfolioChanges": "포트폴리오 변화",
+      "riskChanges": "리스크 변화",
+      "cashBalance": "현금",
+      "weight": "비중",
+      "volatility": "변동성",
+      "maxDrawdown": "최대 낙폭",
+      "recalculation": "수정 후 서버에서 재계산하여 새로운 전/후 비교 데이터를 제공합니다."
     }
   }
 }
