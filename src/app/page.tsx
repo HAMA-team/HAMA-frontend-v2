@@ -6,7 +6,6 @@ import ChatView from "@/components/chat/ChatView";
 import HITLPanel from "@/components/hitl/HITLPanel";
 import { useChatStore } from "@/store/chatStore";
 import { useArtifactStore } from "@/store/artifactStore";
-import { createArtifact } from "@/lib/api/artifacts";
 import { Message, ThinkingStep, ApprovalRequest } from "@/lib/types/chat";
 import { useDialogStore } from "@/store/dialogStore";
 import { approveAction } from "@/lib/api/approvals";
@@ -47,7 +46,6 @@ export default function Home() {
   const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
   const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId } = useChatStore();
-  const { addArtifact } = useArtifactStore();
   const { openAlert } = useDialogStore();
   const { hitlConfig } = useUserStore();
 
@@ -659,26 +657,36 @@ ${t("chat.receivedResponse")}
       return;
     }
 
-    // Save as artifact
+    // Extract title from content (first heading or first line)
+    const extractTitle = (content: string): string => {
+      // Try to find first markdown heading
+      const headingMatch = content.match(/^#+ (.+)$/m);
+      if (headingMatch) {
+        return headingMatch[1].trim();
+      }
+      // Otherwise use first line (max 100 chars)
+      const firstLine = content.split("\n")[0]?.trim() || "";
+      return firstLine.length > 100 ? firstLine.substring(0, 100) + "..." : firstLine || "Artifact";
+    };
+
+    // Save as artifact via API
     if (mode === "live") {
       try {
-        const firstLine = (message.content || "").split("\n")[0]?.replace(/^#\s*/, "").trim() || "Artifact";
-        const res = await createArtifact({
-          title: firstLine,
+        const { createArtifact } = useArtifactStore.getState();
+        await createArtifact({
+          title: extractTitle(message.content),
           content: message.content,
           artifact_type: "analysis",
           metadata: { created_from_message_id: messageId },
         });
-        const artifact = addArtifact(message.content, "📄");
-        console.log("Artifact saved (server+local):", res?.artifact_id || res?.id, artifact.id);
+        console.log("Artifact saved successfully via API");
       } catch (e) {
-        console.error("Server artifact save failed; using local store only:", e);
-        const artifact = addArtifact(message.content, "📄");
-        console.log("Artifact saved (local):", artifact.id);
+        console.error("Failed to save artifact:", e);
+        throw e; // Re-throw to show error toast
       }
     } else {
-      const artifact = addArtifact(message.content, "📄");
-      console.log("Artifact saved:", artifact);
+      // Mock mode: save to demo state
+      console.log("Mock mode: Artifact would be saved to backend");
     }
 
     // Note: Toast is automatically shown by SaveArtifactButton

@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { Artifact, useArtifactStore } from '@/store/artifactStore';
+import { useArtifactStore } from '@/store/artifactStore';
+import { ArtifactListItem } from '@/lib/api/artifacts';
 import { formatRelativeOrDate, formatAbsoluteDate } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useDialogStore } from '@/store/dialogStore';
 
 interface ArtifactCardProps {
-  artifact: Artifact;
+  artifact: ArtifactListItem;
 }
 
 /**
@@ -35,37 +36,53 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
   useEffect(() => {
     const onAnyContextOpen = (e: Event) => {
       const detail = (e as CustomEvent).detail as { id?: string } | undefined;
-      if (detail?.id !== artifact.id) {
+      if (detail?.id !== artifact.artifact_id) {
         setMenuOpen(false);
       }
     };
     window.addEventListener('artifact-contextmenu-open', onAnyContextOpen as EventListener);
     return () => window.removeEventListener('artifact-contextmenu-open', onAnyContextOpen as EventListener);
-  }, [artifact.id]);
+  }, [artifact.artifact_id]);
 
   const handleContextMenu: React.MouseEventHandler<HTMLDivElement> = (e) => {
     e.preventDefault();
     // 다른 카드의 메뉴를 닫도록 브로드캐스트
-    window.dispatchEvent(new CustomEvent('artifact-contextmenu-open', { detail: { id: artifact.id } }));
+    window.dispatchEvent(new CustomEvent('artifact-contextmenu-open', { detail: { id: artifact.artifact_id } }));
     setMenuPos({ x: e.clientX, y: e.clientY });
     setMenuOpen(true);
   };
 
-  const handleDelete = (e?: React.MouseEvent) => {
+  const handleDelete = async (e?: React.MouseEvent) => {
     e?.stopPropagation();
     e?.preventDefault();
     openConfirm({
       title: t('common.delete'),
       message: t('artifacts.deleteConfirm'),
-      onConfirm: () => {
-        deleteArtifact(artifact.id);
+      onConfirm: async () => {
+        try {
+          await deleteArtifact(artifact.artifact_id);
+        } catch (error) {
+          console.error('Failed to delete artifact:', error);
+        }
       },
     });
     setMenuOpen(false);
   };
 
+  // Get icon based on artifact type
+  const getIcon = (type: string) => {
+    const icons: Record<string, string> = {
+      analysis: '📊',
+      portfolio: '💼',
+      strategy: '🎯',
+      research: '🔍',
+      risk_report: '⚠️',
+    };
+    return icons[type] || '📄';
+  };
+
   return (
-    <Link href={`/artifacts/${artifact.id}`}>
+    <Link href={`/artifacts/${artifact.artifact_id}`}>
       <div
         onContextMenu={handleContextMenu}
         className="group p-6 rounded-xl border transition-all duration-200 hover:shadow-md cursor-pointer relative h-full flex flex-col min-h-[240px]"
@@ -79,7 +96,7 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
           className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl mb-4"
           style={{ backgroundColor: 'var(--primary-50)' }}
         >
-          {artifact.icon}
+          {getIcon(artifact.artifact_type)}
         </div>
 
         {/* Title + Summary (flex-1 to push date to bottom) */}
@@ -91,22 +108,24 @@ export default function ArtifactCard({ artifact }: ArtifactCardProps) {
             {artifact.title}
           </h3>
 
-          {/* Summary */}
-          <p
-            className="text-sm mb-4 line-clamp-2"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            {artifact.summary}
-          </p>
+          {/* Preview */}
+          {artifact.preview && (
+            <p
+              className="text-sm mb-4 line-clamp-2"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              {artifact.preview}
+            </p>
+          )}
         </div>
 
         {/* Date (sticks to bottom via flex) */}
         <p
           className="text-xs mt-auto"
           style={{ color: 'var(--text-muted)' }}
-          title={formatAbsoluteDate(artifact.createdAt, i18n?.language || 'en')}
+          title={formatAbsoluteDate(artifact.created_at, i18n?.language || 'en')}
         >
-          {formatRelativeOrDate(artifact.createdAt, i18n?.language || 'en', 30)}
+          {formatRelativeOrDate(artifact.created_at, i18n?.language || 'en', 30)}
         </p>
 
         {/* Context Menu */}

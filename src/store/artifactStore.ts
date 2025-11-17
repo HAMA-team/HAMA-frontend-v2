@@ -1,101 +1,184 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { extractTitleFromMarkdown, generateSummary } from '@/lib/utils';
+import {
+  fetchArtifactsList,
+  fetchArtifactDetail,
+  createArtifact as createArtifactAPI,
+  updateArtifact as updateArtifactAPI,
+  deleteArtifact as deleteArtifactAPI,
+  ArtifactListItem,
+  ArtifactDetail,
+  ArtifactType,
+} from '@/lib/api/artifacts';
 
 /**
- * Artifact Type
+ * Artifact Store (Backend API 기반)
  *
- * Represents a saved AI response/analysis
- * Stored in LocalStorage (Phase 1-2)
- * Will migrate to Backend DB in Phase 3
+ * Phase 3: Backend API 연동 완료
+ * - LocalStorage 제거
+ * - 모든 데이터는 Backend DB에서 가져옴
  */
-export interface Artifact {
-  id: string;
-  title: string;
-  summary: string;
-  content: string; // Markdown content
-  icon: string; // Emoji or icon name
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
-  tags?: string[]; // Optional tags for filtering (Phase 3+)
-}
 
 interface ArtifactStore {
-  artifacts: Artifact[];
-  addArtifact: (content: string, icon?: string) => Artifact;
-  getArtifact: (id: string) => Artifact | undefined;
-  deleteArtifact: (id: string) => void;
-  updateArtifact: (id: string, updates: Partial<Artifact>) => void;
+  // State
+  artifacts: ArtifactListItem[];
+  currentArtifact: ArtifactDetail | null;
+  isLoading: boolean;
+  error: string | null;
+
+  // Actions
+  loadArtifacts: () => Promise<void>;
+  loadArtifact: (id: string) => Promise<void>;
+  createArtifact: (params: {
+    title: string;
+    content: string;
+    artifact_type: ArtifactType;
+    metadata?: Record<string, any>;
+  }) => Promise<ArtifactDetail>;
+  updateArtifact: (
+    id: string,
+    updates: {
+      title?: string;
+      content?: string;
+      metadata?: Record<string, any>;
+    }
+  ) => Promise<void>;
+  deleteArtifact: (id: string) => Promise<void>;
+  clearError: () => void;
 }
 
-/**
- * Artifact Store (Zustand + LocalStorage)
- *
- * Phase 1-2: LocalStorage persistence
- * Phase 3: Migrate to Backend API
- */
-export const useArtifactStore = create<ArtifactStore>()(
-  persist(
-    (set, get) => ({
-      artifacts: [],
+export const useArtifactStore = create<ArtifactStore>((set, get) => ({
+  // Initial state
+  artifacts: [],
+  currentArtifact: null,
+  isLoading: false,
+  error: null,
 
-      /**
-       * Add new artifact
-       *
-       * @param content - Markdown content
-       * @param icon - Optional icon (default: 📄)
-       * @returns Created artifact
-       */
-      addArtifact: (content: string, icon = '📄') => {
-        const now = new Date().toISOString();
-        const newArtifact: Artifact = {
-          id: `artifact-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          title: extractTitleFromMarkdown(content),
-          summary: generateSummary(content),
-          content,
-          icon,
-          createdAt: now,
-          updatedAt: now,
-        };
-
-        set((state) => ({
-          artifacts: [newArtifact, ...state.artifacts], // Newest first
-        }));
-
-        return newArtifact;
-      },
-
-      /**
-       * Get artifact by ID
-       */
-      getArtifact: (id: string) => {
-        return get().artifacts.find((artifact) => artifact.id === id);
-      },
-
-      /**
-       * Delete artifact
-       */
-      deleteArtifact: (id: string) => {
-        set((state) => ({
-          artifacts: state.artifacts.filter((artifact) => artifact.id !== id),
-        }));
-      },
-
-      /**
-       * Update artifact
-       */
-      updateArtifact: (id: string, updates: Partial<Artifact>) => {
-        set((state) => ({
-          artifacts: state.artifacts.map((artifact) =>
-            artifact.id === id
-              ? { ...artifact, ...updates, updatedAt: new Date().toISOString() }
-              : artifact
-          ),
-        }));
-      },
-    }),
-    {
-      name: 'hama-artifacts-storage', // LocalStorage key
+  /**
+   * Load artifacts list from API
+   */
+  loadArtifacts: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetchArtifactsList();
+      set({ artifacts: response.items, isLoading: false });
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message || 'Failed to load artifacts',
+        isLoading: false,
+      });
     }
-  )
-);
+  },
+
+  /**
+   * Load single artifact detail from API
+   */
+  loadArtifact: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const artifact = await fetchArtifactDetail(id);
+      set({ currentArtifact: artifact, isLoading: false });
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message || 'Failed to load artifact',
+        isLoading: false,
+        currentArtifact: null,
+      });
+    }
+  },
+
+  /**
+   * Create new artifact via API
+   */
+  createArtifact: async (params) => {
+    set({ isLoading: true, error: null });
+    try {
+      const newArtifact = await createArtifactAPI(params);
+
+      // Update list (prepend new item)
+      set((state) => ({
+        artifacts: [
+          {
+            artifact_id: newArtifact.artifact_id,
+            title: newArtifact.title,
+            artifact_type: newArtifact.artifact_type,
+            preview: newArtifact.preview,
+            created_at: newArtifact.created_at,
+          },
+          ...state.artifacts,
+        ],
+        isLoading: false,
+      }));
+
+      return newArtifact;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message || 'Failed to create artifact',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  /**
+   * Update artifact via API
+   */
+  updateArtifact: async (id, updates) => {
+    set({ isLoading: true, error: null });
+    try {
+      const updated = await updateArtifactAPI(id, updates);
+
+      // Update in list
+      set((state) => ({
+        artifacts: state.artifacts.map((item) =>
+          item.artifact_id === id
+            ? {
+                ...item,
+                title: updated.title,
+                preview: updated.preview,
+              }
+            : item
+        ),
+        currentArtifact:
+          state.currentArtifact?.artifact_id === id ? updated : state.currentArtifact,
+        isLoading: false,
+      }));
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message || 'Failed to update artifact',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  /**
+   * Delete artifact via API (soft delete)
+   */
+  deleteArtifact: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      await deleteArtifactAPI(id);
+
+      // Remove from list
+      set((state) => ({
+        artifacts: state.artifacts.filter((item) => item.artifact_id !== id),
+        currentArtifact:
+          state.currentArtifact?.artifact_id === id ? null : state.currentArtifact,
+        isLoading: false,
+      }));
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message || 'Failed to delete artifact',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  /**
+   * Clear error state
+   */
+  clearError: () => {
+    set({ error: null });
+  },
+}));

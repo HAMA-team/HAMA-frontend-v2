@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -24,27 +24,42 @@ const ChatInput = dynamic(() => import('@/components/layout/ChatInput'), {
  * Design reference: Mockup - 아티팩트 본문 뷰.png
  *
  * Features:
- * - Markdown rendering
- * - Action buttons (back, download, share)
- * - Context-Aware ChatInput (Phase 3+)
+ * - Markdown rendering (Backend API)
+ * - Action buttons (back, download, share, delete)
+ * - Context-Aware ChatInput (Phase 3)
  */
 export default function ArtifactDetailPage() {
   const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
-  const { getArtifact } = useArtifactStore();
+  const { currentArtifact, isLoading, error, loadArtifact, deleteArtifact } = useArtifactStore();
   const { openConfirm, openAlert } = useDialogStore();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
 
   const artifactId = params.id as string;
-  const artifact = getArtifact(artifactId);
 
-  // 마운트 전에는 렌더링을 지연시켜 hydration mismatch 방지 (LocalStorage 의존)
-  if (!mounted) return null;
+  // Load artifact on mount
+  useEffect(() => {
+    if (artifactId) {
+      loadArtifact(artifactId);
+    }
+  }, [artifactId, loadArtifact]);
 
-  // Handle artifact not found
-  if (!artifact) {
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full flex-col overflow-x-hidden" style={{ backgroundColor: "var(--main-background)" }}>
+        <div className="flex-1 flex items-center justify-center">
+          <div
+            className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
+            style={{ borderColor: "var(--primary-500)", borderTopColor: "transparent" }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Error or not found
+  if (error || !currentArtifact) {
     return (
       <div className="flex h-full w-full flex-col overflow-x-hidden" style={{ backgroundColor: "var(--main-background)" }}>
         <div className="flex-1 flex items-center justify-center">
@@ -54,7 +69,7 @@ export default function ArtifactDetailPage() {
               {t("artifacts.notFound")}
             </h1>
             <p className="text-sm mb-6" style={{ color: "var(--text-secondary)" }}>
-              {t("artifacts.notFoundDescription")}
+              {error || t("artifacts.notFoundDescription")}
             </p>
             <button
               onClick={() => router.push('/artifacts')}
@@ -71,6 +86,8 @@ export default function ArtifactDetailPage() {
       </div>
     );
   }
+
+  const artifact = currentArtifact;
 
   const handleDownload = () => {
     // Create blob and download
@@ -97,12 +114,27 @@ export default function ArtifactDetailPage() {
     openConfirm({
       title: t('common.delete'),
       message: t('artifacts.deleteConfirm'),
-      onConfirm: () => {
-        const { deleteArtifact } = useArtifactStore.getState();
-        deleteArtifact(artifact.id);
-        router.push('/artifacts');
+      onConfirm: async () => {
+        try {
+          await deleteArtifact(artifact.artifact_id);
+          router.push('/artifacts');
+        } catch (error) {
+          console.error('Failed to delete artifact:', error);
+        }
       },
     });
+  };
+
+  // Get icon based on artifact type
+  const getIcon = (type: string) => {
+    const icons: Record<string, string> = {
+      analysis: '📊',
+      portfolio: '💼',
+      strategy: '🎯',
+      research: '🔍',
+      risk_report: '⚠️',
+    };
+    return icons[type] || '📄';
   };
 
   return (
@@ -129,14 +161,17 @@ export default function ArtifactDetailPage() {
               {/* Title and Meta */}
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="flex-1">
-                  <h1
-                    className="text-3xl font-semibold tracking-tight break-words mb-2"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {artifact.title}
-                  </h1>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl">{getIcon(artifact.artifact_type)}</span>
+                    <h1
+                      className="text-3xl font-semibold tracking-tight break-words"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {artifact.title}
+                    </h1>
+                  </div>
                   <div className="flex items-center gap-4 text-sm" style={{ color: "var(--text-muted)" }}>
-                    <span>{formatDate(artifact.createdAt)}</span>
+                    <span>{formatDate(artifact.created_at)}</span>
                     <span>•</span>
                     <span>{artifact.content.split(/\s+/).length} {t("artifacts.wordCount")}</span>
                   </div>
@@ -398,7 +433,7 @@ export default function ArtifactDetailPage() {
       {/* Context-Aware Chat Input */}
       <ChatInput
         placeholder={t("artifacts.chatPlaceholder")}
-        contextArtifactId={artifact.id}
+        contextArtifactId={artifact.artifact_id}
       />
     </>
   );
