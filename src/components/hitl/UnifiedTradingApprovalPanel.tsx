@@ -30,8 +30,8 @@ export default function UnifiedTradingApprovalPanel({
   const [isEditingQuantity, setIsEditingQuantity] = useState(false);
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [editedAction, setEditedAction] = useState<"BUY" | "SELL" | "buy" | "sell">(request.action || "buy");
-  const [editedQuantity, setEditedQuantity] = useState(request.quantity || 0);
-  const [editedPrice, setEditedPrice] = useState(request.price || 0);
+  const [editedQuantity, setEditedQuantity] = useState<number | "">(request.quantity || 0);
+  const [editedPrice, setEditedPrice] = useState<number | "">(request.price || 0);
 
   const modifiableFields = request.modifiable_fields ?? ["quantity", "price", "action"];
   const supportsUserInput = request.supports_user_input ?? false;
@@ -87,20 +87,23 @@ export default function UnifiedTradingApprovalPanel({
     editedPrice !== (request.price || 0) ||
     editedAction.toLowerCase() !== (request.action || "buy").toLowerCase();
 
-  // 수정된 총 금액 계산
-  const editedTotalAmount = editedQuantity * editedPrice;
+  // 수정된 총 금액 계산 (빈 문자열은 0으로 처리)
+  const editedTotalAmount = (editedQuantity || 0) * (editedPrice || 0);
 
   const handleModify = () => {
     if (onModify) {
       // 구조화된 수정사항 생성 (HITL-MODIFY-PATTERN.md)
       const modifications: { quantity?: number; price?: number; action?: string } = {};
 
-      // 변경된 값만 포함
-      if (canEditQuantity && editedQuantity !== (request.quantity || 0)) {
-        modifications.quantity = editedQuantity;
+      // 변경된 값만 포함 (빈 문자열은 0으로 변환)
+      const finalQuantity = editedQuantity || 0;
+      const finalPrice = editedPrice || 0;
+
+      if (canEditQuantity && finalQuantity !== (request.quantity || 0)) {
+        modifications.quantity = finalQuantity;
       }
-      if (canEditPrice && editedPrice !== (request.price || 0)) {
-        modifications.price = editedPrice;
+      if (canEditPrice && finalPrice !== (request.price || 0)) {
+        modifications.price = finalPrice;
       }
       if (canEditAction && editedAction.toLowerCase() !== (request.action || "buy").toLowerCase()) {
         modifications.action = editedAction.toLowerCase();
@@ -262,19 +265,21 @@ export default function UnifiedTradingApprovalPanel({
                 <input
                   type="number"
                   value={editedQuantity}
-                  onChange={(e) => setEditedQuantity(Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEditedQuantity(val === "" ? "" : Number(val));
+                  }}
                   className="w-full px-2 py-1 text-base font-bold rounded border"
                   style={{
                     backgroundColor: "var(--container-background)",
                     borderColor: "var(--border-default)",
                     color: "var(--text-primary)",
                   }}
-                  min="1"
                   step="1"
                 />
               ) : (
                 <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
-                  {formatNumber(editedQuantity)} {t("hitl.shares")}
+                  {formatNumber(editedQuantity || 0)} {t("hitl.shares")}
                 </div>
               )}
             </div>
@@ -307,19 +312,21 @@ export default function UnifiedTradingApprovalPanel({
                 <input
                   type="number"
                   value={editedPrice}
-                  onChange={(e) => setEditedPrice(Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEditedPrice(val === "" ? "" : Number(val));
+                  }}
                   className="w-full px-2 py-1 text-base font-bold rounded border"
                   style={{
                     backgroundColor: "var(--container-background)",
                     borderColor: "var(--border-default)",
                     color: "var(--text-primary)",
                   }}
-                  min="1"
                   step="100"
                 />
               ) : (
                 <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
-                  {formatCurrency(editedPrice)}
+                  {formatCurrency(editedPrice || 0)}
                 </div>
               )}
             </div>
@@ -690,7 +697,7 @@ export default function UnifiedTradingApprovalPanel({
           {/* Modify Button */}
           <button
             onClick={handleModify}
-            disabled={disabled || (!adjustmentRequest.trim() && !isEdited)}
+            disabled={disabled || (!adjustmentRequest.trim() && !isEdited) || !editedQuantity || editedQuantity <= 0 || !editedPrice || editedPrice <= 0}
             className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: (adjustmentRequest.trim() || isEdited)
