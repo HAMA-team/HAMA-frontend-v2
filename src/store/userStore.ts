@@ -21,10 +21,19 @@ export type RiskProfileType =
   | 'neutral'
   | 'aggressive';
 
+export interface InvestmentProfileContext {
+  name?: string;
+  age?: number;
+  purpose?: string;
+  styleKey?: 'conservative' | 'neutral' | 'aggressive';
+  allocation?: 1 | 2 | 3 | 4 | 5;
+}
+
 export interface InvestmentProfile {
   type: RiskProfileType;
   description: string; // LLM 생성 서술형 프로필
   last_updated: string;
+  context?: InvestmentProfileContext;
 }
 
 export interface UserInfo {
