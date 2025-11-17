@@ -79,15 +79,6 @@ export default function InvestmentProfile() {
           {t("mypage.profile.comingSoon")}
         </p>
 
-        <div
-          className="inline-block px-4 py-2 text-xs font-semibold rounded-full"
-          style={{
-            backgroundColor: "var(--primary-50)",
-            color: "var(--primary-500)",
-          }}
-        >
-          Phase 3
-        </div>
       </div>
     );
   }

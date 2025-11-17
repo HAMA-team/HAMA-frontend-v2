@@ -521,7 +521,7 @@
                                    "title":  "Investment Profile",
                                    "subtitle":  "Your investment style analyzed by AI",
                                    "lastUpdated":  "Last Updated",
-                                   "comingSoon":  "AI will automatically generate based on your investment activity. Coming soon.",
+                                   "comingSoon":  "No investment profile yet. You can create a trial profile by running the onboarding experience on My Page.",
                                    "types": {
                                       "conservative": "Conservative",
                                       "moderatelyConservative": "Moderately Conservative",
@@ -544,7 +544,7 @@
                                    },
                    "onboarding":  {
                                       "title":  "Try Investment Profiling",
-                                      "description":  "Discover your investment style through 4 questions and get personalized AI service",
+                                      "description":  "Discover your investment style through a short set of questions and preview personalized AI service",
                                       "button":  "Start Onboarding",
                                       "badge":  "Trial Onboarding",
                                       "subtitle":  "Experience the onboarding flow and risk profiling process without using any real accounts or transaction data.",

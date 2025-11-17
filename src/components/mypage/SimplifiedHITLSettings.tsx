@@ -8,6 +8,7 @@ import { useAppModeStore } from "@/store/appModeStore";
 import { useToastStore } from "@/store/toastStore";
 import { updateAutomationLevel } from "@/lib/api/settings";
 import type { HITLConfig, HITLPhases } from "@/types/hitl";
+import { useThemeStore } from "@/store/themeStore";
 
 interface SimplifiedHITLSettingsProps {
   className?: string;
@@ -35,6 +36,7 @@ export default function SimplifiedHITLSettings({
     setLoading,
     isLoading: globalLoading,
   } = useUserStore();
+  const { theme } = useThemeStore();
   const { mode } = useAppModeStore();
   const { showToast } = useToastStore();
 
@@ -150,11 +152,20 @@ export default function SimplifiedHITLSettings({
             {t("mypage.hitlControl.masterToggle.description")}
           </p>
           {/* Inline Note - 토글 바로 아래에 추가 */}
-          <div className="flex items-start gap-2 mt-2 p-2 rounded-md" style={{ backgroundColor: "var(--warning-50)" }}>
-            <span className="text-xs text-[var(--warning-700)] dark:text-[var(--warning-300)]">
+            <div
+              className="flex items-start gap-2 mt-2 p-2 rounded-md"
+              style={{
+                backgroundColor:
+                  theme === "dark" ? "var(--main-background)" : "var(--warning-50)",
+              }}
+            >
+              <span
+                className="text-xs"
+                style={{ color: "var(--text-secondary)" }}
+              >
               <strong>Note:</strong> {t("mypage.hitlControl.masterToggle.note")}
-            </span>
-          </div>
+              </span>
+            </div>
         </div>
         <button
           onClick={handleMasterToggle}
@@ -175,58 +186,59 @@ export default function SimplifiedHITLSettings({
       {/* 3 Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Trading Card - Always Required (주황색 테마) */}
-        <div
-          className="p-5 rounded-xl border-2 transition-all relative flex flex-col"
-          style={{
-            backgroundColor: "#fff7ed", // orange-50
-            borderColor: "#ea580c", // orange-600
-          }}
-        >
+          <div
+            className="p-5 rounded-xl border-2 transition-all relative flex flex-col"
+            style={{
+              // Light: 기존 주황 톤 유지, Dark: 조금 어두운 주황 톤으로만 조정
+              backgroundColor: theme === "dark" ? "#7c2d12" : "#fff7ed", // orange-900-ish / orange-50
+              borderColor: "#ea580c", // orange-600
+            }}
+          >
           {/* "Always Required" Badge - 상단 가운데 */}
           <div className="flex justify-center mb-3">
-            <div
-              className="flex items-center gap-1 px-2 py-0.5 rounded text-xs"
-              style={{
-                backgroundColor: "#fed7aa", // orange-200
-                color: "#9a3412", // orange-800
-                border: "1px solid #fb923c", // orange-400
-              }}
-            >
-              <Lock size={10} strokeWidth={2.5} />
+              <div
+                className="flex items-center gap-1 px-2 py-0.5 rounded text-xs"
+                style={{
+                  backgroundColor: "#fed7aa", // orange-200
+                  color: "#9a3412", // orange-800
+                  border: "1px solid #fb923c", // orange-400
+                }}
+              >
+                <Lock size={10} strokeWidth={2.5} />
               <span className="font-medium">{t("mypage.hitlControl.badges.alwaysRequired")}</span>
             </div>
           </div>
 
           {/* 제목 */}
-          <div className="flex items-start gap-2 mb-3">
-            <ShieldCheck className="w-5 h-5" style={{ color: "#ea580c" }} strokeWidth={1.5} />
-            <h4 className="font-semibold text-[var(--text-primary)]">{t("mypage.hitlControl.trading.title")}</h4>
-          </div>
+            <div className="flex items-start gap-2 mb-3">
+              <ShieldCheck className="w-5 h-5" style={{ color: "#ea580c" }} strokeWidth={1.5} />
+              <h4 className="font-semibold text-[var(--text-primary)]">{t("mypage.hitlControl.trading.title")}</h4>
+            </div>
           <p className="text-sm text-[var(--text-secondary)] mb-3">
             {t("mypage.hitlControl.trading.description")}
           </p>
-          <div className="space-y-1.5 text-xs text-[var(--text-tertiary)]">
-            <div className="flex items-start gap-2">
-              <span style={{ color: "#ea580c" }}>•</span>
-              <span>{t("mypage.hitlControl.trading.features.reviewRisk")}</span>
+            <div className="space-y-1.5 text-xs text-[var(--text-tertiary)]">
+              <div className="flex items-start gap-2">
+                <span style={{ color: "#ea580c" }}>•</span>
+                <span>{t("mypage.hitlControl.trading.features.reviewRisk")}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span style={{ color: "#ea580c" }}>•</span>
+                <span>{t("mypage.hitlControl.trading.features.confirmChanges")}</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span style={{ color: "#ea580c" }}>•</span>
+                <span>{t("mypage.hitlControl.trading.features.approveOrder")}</span>
+              </div>
             </div>
-            <div className="flex items-start gap-2">
-              <span style={{ color: "#ea580c" }}>•</span>
-              <span>{t("mypage.hitlControl.trading.features.confirmChanges")}</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span style={{ color: "#ea580c" }}>•</span>
-              <span>{t("mypage.hitlControl.trading.features.approveOrder")}</span>
-            </div>
-          </div>
           <div className="mt-3 pt-3 border-t border-[var(--border-secondary)] flex justify-center">
-            <span
-              className="px-3 py-1 text-xs font-semibold rounded-full"
-              style={{
-                backgroundColor: "#ea580c",
-                color: "white",
-              }}
-            >
+              <span
+                className="px-3 py-1 text-xs font-semibold rounded-full"
+                style={{
+                  backgroundColor: "#ea580c",
+                  color: "white",
+                }}
+              >
               {t("mypage.hitlControl.status.manualApproval")}
             </span>
           </div>
