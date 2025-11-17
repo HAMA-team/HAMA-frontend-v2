@@ -34,7 +34,8 @@ export default function UnifiedTradingApprovalPanel({
   const [editedPrice, setEditedPrice] = useState<number | "">(request.price || 0);
 
   const modifiableFields = request.modifiable_fields ?? ["quantity", "price", "action"];
-  const supportsUserInput = request.supports_user_input ?? false;
+  // Trading HITL에서도 기본적으로 자유 텍스트 수정 허용 (HITL-MODIFY-PATTERN.md)
+  const supportsUserInput = request.supports_user_input ?? true;
   const canEditQuantity = modifiableFields.includes("quantity");
   const canEditPrice = modifiableFields.includes("price");
   const canEditAction = modifiableFields.includes("action");
@@ -695,31 +696,46 @@ export default function UnifiedTradingApprovalPanel({
           </button>
 
           {/* Modify Button */}
+          {(() => {
+            const hasText = adjustmentRequest.trim().length > 0;
+            const canSubmitNumbers =
+              !!editedQuantity && editedQuantity > 0 && !!editedPrice && editedPrice > 0;
+            const isActive = (hasText || isEdited) && canSubmitNumbers;
+
+            return (
           <button
             onClick={handleModify}
-            disabled={disabled || (!adjustmentRequest.trim() && !isEdited) || !editedQuantity || editedQuantity <= 0 || !editedPrice || editedPrice <= 0}
+            disabled={disabled || !isActive}
             className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: (adjustmentRequest.trim() || isEdited)
-                ? (isDark ? "#374151" : "#ffffff")
+              backgroundColor: isActive
+                ? (isDark ? "#1f2937" : "#e0edff")
                 : "var(--container-background)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border-default)",
+              color: isActive ? (isDark ? "#e5e7eb" : "#1d4ed8") : "var(--text-secondary)",
+              border: `1px solid ${isActive ? "#2563eb" : "var(--border-default)"}`,
             }}
             onMouseEnter={(e) => {
-              if (!disabled && (adjustmentRequest.trim() || isEdited)) {
-                e.currentTarget.style.backgroundColor = isDark ? "#4b5563" : "#f9fafb";
+              if (!disabled && isActive) {
+                e.currentTarget.style.backgroundColor = isDark ? "#374151" : "#d0e2ff";
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = (adjustmentRequest.trim() || isEdited)
-                ? (isDark ? "#374151" : "#ffffff")
+              e.currentTarget.style.backgroundColor = isActive
+                ? (isDark ? "#1f2937" : "#e0edff")
                 : "var(--container-background)";
             }}
           >
             {t("hitl.unified.modify")}
-            {isEdited && <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>({editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0) ? "수정됨" : ""})</span>}
+            {isEdited && (
+              <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>
+                {editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0)
+                  ? "(수정됨)"
+                  : ""}
+              </span>
+            )}
           </button>
+            );
+          })()}
 
           {/* Approve Button */}
           <button

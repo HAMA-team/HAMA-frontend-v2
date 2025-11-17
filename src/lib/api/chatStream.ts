@@ -43,7 +43,9 @@ export async function startMultiAgentStream({
     body: JSON.stringify({
       message,
       conversation_id,
-      hitl_config,
+      // 백엔드에는 preset 같은 프론트 전용 필드는 보내지 않고,
+      // phases 정보만 포함된 hitl_config를 전송한다.
+      hitl_config: hitl_config?.phases ? { phases: hitl_config.phases } : undefined,
       // 최신 ChatRequest 스펙: intervention_required 플래그 추가
       // 비-매매 단계 중 하나라도 HITL이면 true, 아니면 false (매매만 HITL)
       intervention_required: Boolean(
