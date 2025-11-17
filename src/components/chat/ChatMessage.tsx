@@ -172,7 +172,7 @@ export default function ChatMessage({
               />
             ),
             // Lists
-            ul: ({ node, ...props }) => (
+            ul: ({ node, children, ...props }) => (
               <ul
                 style={{
                   marginTop: "16px",
@@ -183,9 +183,11 @@ export default function ChatMessage({
                   listStylePosition: "outside",
                 }}
                 {...props}
-              />
+              >
+                {children}
+              </ul>
             ),
-            ol: ({ node, ...props }) => (
+            ol: ({ node, children, ...props }) => (
               <ol
                 style={{
                   marginTop: "16px",
@@ -196,9 +198,11 @@ export default function ChatMessage({
                   listStylePosition: "outside",
                 }}
                 {...props}
-              />
+              >
+                {children}
+              </ol>
             ),
-            li: ({ node, ...props }) => (
+            li: ({ node, children, ...props }) => (
               <li
                 style={{
                   marginBottom: "10px",
@@ -207,7 +211,9 @@ export default function ChatMessage({
                   display: "list-item",
                 }}
                 {...props}
-              />
+              >
+                {children}
+              </li>
             ),
             // Code
             code: ({ node, inline, ...props }: any) =>

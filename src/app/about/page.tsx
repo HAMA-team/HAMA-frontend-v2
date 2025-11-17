@@ -1,7 +1,23 @@
 "use client";
 
 import React from "react";
-import { WhatIsHAMA, BusinessModel, TeamIntro } from "@/components/about/AboutContent";
+import dynamic from "next/dynamic";
+
+// Dynamic import로 hydration 에러 방지
+const AboutContent = dynamic(() => import("@/components/about/AboutPageContent"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen">
+      <div
+        className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
+        style={{
+          borderColor: "var(--primary-500)",
+          borderTopColor: "transparent",
+        }}
+      />
+    </div>
+  ),
+});
 
 /**
  * About Page
@@ -19,25 +35,7 @@ import { WhatIsHAMA, BusinessModel, TeamIntro } from "@/components/about/AboutCo
 export default function AboutPage() {
   return (
     <div className="flex h-full w-full flex-col overflow-x-hidden" style={{ backgroundColor: "var(--main-background)" }}>
-      {/* About Content Area */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[1000px] mx-auto px-6 py-8 w-full">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-semibold tracking-tight break-words" style={{ color: "var(--text-primary)" }}>
-              About HAMA
-            </h1>
-            <p className="mt-2 text-base break-words" style={{ color: "var(--text-secondary)" }}>
-              Human-in-the-Loop AI 투자 시스템
-            </p>
-          </div>
-
-          {/* Sections */}
-          <WhatIsHAMA />
-          <BusinessModel />
-          <TeamIntro />
-        </div>
-      </div>
+      <AboutContent />
     </div>
   );
 }

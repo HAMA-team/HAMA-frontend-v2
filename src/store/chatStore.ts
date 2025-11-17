@@ -29,6 +29,7 @@ interface ChatStore {
   updateMessage: (messageId: string, updates: Partial<Message>) => void;
   deleteMessage: (messageId: string) => void;
   clearMessages: () => void;
+  setMessages: (messages: Message[]) => void;
   setLoading: (loading: boolean) => void;
   setHistoryLoading: (loading: boolean) => void;
   setCurrentThreadId: (threadId: string) => void;
@@ -74,6 +75,11 @@ export const useChatStore = create<ChatStore>((set) => ({
   clearMessages: () =>
     set({
       messages: [],
+    }),
+
+  setMessages: (messages) =>
+    set({
+      messages,
     }),
 
   setLoading: (loading) =>

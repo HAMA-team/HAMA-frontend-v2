@@ -29,9 +29,9 @@ export default function UnifiedTradingApprovalPanel({
   // 구조화된 수정 상태 (HITL-MODIFY-PATTERN.md)
   const [isEditingQuantity, setIsEditingQuantity] = useState(false);
   const [isEditingPrice, setIsEditingPrice] = useState(false);
-  const [editedAction, setEditedAction] = useState<"BUY" | "SELL" | "buy" | "sell">(request.action);
-  const [editedQuantity, setEditedQuantity] = useState(request.quantity);
-  const [editedPrice, setEditedPrice] = useState(request.price);
+  const [editedAction, setEditedAction] = useState<"BUY" | "SELL" | "buy" | "sell">(request.action || "buy");
+  const [editedQuantity, setEditedQuantity] = useState(request.quantity || 0);
+  const [editedPrice, setEditedPrice] = useState(request.price || 0);
 
   const modifiableFields = request.modifiable_fields ?? ["quantity", "price", "action"];
   const supportsUserInput = request.supports_user_input ?? false;
@@ -49,9 +49,9 @@ export default function UnifiedTradingApprovalPanel({
     return () => observer.disconnect();
   }, []);
 
-  const formatNumber = (num: number) => num.toLocaleString();
-  const formatCurrency = (num: number) => `${num.toLocaleString()} KRW`;
-  const formatPercentage = (num: number) => `${num.toFixed(1)}%`;
+  const formatNumber = (num?: number) => (num ?? 0).toLocaleString();
+  const formatCurrency = (num?: number) => `${(num ?? 0).toLocaleString()} KRW`;
+  const formatPercentage = (num?: number) => `${(num ?? 0).toFixed(1)}%`;
 
   const getRiskColor = (level?: string) => {
     switch (level) {
@@ -83,9 +83,9 @@ export default function UnifiedTradingApprovalPanel({
 
   const isSell = (request.action || "buy").toLowerCase() === "sell";
   const isEdited =
-    editedQuantity !== request.quantity ||
-    editedPrice !== request.price ||
-    editedAction.toLowerCase() !== request.action;
+    editedQuantity !== (request.quantity || 0) ||
+    editedPrice !== (request.price || 0) ||
+    editedAction.toLowerCase() !== (request.action || "buy").toLowerCase();
 
   // 수정된 총 금액 계산
   const editedTotalAmount = editedQuantity * editedPrice;
@@ -96,13 +96,13 @@ export default function UnifiedTradingApprovalPanel({
       const modifications: { quantity?: number; price?: number; action?: string } = {};
 
       // 변경된 값만 포함
-      if (canEditQuantity && editedQuantity !== request.quantity) {
+      if (canEditQuantity && editedQuantity !== (request.quantity || 0)) {
         modifications.quantity = editedQuantity;
       }
-      if (canEditPrice && editedPrice !== request.price) {
+      if (canEditPrice && editedPrice !== (request.price || 0)) {
         modifications.price = editedPrice;
       }
-      if (canEditAction && editedAction !== request.action) {
+      if (canEditAction && editedAction.toLowerCase() !== (request.action || "buy").toLowerCase()) {
         modifications.action = editedAction.toLowerCase();
       }
 
@@ -462,11 +462,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage((request.portfolio_before.cash_balance / request.portfolio_before.total_value) * 100)}
+                    {formatPercentage(((request.portfolio_before?.cash_balance ?? 0) / (request.portfolio_before?.total_value ?? 1)) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: (request.portfolio_after.cash_balance < request.portfolio_before.cash_balance) ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage((request.portfolio_after.cash_balance / request.portfolio_after.total_value) * 100)}
+                  <span style={{ color: ((request.portfolio_after?.cash_balance ?? 0) < (request.portfolio_before?.cash_balance ?? 0)) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage(((request.portfolio_after?.cash_balance ?? 0) / (request.portfolio_after?.total_value ?? 1)) * 100)}
                   </span>
                 </div>
               </div>
@@ -484,16 +484,16 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   {(() => {
-                    const before = request.portfolio_before.holdings.find(h => h.stock_code === request.stock_code);
-                    const after = request.portfolio_after.holdings.find(h => h.stock_code === request.stock_code);
+                    const before = request.portfolio_before?.holdings?.find(h => h.stock_code === request.stock_code);
+                    const after = request.portfolio_after?.holdings?.find(h => h.stock_code === request.stock_code);
                     return (
                       <>
                         <span style={{ color: "var(--text-primary)" }}>
-                          {formatPercentage((before?.weight || 0) * 100)}
+                          {formatPercentage((before?.weight ?? 0) * 100)}
                         </span>
                         <span style={{ color: "var(--text-secondary)" }}>→</span>
                         <span style={{ color: (after && before && after.weight > before.weight) ? "#10b981" : "#ef4444" }}>
-                          {formatPercentage((after?.weight || 0) * 100)}
+                          {formatPercentage((after?.weight ?? 0) * 100)}
                         </span>
                       </>
                     );
@@ -527,11 +527,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage(request.risk_before.portfolio_volatility * 100)}
+                    {formatPercentage((request.risk_before?.portfolio_volatility ?? 0) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.portfolio_volatility > request.risk_before.portfolio_volatility ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage(request.risk_after.portfolio_volatility * 100)}
+                  <span style={{ color: (request.risk_after?.portfolio_volatility ?? 0) > (request.risk_before?.portfolio_volatility ?? 0) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage((request.risk_after?.portfolio_volatility ?? 0) * 100)}
                   </span>
                 </div>
               </div>
@@ -549,11 +549,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {request.risk_before.sharpe_ratio.toFixed(2)}
+                    {(request.risk_before?.sharpe_ratio ?? 0).toFixed(2)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.sharpe_ratio > request.risk_before.sharpe_ratio ? "#10b981" : "#ef4444" }}>
-                    {request.risk_after.sharpe_ratio.toFixed(2)}
+                  <span style={{ color: (request.risk_after?.sharpe_ratio ?? 0) > (request.risk_before?.sharpe_ratio ?? 0) ? "#10b981" : "#ef4444" }}>
+                    {(request.risk_after?.sharpe_ratio ?? 0).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -571,11 +571,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage(request.risk_before.var_95 * 100)}
+                    {formatPercentage((request.risk_before?.var_95 ?? 0) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.var_95 < request.risk_before.var_95 ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage(request.risk_after.var_95 * 100)}
+                  <span style={{ color: (request.risk_after?.var_95 ?? 0) < (request.risk_before?.var_95 ?? 0) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage((request.risk_after?.var_95 ?? 0) * 100)}
                   </span>
                 </div>
               </div>
@@ -593,11 +593,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage(request.risk_before.max_drawdown_estimate * 100)}
+                    {formatPercentage((request.risk_before?.max_drawdown_estimate ?? 0) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.max_drawdown_estimate > request.risk_before.max_drawdown_estimate ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage(request.risk_after.max_drawdown_estimate * 100)}
+                  <span style={{ color: (request.risk_after?.max_drawdown_estimate ?? 0) > (request.risk_before?.max_drawdown_estimate ?? 0) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage((request.risk_after?.max_drawdown_estimate ?? 0) * 100)}
                   </span>
                 </div>
               </div>
@@ -711,7 +711,7 @@ export default function UnifiedTradingApprovalPanel({
             }}
           >
             {t("hitl.unified.modify")}
-            {isEdited && <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>({editedQuantity !== request.quantity || editedPrice !== request.price ? "수정됨" : ""})</span>}
+            {isEdited && <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>({editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0) ? "수정됨" : ""})</span>}
           </button>
 
           {/* Approve Button */}

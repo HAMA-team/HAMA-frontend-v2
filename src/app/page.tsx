@@ -6,13 +6,12 @@ import ChatView from "@/components/chat/ChatView";
 import HITLPanel from "@/components/hitl/HITLPanel";
 import { useChatStore } from "@/store/chatStore";
 import { useArtifactStore } from "@/store/artifactStore";
-import { createArtifact } from "@/lib/api/artifacts";
 import { Message, ThinkingStep, ApprovalRequest } from "@/lib/types/chat";
 import { useDialogStore } from "@/store/dialogStore";
 import { approveAction } from "@/lib/api/approvals";
 import { useAppModeStore } from "@/store/appModeStore";
 import { useTranslation } from "react-i18next";
-import { sendChat } from "@/lib/api/chat";
+import { sendChat, getChatHistory } from "@/lib/api/chat";
 import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useUserStore } from "@/store/userStore";
 import { MOCK_UNIFIED_TRADING_HIGH_RISK } from "@/lib/mock/unifiedTradingMock";
@@ -46,8 +45,7 @@ const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
 export default function Home() {
   const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
-  const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId } = useChatStore();
-  const { addArtifact } = useArtifactStore();
+  const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId, setMessages } = useChatStore();
   const { openAlert } = useDialogStore();
   const { hitlConfig } = useUserStore();
 
@@ -95,6 +93,25 @@ export default function Home() {
     return "";
   };
   const [approvalBusy, setApprovalBusy] = React.useState(false);
+
+  // Chat History 새로고침 헬퍼 함수
+  const refreshChatHistory = async (threadId: string) => {
+    try {
+      const historyData = await getChatHistory(threadId);
+      const fetchedMessages: Message[] = historyData.messages.map((msg: any) => ({
+        id: msg.message_id,
+        role: msg.role,
+        content: msg.content,
+        timestamp: msg.created_at,
+        status: "sent",
+        metadata: msg.metadata,
+      }));
+      setMessages(fetchedMessages);
+      console.log("✅ Chat History 새로고침 완료:", fetchedMessages.length, "개 메시지");
+    } catch (error) {
+      console.error("❌ Chat History 새로고침 실패:", error);
+    }
+  };
 
   const handleSuggestionClick = async (prompt: string) => {
     // 사용자 메시지 추가
@@ -326,9 +343,11 @@ ${t("chat.receivedResponse")}
               // `hitl_interrupt` 분기는 제거하고 `hitl.request`만 유지한다.
               case "hitl_interrupt": {
                 const raw = ev?.data?.approval_request ?? ev?.data;
+                console.log("[DEBUG] HITL Interrupt Raw Data:", JSON.stringify(raw, null, 2));
                 if (raw) {
                   const norm: any = { ...raw };
                   if (norm.type === 'trade_approval') norm.type = 'trading';
+                  console.log("[DEBUG] Normalized HITL Data:", JSON.stringify(norm, null, 2));
                   try { openApprovalPanel(norm as any); } catch {}
                 }
                 break;
@@ -371,6 +390,16 @@ ${t("chat.receivedResponse")}
         });
         const cid = (data as any)?.conversation_id || (data as any)?.thread_id || (data as any)?.id;
         if (cid) setCurrentThreadId(String(cid));
+
+        // HITL approval_request 처리 (REST API 폴백)
+        if ((data as any)?.requires_approval && (data as any)?.approval_request) {
+          const approvalReq = (data as any).approval_request;
+          // 타입 정규화 (trade_approval → trading)
+          if (approvalReq.type === 'trade_approval') approvalReq.type = 'trading';
+          console.log("[DEBUG] REST API Approval Request:", JSON.stringify(approvalReq, null, 2));
+          try { openApprovalPanel(approvalReq as any); } catch {}
+        }
+
         try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
       }
     } catch (error) {
@@ -659,26 +688,36 @@ ${t("chat.receivedResponse")}
       return;
     }
 
-    // Save as artifact
+    // Extract title from content (first heading or first line)
+    const extractTitle = (content: string): string => {
+      // Try to find first markdown heading
+      const headingMatch = content.match(/^#+ (.+)$/m);
+      if (headingMatch) {
+        return headingMatch[1].trim();
+      }
+      // Otherwise use first line (max 100 chars)
+      const firstLine = content.split("\n")[0]?.trim() || "";
+      return firstLine.length > 100 ? firstLine.substring(0, 100) + "..." : firstLine || "Artifact";
+    };
+
+    // Save as artifact via API
     if (mode === "live") {
       try {
-        const firstLine = (message.content || "").split("\n")[0]?.replace(/^#\s*/, "").trim() || "Artifact";
-        const res = await createArtifact({
-          title: firstLine,
+        const { createArtifact } = useArtifactStore.getState();
+        await createArtifact({
+          title: extractTitle(message.content),
           content: message.content,
           artifact_type: "analysis",
           metadata: { created_from_message_id: messageId },
         });
-        const artifact = addArtifact(message.content, "📄");
-        console.log("Artifact saved (server+local):", res?.artifact_id || res?.id, artifact.id);
+        console.log("Artifact saved successfully via API");
       } catch (e) {
-        console.error("Server artifact save failed; using local store only:", e);
-        const artifact = addArtifact(message.content, "📄");
-        console.log("Artifact saved (local):", artifact.id);
+        console.error("Failed to save artifact:", e);
+        throw e; // Re-throw to show error toast
       }
     } else {
-      const artifact = addArtifact(message.content, "📄");
-      console.log("Artifact saved:", artifact);
+      // Mock mode: save to demo state
+      console.log("Mock mode: Artifact would be saved to backend");
     }
 
     // Note: Toast is automatically shown by SaveArtifactButton
@@ -774,16 +813,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     if (approvalBusy) return;
     setApprovalBusy(true);
     try {
-      // 승인 결정을 사용자 메시지로 추가 (요청 요약은 백엔드 자동 저장)
-      const approvalDecisionMessage: Message = {
-        id: `approval-decision-${Date.now()}`,
-        role: "user",
-        content: `✅ **${t("hitl.approved") || "승인됨"}**`,
-        timestamp: new Date().toISOString(),
-        status: "sent",
-      };
-      addMessage(approvalDecisionMessage);
-
       if (mode === "demo") {
         closeApprovalPanel();
         return;
@@ -814,15 +843,21 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       }
 
       // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
-      await approveAction({
+      const approvalPayload = {
         thread_id: currentThreadId,
-        decision: "approved",
+        decision: "approved" as const,
         request_id: requestId,
         modifications: Object.keys(modifications).length > 0 ? modifications : undefined,
-      });
+      };
+      console.log("[DEBUG] Approval Request Payload:", JSON.stringify(approvalPayload, null, 2));
+
+      await approveAction(approvalPayload);
 
       console.log("Approve:", messageId, currentThreadId);
       closeApprovalPanel();
+
+      // 승인 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
+      await refreshChatHistory(currentThreadId);
 
     } catch (error) {
       console.error("Approval error:", error);
@@ -845,16 +880,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     if (approvalBusy) return;
     setApprovalBusy(true);
     try {
-      // 거부 결정을 사용자 메시지로 추가 (요청 요약은 백엔드 자동 저장)
-      const approvalDecisionMessage: Message = {
-        id: `approval-decision-${Date.now()}`,
-        role: "user",
-        content: `❌ **${t("hitl.rejected") || "거부됨"}**`,
-        timestamp: new Date().toISOString(),
-        status: "sent",
-      };
-      addMessage(approvalDecisionMessage);
-
       if (mode === "demo") {
         closeApprovalPanel();
         return;
@@ -876,6 +901,10 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
 
       console.log("Reject:", messageId, currentThreadId);
       closeApprovalPanel();
+
+      // 거부 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
+      await refreshChatHistory(currentThreadId);
+
     } catch (error) {
       console.error("Rejection error:", error);
       // 백엔드 에러 메시지 출력
@@ -897,16 +926,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     if (approvalBusy) return;
     setApprovalBusy(true);
     try {
-      // 수정 결정을 사용자 메시지로 추가
-      const modificationMessage: Message = {
-        id: `approval-decision-${Date.now()}`,
-        role: "user",
-        content: `✏️ **${t("hitl.unified.modify") || "수정 후 승인"}**${userInput ? `\n\n${userInput}` : ""}`,
-        timestamp: new Date().toISOString(),
-        status: "sent",
-      };
-      addMessage(modificationMessage);
-
       if (mode === "demo") {
         closeApprovalPanel();
         return;
@@ -936,6 +955,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
 
       console.log("Modify:", messageId, currentThreadId);
       closeApprovalPanel();
+
+      // 수정 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
+      await refreshChatHistory(currentThreadId);
 
     } catch (error) {
       console.error("Modification error:", error);

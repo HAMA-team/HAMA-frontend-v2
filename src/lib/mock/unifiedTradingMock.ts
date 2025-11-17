@@ -18,6 +18,10 @@ export const MOCK_UNIFIED_TRADING_LOW_RISK = {
   expected_weight: 30.5,
   quantity_after_trade: 110,
 
+  // HITL Modify Support
+  modifiable_fields: ["quantity", "price", "action"],
+  supports_user_input: true,
+
   // No risk info (low risk trade)
 };
 
@@ -34,6 +38,10 @@ export const MOCK_UNIFIED_TRADING_MEDIUM_RISK = {
   current_weight: 15.0,
   expected_weight: 28.0,
   quantity_after_trade: 200,
+
+  // HITL Modify Support
+  modifiable_fields: ["quantity", "price", "action"],
+  supports_user_input: true,
 
   // Risk Info
   risk_level: "medium" as const,
@@ -57,6 +65,10 @@ export const MOCK_UNIFIED_TRADING_HIGH_RISK = {
   expected_weight: 42.0,
   quantity_after_trade: 370,
 
+  // HITL Modify Support
+  modifiable_fields: ["quantity", "price", "action"],
+  supports_user_input: true,
+
   // Risk Info
   risk_level: "high" as const,
   risk_warnings: [
@@ -79,6 +91,10 @@ export const MOCK_UNIFIED_TRADING_SELL_HIGH_RISK = {
   current_weight: 25.0,
   expected_weight: 8.5,
   quantity_after_trade: 50,
+
+  // HITL Modify Support
+  modifiable_fields: ["quantity", "price", "action"],
+  supports_user_input: true,
 
   // Risk Info
   risk_level: "medium" as const,

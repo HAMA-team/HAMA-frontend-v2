@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useArtifactStore } from '@/store/artifactStore';
 import ArtifactCard from '@/components/artifacts/ArtifactCard';
@@ -13,11 +14,16 @@ import ArtifactCard from '@/components/artifacts/ArtifactCard';
  * Features:
  * - Grid layout (responsive: 1-3 columns)
  * - No ChatInput (per PRD - only on detail page)
- * - LocalStorage persistence (Phase 1-2)
+ * - Backend API persistence (Phase 3)
  */
 export default function ArtifactsView() {
   const { t } = useTranslation();
-  const { artifacts } = useArtifactStore();
+  const { artifacts, isLoading, error, loadArtifacts } = useArtifactStore();
+
+  // Load artifacts on mount
+  useEffect(() => {
+    loadArtifacts();
+  }, [loadArtifacts]);
 
   return (
     <div className="flex h-full w-full flex-col overflow-x-hidden" style={{ backgroundColor: "var(--main-background)" }}>
@@ -34,8 +40,25 @@ export default function ArtifactsView() {
             </p>
           </div>
 
-          {/* Artifacts Grid */}
-          {artifacts.length === 0 ? (
+          {/* Error State */}
+          {error && (
+            <div className="mb-4 p-4 rounded-lg border" style={{ backgroundColor: "var(--error-background)", borderColor: "var(--error-border)" }}>
+              <p className="text-sm" style={{ color: "var(--text-error)" }}>
+                {error}
+              </p>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <div
+                className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
+                style={{ borderColor: "var(--primary-500)", borderTopColor: "transparent" }}
+              />
+            </div>
+          ) : artifacts.length === 0 ? (
+            /* Empty State */
             <div className="flex flex-col items-center justify-center py-20">
               <div className="text-6xl mb-4">📄</div>
               <p className="text-lg font-medium mb-2" style={{ color: "var(--text-primary)" }}>
@@ -46,9 +69,10 @@ export default function ArtifactsView() {
               </p>
             </div>
           ) : (
+            /* Artifacts Grid */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {artifacts.map((artifact) => (
-                <ArtifactCard key={artifact.id} artifact={artifact} />
+                <ArtifactCard key={artifact.artifact_id} artifact={artifact} />
               ))}
             </div>
           )}

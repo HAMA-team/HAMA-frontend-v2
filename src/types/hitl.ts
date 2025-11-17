@@ -106,22 +106,34 @@ export const PRESET_ADVISOR: HITLConfig = {
 /**
  * GET /api/v1/settings/intervention 응답
  */
-export interface AutomationLevelResponse {
+export interface InterventionSettingsResponse {
   hitl_config: HITLConfig;
-  preset_name: string;
-  description: string;
   interrupt_points: string[];
+}
+
+/**
+ * PUT /api/v1/settings/intervention 요청
+ */
+export interface InterventionSettingsUpdateRequest {
+  hitl_config: HITLConfig;
+  confirm: boolean;
 }
 
 /**
  * PUT /api/v1/settings/intervention 응답
  */
-export interface AutomationLevelUpdateResponse {
+export interface InterventionSettingsUpdateResponse {
   success: boolean;
   message: string;
   new_config: HITLConfig;
   effective_from: string;
 }
+
+// Legacy type aliases for backwards compatibility
+/** @deprecated Use InterventionSettingsResponse instead */
+export type AutomationLevelResponse = InterventionSettingsResponse;
+/** @deprecated Use InterventionSettingsUpdateResponse instead */
+export type AutomationLevelUpdateResponse = InterventionSettingsUpdateResponse;
 
 /**
  * POST /api/v1/chat/approve 요청

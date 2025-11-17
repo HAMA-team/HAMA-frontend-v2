@@ -8,94 +8,176 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
- * HAMA 소개 섹션
+ * HAMA 소개 섹션 - Chat 스타일
  */
 export function WhatIsHAMA() {
+  const { t } = useTranslation();
+  const [showQuestion, setShowQuestion] = React.useState(false);
+  const [showAnswer, setShowAnswer] = React.useState(false);
+  const [isVisible, setIsVisible] = React.useState(true);
+  const sectionRef = React.useRef<HTMLElement>(null);
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const playAnimation = React.useCallback(() => {
+    setShowQuestion(false);
+    setShowAnswer(false);
+    setIsVisible(true);
+
+    setTimeout(() => setShowQuestion(true), 300);
+    setTimeout(() => setShowAnswer(true), 1500);
+  }, []);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Play animation when section enters viewport
+            playAnimation();
+
+            // Start 30-second loop
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+            }
+            intervalRef.current = setInterval(() => {
+              setIsVisible(false);
+              setTimeout(() => playAnimation(), 500);
+            }, 30000);
+          } else {
+            // Stop loop when section leaves viewport
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+              intervalRef.current = null;
+            }
+          }
+        });
+      },
+      { threshold: 0.3 } // Trigger when 30% of section is visible
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      observer.disconnect();
+    };
+  }, [playAnimation]);
+
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-semibold mb-4 tracking-tight" style={{ color: "var(--text-primary)" }}>
-        HAMA란?
-      </h2>
-      <div className="prose max-w-none" style={{ color: "var(--text-secondary)" }}>
-        <p className="text-base leading-relaxed mb-4">
-          HAMA는 Human-in-the-Loop AI 투자 시스템으로, AI의 분석 능력과 인간의 판단력을 결합한 차세대 투자 플랫폼입니다.
-        </p>
-        <p className="text-base leading-relaxed">
-          사용자가 원하는 자동화 수준을 직접 설정하여, AI와 협업하며 투자 의사결정을 수행할 수 있습니다.
-        </p>
+    <section ref={sectionRef} className="mb-12">
+      {/* User Question Bubble */}
+      <div
+        className="flex justify-end mb-4 transition-opacity duration-500"
+        style={{ opacity: isVisible ? 1 : 0 }}
+      >
+        <div
+          className={`inline-block px-6 py-3 rounded-2xl max-w-[80%] transition-all duration-500 ${
+            showQuestion
+              ? "translate-x-0 opacity-100 scale-100"
+              : "translate-x-8 opacity-0 scale-95"
+          }`}
+          style={{
+            backgroundColor: "var(--primary-500)",
+          }}
+        >
+          <p
+            className="text-base font-medium"
+            style={{ color: "white" }}
+          >
+            {t("about.whatIsHAMA.title")}
+          </p>
+        </div>
+      </div>
+
+      {/* AI Response */}
+      <div
+        className="w-full transition-opacity duration-500"
+        style={{ opacity: isVisible ? 1 : 0 }}
+      >
+        <div
+          className={`p-6 rounded-2xl transition-all duration-700 ${
+            showAnswer
+              ? "translate-y-0 opacity-100 scale-100"
+              : "translate-y-4 opacity-0 scale-98"
+          }`}
+          style={{
+            backgroundColor: "var(--container-background)",
+            border: "1px solid var(--border-default)",
+          }}
+        >
+          <p
+            className="text-base md:text-lg leading-relaxed"
+            style={{
+              color: "var(--text-primary)",
+              lineHeight: "1.8",
+            }}
+          >
+            {t("about.whatIsHAMA.description1")}
+          </p>
+        </div>
       </div>
     </section>
   );
 }
 
 /**
- * 비즈니스 모델 섹션
- */
-export function BusinessModel() {
-  return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-semibold mb-4 tracking-tight" style={{ color: "var(--text-primary)" }}>
-        비즈니스 모델
-      </h2>
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* 수익 구조 */}
-        <div className="p-6 rounded-lg border" style={{
-          backgroundColor: "var(--card-background)",
-          borderColor: "var(--border-primary)"
-        }}>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--text-primary)" }}>
-            수익 구조
-          </h3>
-          <div className="space-y-2" style={{ color: "var(--text-secondary)" }}>
-            <p className="text-sm">내용 추후 업데이트 예정</p>
-          </div>
-        </div>
-
-        {/* 타겟 고객 */}
-        <div className="p-6 rounded-lg border" style={{
-          backgroundColor: "var(--card-background)",
-          borderColor: "var(--border-primary)"
-        }}>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--text-primary)" }}>
-            타겟 고객
-          </h3>
-          <div className="space-y-2" style={{ color: "var(--text-secondary)" }}>
-            <p className="text-sm">내용 추후 업데이트 예정</p>
-          </div>
-        </div>
-
-        {/* 시장 분석 */}
-        <div className="p-6 rounded-lg border md:col-span-2" style={{
-          backgroundColor: "var(--card-background)",
-          borderColor: "var(--border-primary)"
-        }}>
-          <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--text-primary)" }}>
-            시장 분석
-          </h3>
-          <div className="space-y-2" style={{ color: "var(--text-secondary)" }}>
-            <p className="text-sm">내용 추후 업데이트 예정</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/**
- * 팀 소개 섹션 (선택사항)
+ * 팀 소개 섹션
  */
 export function TeamIntro() {
+  const { t } = useTranslation();
+
+  const members = [
+    {
+      key: "jiwoo",
+      name: t("about.team.members.jiwoo.name"),
+      role: t("about.team.members.jiwoo.role"),
+    },
+    {
+      key: "seongmin",
+      name: t("about.team.members.seongmin.name"),
+      role: t("about.team.members.seongmin.role"),
+    },
+  ];
+
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-semibold mb-4 tracking-tight" style={{ color: "var(--text-primary)" }}>
-        팀 소개
+    <section className="mt-16 mb-12">
+      <h2
+        className="text-2xl md:text-3xl font-bold mb-8 text-center"
+        style={{
+          color: "var(--text-primary)",
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {t("about.team.title")}
       </h2>
-      <div className="prose max-w-none" style={{ color: "var(--text-secondary)" }}>
-        <p className="text-base leading-relaxed">
-          내용 추후 업데이트 예정
-        </p>
+
+      <div className="flex flex-col md:flex-row items-center justify-center gap-12 max-w-2xl mx-auto">
+        {members.map((member) => (
+          <div key={member.key} className="text-center">
+            {/* Name */}
+            <h3
+              className="text-xl font-bold mb-1"
+              style={{ color: "var(--text-primary)" }}
+            >
+              {member.name}
+            </h3>
+
+            {/* Role */}
+            <p
+              className="text-sm"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {member.role}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );

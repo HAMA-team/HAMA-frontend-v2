@@ -9,6 +9,10 @@
 import apiClient from '@/lib/api';
 import type {
   HITLConfig,
+  InterventionSettingsResponse,
+  InterventionSettingsUpdateRequest,
+  InterventionSettingsUpdateResponse,
+  // Legacy aliases for backwards compatibility
   AutomationLevelResponse,
   AutomationLevelUpdateResponse,
 } from '@/types/hitl';

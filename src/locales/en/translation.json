@@ -451,7 +451,10 @@
                    },
                    "user":  {
                                 "title":  "User Information",
-                                "demoName":  "Demo User"
+                                "demoName":  "Demo User",
+                                "age":  "Age {{age}}",
+                                "planPremium": "Premium plan",
+                                "resetToDemo": "Reset to Demo user"
                             },
                    "automation":  {
                                       "title":  "Automation Level",
@@ -518,7 +521,13 @@
                                    "title":  "Investment Profile",
                                    "subtitle":  "Your investment style analyzed by AI",
                                    "lastUpdated":  "Last Updated",
-                                   "comingSoon":  "AI will automatically generate based on your investment activity. Coming soon."
+                                   "comingSoon":  "No investment profile yet. You can create a trial profile by running the onboarding experience on My Page.",
+                                   "types": {
+                                      "conservative": "Conservative",
+                                      "moderatelyConservative": "Moderately Conservative",
+                                      "neutral": "Risk-Neutral",
+                                      "aggressive": "Aggressive"
+                                   }
                                },
                    "preferences":  {
                                        "title":  "Preferences",
@@ -535,8 +544,88 @@
                                    },
                    "onboarding":  {
                                       "title":  "Try Investment Profiling",
-                                      "description":  "Discover your investment style through 4 questions and get personalized AI service",
-                                      "button":  "Start Onboarding"
+                                      "description":  "Discover your investment style through a short set of questions and preview personalized AI service",
+                                      "button":  "Start Onboarding",
+                                      "badge":  "Trial Onboarding",
+                                      "subtitle":  "Experience the onboarding flow and risk profiling process without using any real accounts or transaction data.",
+                                      "notice":  "This onboarding is for demo purposes only. Your answers are not sent to the backend and are used only to update the My Page view in this browser.",
+                                      "stepIndicator":  {
+                                        "label":  "Step {{current}} of {{total}}"
+                                      },
+                                      "basicInfo":  {
+                                        "title":  "First, tell us a bit about yourself",
+                                        "subtitle":  "We will use your name and rough age range to make the investment profile explanation feel more natural.",
+                                        "nameLabel":  "Name",
+                                        "namePlaceholder":  "e.g. Alex HAMA",
+                                        "nameError":  "Please enter your name.",
+                                        "ageLabel":  "Age",
+                                        "ageOptional":  "(optional)",
+                                        "agePlaceholder":  "e.g. 32",
+                                        "ageHelper":  "If you leave this blank, we will assume you are {{age}} years old for this demo."
+                                      },
+                                      "purpose":  {
+                                        "title":  "What is the purpose of this investment and when will you need the money?",
+                                        "subtitle":  "In the real screening flow, this answer helps reduce the number of questions and tailor the strategy to your goals.",
+                                        "placeholder":  "e.g. I plan to use this as housing funds in about 5 years.",
+                                        "helper":  "Feel free to answer in free text. This answer is used only within this trial onboarding view."
+                                      },
+                                      "style":  {
+                                        "title":  "Which of the following investment styles is closest to you?",
+                                        "subtitle":  "These three personas are used in the initial screening scenario.",
+                                        "options":  {
+                                          "conservative":  {
+                                            "title":  "Conservative",
+                                            "description":  "You have stable income and understand only the basics of financial products. Preserving your principal is more important than returns."
+                                          },
+                                          "neutral":  {
+                                            "title":  "Balanced",
+                                            "description":  "You have steady income and can understand product explanations. You want returns above deposits but prefer to avoid large losses."
+                                          },
+                                          "aggressive":  {
+                                            "title":  "Aggressive",
+                                            "description":  "You can analyze products on your own and have a positive outlook on future income. You are willing to accept principal loss risk for higher returns."
+                                          }
+                                        }
+                                      },
+                                      "allocation":  {
+                                        "title":  "What percentage of your total assets is currently invested?",
+                                        "subtitle":  "Please choose an approximate ratio based on your overall assets, including real estate and deposits.",
+                                        "options":  {
+                                          "1":  { "label":  "10% or less" },
+                                          "2":  { "label":  "Up to 15%" },
+                                          "3":  { "label":  "Up to 20%" },
+                                          "4":  { "label":  "Up to 25%" },
+                                          "5":  { "label":  "More than 25%" }
+                                        }
+                                      },
+                                      "summary":  {
+                                        "title":  "Trial onboarding result",
+                                        "subtitle":  "Based on your answers, we created a demo investment profile.",
+                                        "name":  "Name",
+                                        "age":  "Age",
+                                        "style":  "Investment style",
+                                        "styleFallback":  "Not selected",
+                                        "allocation":  "Investment ratio",
+                                        "allocationFallback":  "Not selected",
+                                        "type":  "Risk profile",
+                                        "notice":  "This result is for trial onboarding only and is not used for actual accounts or regulatory risk classification.",
+                                        "defaultPurpose":  "general mid- to long-term wealth accumulation",
+                                        "description":  "{{name}}, age {{age}}, is assumed to be investing for \"{{purpose}}\". With the style \"{{style}}\" and an overall investment ratio of \"{{allocation}}\", we summarize your overall risk profile as \"{{type}}\" for this demo."
+                                      },
+                                      "actions":  {
+                                        "start":  "Start onboarding",
+                                        "next":  "Next",
+                                        "back":  "Previous step",
+                                        "finish":  "Save to My Page and finish",
+                                        "cancel":  "Cancel onboarding",
+                                        "backToMyPage":  "Back to My Page"
+                                      },
+                                      "cancel":  {
+                                        "title":  "Cancel onboarding?",
+                                        "description":  "Your current answers will not be saved and you will be taken back to My Page.",
+                                        "confirm":  "Cancel and go to My Page",
+                                        "keep":  "Continue"
+                                      }
                                   },
                    "hitlControl": {
                                       "title": "HITL Control",
@@ -591,5 +680,116 @@
                                                       "recalculation": "The server will recalculate with modified values and provide updated before/after data."
                                                   }
                                   }
-               }
+               },
+    "about": {
+        "title": "About HAMA",
+        "subtitle": "Human-in-the-Loop AI Investment System",
+        "whatIsHAMA": {
+            "title": "What is HAMA?",
+            "description1": "HAMA is a Human-in-the-Loop AI investment system that combines AI's analytical capabilities with human judgment for next-generation investment decisions.",
+            "description2": "Users can set their preferred level of automation and collaborate with AI to make investment decisions."
+        },
+        "businessModel": {
+            "title": "Business Model",
+            "revenue": {
+                "title": "Revenue Structure",
+                "content": "Content to be updated"
+            },
+            "target": {
+                "title": "Target Customers",
+                "content": "Content to be updated"
+            },
+            "market": {
+                "title": "Market Analysis",
+                "content": "Content to be updated"
+            }
+        },
+        "team": {
+            "title": "Team",
+            "members": {
+                "jiwoo": {
+                    "name": "Jiwoo Choi",
+                    "role": "Backend & AI Agent System"
+                },
+                "seongmin": {
+                    "name": "Seongmin Hwang",
+                    "role": "Frontend & Product Design"
+                }
+            }
+        },
+        "economic": {
+            "title": "Business Model",
+            "subtitle": "Market Analysis and Roadmap for Sustainable Growth",
+            "tam": {
+                "label": "TAM",
+                "fullName": "Total Addressable Market",
+                "description": "Domestic individual stock investors"
+            },
+            "sam": {
+                "label": "SAM",
+                "fullName": "Serviceable Available Market",
+                "description": "Digital investors with web/app access"
+            },
+            "som": {
+                "label": "SOM",
+                "fullName": "Serviceable Obtainable Market",
+                "description": "AI-interested investors aged 20-40"
+            },
+            "mau": {
+                "title": "Expected MAU",
+                "value": "250K",
+                "description": "70% monthly activation rate of annual active users",
+                "annualUsers": "Annual Users",
+                "activationRate": "Activation Rate"
+            },
+            "labels": {
+                "marketSize": "Market Size",
+                "users": "Users",
+                "target": "Target",
+                "pricing": "Pricing",
+                "timeline": "Timeline"
+            },
+            "units": {
+                "billion": "B",
+                "million": "M",
+                "thousand": "K"
+            },
+            "scalability": {
+                "title": "Why We Can Scale",
+                "description": "HAMA uses the same AI technology whether serving 1 individual investor or 1,000 clients at an asset management firm.",
+                "reason1": {
+                    "title": "Proven AI Technology",
+                    "description": "5 specialized AI agents working together"
+                },
+                "reason2": {
+                    "title": "Flexible Architecture",
+                    "description": "From individual to institutional management"
+                },
+                "reason3": {
+                    "title": "Cost Efficient",
+                    "description": "AI cost minimization with prompt caching"
+                }
+            },
+            "phases": {
+                "title": "Growth Roadmap",
+                "tagline": "Same AI technology, scaled for different markets",
+                "phase1": {
+                    "title": "Phase 1: B2C",
+                    "subtitle": "For Individual Investors",
+                    "target": "Digital investors aged 20-40",
+                    "pricing": "₩9,900/month",
+                    "timeline": "2025 Q1-Q2",
+                    "icon": "🧑‍💼"
+                },
+                "phase2": {
+                    "title": "Phase 2: B2B",
+                    "subtitle": "For Institutional Investors",
+                    "target": "Asset managers, Securities firms",
+                    "pricing": "Custom pricing",
+                    "timeline": "2025 Q3-Q4",
+                    "icon": "🏢"
+                }
+            }
+        }
+    }
 }
