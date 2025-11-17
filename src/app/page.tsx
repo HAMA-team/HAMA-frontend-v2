@@ -390,6 +390,16 @@ ${t("chat.receivedResponse")}
         });
         const cid = (data as any)?.conversation_id || (data as any)?.thread_id || (data as any)?.id;
         if (cid) setCurrentThreadId(String(cid));
+
+        // HITL approval_request 처리 (REST API 폴백)
+        if ((data as any)?.requires_approval && (data as any)?.approval_request) {
+          const approvalReq = (data as any).approval_request;
+          // 타입 정규화 (trade_approval → trading)
+          if (approvalReq.type === 'trade_approval') approvalReq.type = 'trading';
+          console.log("[DEBUG] REST API Approval Request:", JSON.stringify(approvalReq, null, 2));
+          try { openApprovalPanel(approvalReq as any); } catch {}
+        }
+
         try { window.dispatchEvent(new Event('chat-session-updated')); } catch {}
       }
     } catch (error) {
