@@ -29,9 +29,9 @@ export default function UnifiedTradingApprovalPanel({
   // 구조화된 수정 상태 (HITL-MODIFY-PATTERN.md)
   const [isEditingQuantity, setIsEditingQuantity] = useState(false);
   const [isEditingPrice, setIsEditingPrice] = useState(false);
-  const [editedAction, setEditedAction] = useState<"BUY" | "SELL" | "buy" | "sell">(request.action);
-  const [editedQuantity, setEditedQuantity] = useState(request.quantity);
-  const [editedPrice, setEditedPrice] = useState(request.price);
+  const [editedAction, setEditedAction] = useState<"BUY" | "SELL" | "buy" | "sell">(request.action || "buy");
+  const [editedQuantity, setEditedQuantity] = useState(request.quantity || 0);
+  const [editedPrice, setEditedPrice] = useState(request.price || 0);
 
   const modifiableFields = request.modifiable_fields ?? ["quantity", "price", "action"];
   const supportsUserInput = request.supports_user_input ?? false;
@@ -83,9 +83,9 @@ export default function UnifiedTradingApprovalPanel({
 
   const isSell = (request.action || "buy").toLowerCase() === "sell";
   const isEdited =
-    editedQuantity !== request.quantity ||
-    editedPrice !== request.price ||
-    editedAction.toLowerCase() !== request.action;
+    editedQuantity !== (request.quantity || 0) ||
+    editedPrice !== (request.price || 0) ||
+    editedAction.toLowerCase() !== (request.action || "buy").toLowerCase();
 
   // 수정된 총 금액 계산
   const editedTotalAmount = editedQuantity * editedPrice;
@@ -96,13 +96,13 @@ export default function UnifiedTradingApprovalPanel({
       const modifications: { quantity?: number; price?: number; action?: string } = {};
 
       // 변경된 값만 포함
-      if (canEditQuantity && editedQuantity !== request.quantity) {
+      if (canEditQuantity && editedQuantity !== (request.quantity || 0)) {
         modifications.quantity = editedQuantity;
       }
-      if (canEditPrice && editedPrice !== request.price) {
+      if (canEditPrice && editedPrice !== (request.price || 0)) {
         modifications.price = editedPrice;
       }
-      if (canEditAction && editedAction !== request.action) {
+      if (canEditAction && editedAction.toLowerCase() !== (request.action || "buy").toLowerCase()) {
         modifications.action = editedAction.toLowerCase();
       }
 
@@ -711,7 +711,7 @@ export default function UnifiedTradingApprovalPanel({
             }}
           >
             {t("hitl.unified.modify")}
-            {isEdited && <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>({editedQuantity !== request.quantity || editedPrice !== request.price ? "수정됨" : ""})</span>}
+            {isEdited && <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>({editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0) ? "수정됨" : ""})</span>}
           </button>
 
           {/* Approve Button */}

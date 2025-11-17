@@ -247,14 +247,14 @@ export interface RiskApprovalRequest extends BaseApprovalRequest {
 export interface TradingApprovalRequest extends BaseApprovalRequest {
   type: "trading" | "trade_approval";
   agent: "Trading";
-  action: "buy" | "sell";
+  action?: "buy" | "sell"; // Optional to handle undefined from backend
   stock_code: string;
   stock_name: string;
   quantity: number;
   price: number;
   total_amount: number;
-  current_weight: number;
-  expected_weight: number;
+  current_weight?: number; // Optional to handle undefined from backend
+  expected_weight?: number; // Optional to handle undefined from backend
   risk_warning?: string;
   alternatives?: Alternative[];
   /** 위험 레벨(옵션) */
