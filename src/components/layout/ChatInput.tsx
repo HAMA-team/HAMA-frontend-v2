@@ -40,7 +40,7 @@ export default function ChatInput({
   const { width: lnbWidth } = useLNBWidth();
   const { addMessage, updateMessage, isLoading, setLoading, setCurrentThreadId, openApprovalPanel, currentThreadId, clearMessages } = useChatStore();
   const { mode } = useAppModeStore();
-  const { getArtifact } = useArtifactStore();
+  const { currentArtifact } = useArtifactStore();
   const { hitlConfig } = useUserStore();
   const charLimit = 5000;
   const showCharCount = message.length >= 4900;
@@ -63,13 +63,12 @@ export default function ChatInput({
       }
 
       // 아티팩트 컨텍스트가 있으면 사용자 메시지 이전에 컨텍스트를 '기존 LLM 답변'처럼 표시
-      if (fromExternalPage && contextArtifactId) {
-        const art = useArtifactStore.getState().getArtifact?.(contextArtifactId);
-        if (art?.content) {
+      if (fromExternalPage && contextArtifactId && currentArtifact?.artifact_id === contextArtifactId) {
+        if (currentArtifact?.content) {
           const contextAssistant: Message = {
             id: `ctx-${Date.now()}`,
             role: "assistant",
-            content: art.content,
+            content: currentArtifact.content,
             timestamp: new Date().toISOString(),
             status: "sent",
           };
@@ -116,13 +115,12 @@ export default function ChatInput({
         // 아티팩트 컨텍스트가 있으면 LLM 입력에는 아티팩트 내용을 안전하게 선행해 전송(화면에는 미표시)
         let composedForLLM = userMessageContent;
         let desiredConfig = hitlConfig; // 기본: userStore의 hitlConfig
-        if (fromExternalPage && contextArtifactId) {
-          const art = getArtifact?.(contextArtifactId);
-          if (art?.content) {
+        if (fromExternalPage && contextArtifactId && currentArtifact?.artifact_id === contextArtifactId) {
+          if (currentArtifact?.content) {
             const sep = t("chat.artifactPromptSeparator");
             const preamble = t("chat.artifactContextPreamble");
             const maxLen = 6000;
-            const rawCtx = art.content.length > maxLen ? art.content.slice(0, maxLen) + "\n\n…(truncated)" : art.content;
+            const rawCtx = currentArtifact.content.length > maxLen ? currentArtifact.content.slice(0, maxLen) + "\n\n…(truncated)" : currentArtifact.content;
             // 숫자식 종목코드(6자리)와 A+6자리 패턴은 공백 삽입으로 마스킹하여 도구 파이프라인 추출 회피
             const maskedCtx = rawCtx
               .replace(/\b(\d{6})\b/g, (_m: string, g1: string) => g1.split("").join(" "))
