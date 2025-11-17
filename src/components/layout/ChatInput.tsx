@@ -183,23 +183,28 @@ export default function ChatInput({
           setCurrentThreadId(data.conversation_id);
         } else {
           // Live: 우선 스트림 시도, 실패 시 REST 폴백
-          try {
-            // 스트림 시작 전, pending 메시지는 이미 추가됨 (tempId)
-            let lastCid: string | null = null;
-            await startMultiAgentStream({
-              message: composedForLLM,
-              conversation_id: conversationIdForRequest,
-              hitl_config: desiredConfig,
+            try {
+              // 스트림 시작 전, pending 메시지는 이미 추가됨 (tempId)
+              let lastCid: string | null = null;
+              await startMultiAgentStream({
+                message: composedForLLM,
+                conversation_id: conversationIdForRequest,
+                hitl_config: desiredConfig,
                 onEvent: (ev) => {
-                  const now = new Date().toISOString();
-
-                  // 스트림 중 서버가 thread/conversation id를 제공하면 즉시 저장하여 LNB 갱신 유도
-                  try {
-                    const providedId = ev?.data?.conversation_id || ev?.data?.thread_id || ev?.data?.id;
-                    if (providedId && !useChatStore.getState().currentThreadId) {
-                      setCurrentThreadId(String(providedId));
-                    }
-                  } catch {}
+                    const now = new Date().toISOString();
+  
+                    // 스트림 중 서버가 thread/conversation id를 제공하면 즉시 저장하여 LNB 갱신 유도
+                    try {
+                      const providedId =
+                        ev?.data?.conversation_id ||
+                        ev?.data?.thread_id ||
+                        ev?.data?.id ||
+                        ev?.data?.approval_request?.thread_id ||
+                        ev?.data?.reasoning_event?.conversation_id;
+                      if (providedId && !useChatStore.getState().currentThreadId) {
+                        setCurrentThreadId(String(providedId));
+                      }
+                    } catch {}
 
                   // Reasoning Event Guide 기반 HITL 감지
                   try {
