@@ -584,5 +584,106 @@
       "maxDrawdown": "최대 낙폭",
       "recalculation": "수정 후 서버에서 재계산하여 새로운 전/후 비교 데이터를 제공합니다."
     }
+  },
+  "about": {
+    "title": "About HAMA",
+    "subtitle": "Human-in-the-Loop AI 투자 시스템",
+    "whatIsHAMA": {
+      "title": "HAMA란?",
+      "description1": "HAMA는 Human-in-the-Loop AI 투자 시스템으로, AI의 분석 능력과 인간의 판단력을 결합한 차세대 투자 플랫폼입니다.",
+      "description2": "사용자가 원하는 자동화 수준을 직접 설정하여, AI와 협업하며 투자 의사결정을 수행할 수 있습니다."
+    },
+    "businessModel": {
+      "title": "비즈니스 모델",
+      "revenue": {
+        "title": "수익 구조",
+        "content": "내용 추후 업데이트 예정"
+      },
+      "target": {
+        "title": "타겟 고객",
+        "content": "내용 추후 업데이트 예정"
+      },
+      "market": {
+        "title": "시장 분석",
+        "content": "내용 추후 업데이트 예정"
+      }
+    },
+    "team": {
+      "title": "팀 소개",
+      "content": "내용 추후 업데이트 예정"
+    },
+    "economic": {
+      "title": "비즈니스 모델",
+      "subtitle": "지속 가능한 성장을 위한 시장 분석과 로드맵",
+      "tam": {
+        "label": "TAM",
+        "fullName": "전체 시장",
+        "description": "국내 상장주식 보유 개인투자자"
+      },
+      "sam": {
+        "label": "SAM",
+        "fullName": "유효 시장",
+        "description": "웹/앱 사용 가능한 디지털 투자자"
+      },
+      "som": {
+        "label": "SOM",
+        "fullName": "초기 목표 시장",
+        "description": "실제 접근 가능한 20-40대 AI투자 관심층"
+      },
+      "mau": {
+        "title": "예상 MAU",
+        "value": "25만 명",
+        "description": "연간 활성 사용자 대비 70% 월간 활성화 가정",
+        "annualUsers": "연간 사용자",
+        "activationRate": "활성화율"
+      },
+      "labels": {
+        "marketSize": "시장 규모",
+        "users": "사용자",
+        "target": "타겟",
+        "pricing": "가격",
+        "timeline": "출시 시기"
+      },
+      "units": {
+        "billion": "억",
+        "tenThousand": "만"
+      },
+      "scalability": {
+        "title": "왜 확장 가능한가?",
+        "description": "HAMA는 개인 투자자 1명이 쓰든, 자산운용사가 1000명 고객을 관리하든 같은 AI 기술로 작동합니다.",
+        "reason1": {
+          "title": "검증된 AI 기술",
+          "description": "5개 전문 AI 에이전트가 협업하는 시스템"
+        },
+        "reason2": {
+          "title": "유연한 구조",
+          "description": "개인부터 기관까지 동시 관리 가능"
+        },
+        "reason3": {
+          "title": "비용 효율적",
+          "description": "프롬프트 캐싱으로 AI 비용 최소화"
+        }
+      },
+      "phases": {
+        "title": "성장 로드맵",
+        "tagline": "같은 AI 기술, 다른 시장으로 확장",
+        "phase1": {
+          "title": "Phase 1: B2C",
+          "subtitle": "개인 투자자 대상",
+          "target": "20-40대 디지털 투자자",
+          "pricing": "₩9,900/월",
+          "timeline": "2025 Q1-Q2",
+          "icon": "🧑‍💼"
+        },
+        "phase2": {
+          "title": "Phase 2: B2B",
+          "subtitle": "기관 투자자 대상",
+          "target": "자산운용사, 증권사",
+          "pricing": "맞춤형 가격",
+          "timeline": "2025 Q3-Q4",
+          "icon": "🏢"
+        }
+      }
+    }
   }
 }
