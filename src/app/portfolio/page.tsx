@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import PortfolioView from "@/components/portfolio/PortfolioView";
-import { fetchPortfolioOverview } from "@/lib/api/portfolio";
+import { fetchPortfolioChartData, fetchPortfolioOverview } from "@/lib/api/portfolio";
 import { Portfolio } from "@/lib/types/portfolio";
 import { useTranslation } from "react-i18next";
 import { useAppModeStore } from "@/store/appModeStore";
@@ -36,10 +36,45 @@ export default function PortfolioPage() {
     (async () => {
       try {
         if (mode === "demo") {
-          if (mounted) setPortfolio(mockPortfolio);
+          if (mounted) {
+            setPortfolio(mockPortfolio);
+          }
         } else {
-          const data = await fetchPortfolioOverview();
-          if (mounted) setPortfolio(data);
+          // 1차: overview 먼저 로드해서 화면을 빠르게 렌더링
+          const overview = await fetchPortfolioOverview();
+          if (!mounted) return;
+
+          setPortfolio(overview);
+
+          // 2차: chart-data는 별도로 로드하여 섹터 정보만 보강 (실패해도 화면 유지)
+          fetchPortfolioChartData()
+            .then((chartData) => {
+              if (!mounted || !chartData || !Array.isArray(chartData.stocks)) return;
+
+              const sectorByCode = new Map<string, string>();
+              chartData.stocks.forEach((s) => {
+                if (s.stock_code) {
+                  sectorByCode.set(s.stock_code, s.sector);
+                }
+              });
+
+              setPortfolio((prev) => {
+                if (!prev) return prev;
+                return {
+                  ...prev,
+                  stocks: prev.stocks.map((stock) => {
+                    const sectorFromChart = sectorByCode.get(stock.code);
+                    return {
+                      ...stock,
+                      sector: sectorFromChart ?? stock.sector ?? "",
+                    };
+                  }),
+                };
+              });
+            })
+            .catch((err) => {
+              console.error("Failed to load portfolio chart data:", err);
+            });
         }
       } catch (e: any) {
         console.error("Failed to load portfolio:", e);
