@@ -96,11 +96,9 @@ function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
   // 백엔드 원본 값
   const backendTotalValue = apiSummary.total_value ?? 0;
   const backendCash = apiSummary.cash ?? 0;
-  const backendPrincipal = apiSummary.principal ?? 0;
-  const backendProfit = apiSummary.profit ?? 0;
-  const backendProfitRate = apiSummary.profit_rate ?? 0;
 
-  // 1차: 백엔드 summary 값을 신뢰하고, 빠진 값만 최소한으로 보완한다.
+  // 1차: 총 평가금액과 현금은 백엔드 값을 우선 사용,
+  // 수익/수익률은 "현금 + 주식 원금"을 전체 원금으로 보는 관점에서 프론트에서 일관되게 계산한다.
   const totalValue: number =
     backendTotalValue && backendTotalValue > 0
       ? backendTotalValue
@@ -111,22 +109,13 @@ function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
       ? backendCash
       : Math.max(0, totalValue - stocksValue);
 
-  const principal: number =
-    backendPrincipal && backendPrincipal > 0
-      ? backendPrincipal
-      : stocksPrincipal + cash;
+  // 전체 원금 = 주식 매수 원금 + 현재 보유 현금
+  const principal: number = stocksPrincipal + cash;
 
-  const profit: number =
-    backendProfit || backendProfit === 0
-      ? backendProfit
-      : totalValue - principal;
+  const profit: number = totalValue - principal;
 
   const profitRate: number =
-    backendProfitRate || backendProfitRate === 0
-      ? backendProfitRate
-      : principal > 0
-        ? (profit / principal) * 100
-        : 0;
+    principal > 0 ? (profit / principal) * 100 : 0;
 
   return {
     summary: {
