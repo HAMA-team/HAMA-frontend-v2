@@ -235,7 +235,7 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
 
             return (
               <div
-                key={index}
+                key={step.timestamp + "-" + index}
                 className="flex flex-col gap-1 py-1.5"
                 style={{
                   borderBottom:
@@ -328,10 +328,16 @@ export default function ThinkingSection({ steps }: ThinkingSectionProps) {
                             p: ({ node, ...props }) => <p style={{ marginBottom: "8px" }} {...props} />,
                             strong: ({ node, ...props }) => <strong style={{ fontWeight: 600 }} {...props} />,
                             em: ({ node, ...props }) => <em {...props} />,
-                            ul: ({ node, ...props }) => (
-                              <ul style={{ marginLeft: "16px", marginBottom: "8px", listStyleType: "disc" }} {...props} />
+                            ul: ({ node, children, ...props }) => (
+                              <ul style={{ marginLeft: "16px", marginBottom: "8px", listStyleType: "disc" }} {...props}>
+                                {children}
+                              </ul>
                             ),
-                            li: ({ node, ...props }) => <li style={{ marginBottom: "4px" }} {...props} />,
+                            li: ({ node, children, ...props }) => (
+                              <li style={{ marginBottom: "4px" }} {...props}>
+                                {children}
+                              </li>
+                            ),
                             code: ({ node, className, children, ...props }) => {
                               const isInline = !className;
                               if (isInline) {

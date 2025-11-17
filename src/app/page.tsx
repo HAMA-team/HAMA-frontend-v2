@@ -11,7 +11,7 @@ import { useDialogStore } from "@/store/dialogStore";
 import { approveAction } from "@/lib/api/approvals";
 import { useAppModeStore } from "@/store/appModeStore";
 import { useTranslation } from "react-i18next";
-import { sendChat } from "@/lib/api/chat";
+import { sendChat, getChatHistory } from "@/lib/api/chat";
 import { startMultiAgentStream } from "@/lib/api/chatStream";
 import { useUserStore } from "@/store/userStore";
 import { MOCK_UNIFIED_TRADING_HIGH_RISK } from "@/lib/mock/unifiedTradingMock";
@@ -45,7 +45,7 @@ const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
 export default function Home() {
   const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
-  const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId } = useChatStore();
+  const { messages, isHistoryLoading, addMessage, deleteMessage, approvalPanel, closeApprovalPanel, openApprovalPanel, currentThreadId, updateMessage, setLoading, setCurrentThreadId, setMessages } = useChatStore();
   const { openAlert } = useDialogStore();
   const { hitlConfig } = useUserStore();
 
@@ -93,6 +93,25 @@ export default function Home() {
     return "";
   };
   const [approvalBusy, setApprovalBusy] = React.useState(false);
+
+  // Chat History 새로고침 헬퍼 함수
+  const refreshChatHistory = async (threadId: string) => {
+    try {
+      const historyData = await getChatHistory(threadId);
+      const fetchedMessages: Message[] = historyData.messages.map((msg: any) => ({
+        id: msg.message_id,
+        role: msg.role,
+        content: msg.content,
+        timestamp: msg.created_at,
+        status: "sent",
+        metadata: msg.metadata,
+      }));
+      setMessages(fetchedMessages);
+      console.log("✅ Chat History 새로고침 완료:", fetchedMessages.length, "개 메시지");
+    } catch (error) {
+      console.error("❌ Chat History 새로고침 실패:", error);
+    }
+  };
 
   const handleSuggestionClick = async (prompt: string) => {
     // 사용자 메시지 추가
@@ -784,16 +803,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     if (approvalBusy) return;
     setApprovalBusy(true);
     try {
-      // 승인 결정을 사용자 메시지로 추가 (요청 요약은 백엔드 자동 저장)
-      const approvalDecisionMessage: Message = {
-        id: `approval-decision-${Date.now()}`,
-        role: "user",
-        content: `✅ **${t("hitl.approved") || "승인됨"}**`,
-        timestamp: new Date().toISOString(),
-        status: "sent",
-      };
-      addMessage(approvalDecisionMessage);
-
       if (mode === "demo") {
         closeApprovalPanel();
         return;
@@ -837,6 +846,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       console.log("Approve:", messageId, currentThreadId);
       closeApprovalPanel();
 
+      // 승인 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
+      await refreshChatHistory(currentThreadId);
+
     } catch (error) {
       console.error("Approval error:", error);
       closeApprovalPanel(); // HITL 패널 먼저 닫기
@@ -858,16 +870,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     if (approvalBusy) return;
     setApprovalBusy(true);
     try {
-      // 거부 결정을 사용자 메시지로 추가 (요청 요약은 백엔드 자동 저장)
-      const approvalDecisionMessage: Message = {
-        id: `approval-decision-${Date.now()}`,
-        role: "user",
-        content: `❌ **${t("hitl.rejected") || "거부됨"}**`,
-        timestamp: new Date().toISOString(),
-        status: "sent",
-      };
-      addMessage(approvalDecisionMessage);
-
       if (mode === "demo") {
         closeApprovalPanel();
         return;
@@ -889,6 +891,10 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
 
       console.log("Reject:", messageId, currentThreadId);
       closeApprovalPanel();
+
+      // 거부 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
+      await refreshChatHistory(currentThreadId);
+
     } catch (error) {
       console.error("Rejection error:", error);
       // 백엔드 에러 메시지 출력
@@ -910,16 +916,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
     if (approvalBusy) return;
     setApprovalBusy(true);
     try {
-      // 수정 결정을 사용자 메시지로 추가
-      const modificationMessage: Message = {
-        id: `approval-decision-${Date.now()}`,
-        role: "user",
-        content: `✏️ **${t("hitl.unified.modify") || "수정 후 승인"}**${userInput ? `\n\n${userInput}` : ""}`,
-        timestamp: new Date().toISOString(),
-        status: "sent",
-      };
-      addMessage(modificationMessage);
-
       if (mode === "demo") {
         closeApprovalPanel();
         return;
@@ -949,6 +945,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
 
       console.log("Modify:", messageId, currentThreadId);
       closeApprovalPanel();
+
+      // 수정 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
+      await refreshChatHistory(currentThreadId);
 
     } catch (error) {
       console.error("Modification error:", error);
