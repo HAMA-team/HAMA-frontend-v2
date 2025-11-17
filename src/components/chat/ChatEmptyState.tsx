@@ -25,10 +25,60 @@ interface ChatEmptyStateProps {
  * Chat 빈 상태 UI (환영 메시지 + 제안 카드 4개)
  * - i18n 적용 (useTranslation 사용)
  * - Dynamic import로 SSR hydration 에러 방지
+ * - 타이핑 애니메이션 (15초마다 반복)
  */
 export default function ChatEmptyState({ onSuggestionClick, onTestHITL }: ChatEmptyStateProps) {
   const { t } = useTranslation();
   const { mode } = useAppModeStore();
+  const [displayedGreeting, setDisplayedGreeting] = React.useState("");
+  const [displayedSubGreeting, setDisplayedSubGreeting] = React.useState("");
+
+  const greetingText = t("chat.emptyState.greeting");
+  const subGreetingText = t("chat.emptyState.subGreeting");
+
+  // 타이핑 애니메이션 효과
+  React.useEffect(() => {
+    let greetingIndex = 0;
+    let subGreetingIndex = 0;
+    let typingInterval: NodeJS.Timeout;
+
+    const startTyping = () => {
+      setDisplayedGreeting("");
+      setDisplayedSubGreeting("");
+      greetingIndex = 0;
+      subGreetingIndex = 0;
+
+      typingInterval = setInterval(() => {
+        // 먼저 greeting 타이핑
+        if (greetingIndex < greetingText.length) {
+          setDisplayedGreeting(greetingText.slice(0, greetingIndex + 1));
+          greetingIndex++;
+        }
+        // greeting 완료 후 subGreeting 타이핑
+        else if (subGreetingIndex < subGreetingText.length) {
+          setDisplayedSubGreeting(subGreetingText.slice(0, subGreetingIndex + 1));
+          subGreetingIndex++;
+        }
+        // 모두 완료
+        else {
+          clearInterval(typingInterval);
+        }
+      }, 50); // 50ms per character
+    };
+
+    // 초기 타이핑 시작
+    startTyping();
+
+    // 15초마다 리셋 후 재타이핑
+    const loopInterval = setInterval(() => {
+      startTyping();
+    }, 15000);
+
+    return () => {
+      clearInterval(typingInterval);
+      clearInterval(loopInterval);
+    };
+  }, [greetingText, subGreetingText]);
 
   const suggestions: SuggestionCard[] = [
     {
@@ -76,12 +126,12 @@ export default function ChatEmptyState({ onSuggestionClick, onTestHITL }: ChatEm
           <span className="text-2xl font-bold" style={{ color: "var(--lnb-active-text)" }}>H</span>
         </div>
 
-        {/* Greeting */}
-        <h1 className="text-3xl font-bold mb-2 text-center" style={{ color: "var(--text-primary)" }}>
-          {t("chat.emptyState.greeting")}
+        {/* Greeting with Typing Animation */}
+        <h1 className="text-3xl font-bold mb-2 text-center min-h-[2.5rem]" style={{ color: "var(--text-primary)" }}>
+          {displayedGreeting}
         </h1>
-        <p className="text-base mb-12 text-center" style={{ color: "var(--text-secondary)" }}>
-          {t("chat.emptyState.subGreeting")}
+        <p className="text-base mb-12 text-center min-h-[1.5rem]" style={{ color: "var(--text-secondary)" }}>
+          {displayedSubGreeting}
         </p>
 
         {/* Suggestion Cards - 2x2 Grid */}

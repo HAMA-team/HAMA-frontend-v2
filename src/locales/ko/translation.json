@@ -609,8 +609,17 @@
       }
     },
     "team": {
-      "title": "팀 소개",
-      "content": "내용 추후 업데이트 예정"
+      "title": "Team",
+      "members": {
+        "jiwoo": {
+          "name": "Jiwoo Choi",
+          "role": "Backend & AI Agent System"
+        },
+        "seongmin": {
+          "name": "Seongmin Hwang",
+          "role": "Frontend & Product Design"
+        }
+      }
     },
     "economic": {
       "title": "비즈니스 모델",

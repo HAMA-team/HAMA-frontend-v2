@@ -1,9 +1,23 @@
 "use client";
 
 import React from "react";
-import { useTranslation } from "react-i18next";
-import { WhatIsHAMA, TeamIntro } from "@/components/about/AboutContent";
-import EconomicViabilitySection from "@/components/about/EconomicViabilitySection";
+import dynamic from "next/dynamic";
+
+// Dynamic import로 hydration 에러 방지
+const AboutContent = dynamic(() => import("@/components/about/AboutPageContent"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen">
+      <div
+        className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin"
+        style={{
+          borderColor: "var(--primary-500)",
+          borderTopColor: "transparent",
+        }}
+      />
+    </div>
+  ),
+});
 
 /**
  * About Page
@@ -19,40 +33,9 @@ import EconomicViabilitySection from "@/components/about/EconomicViabilitySectio
  * 각 섹션은 AboutContent.tsx에서 관리하여 수정 용이
  */
 export default function AboutPage() {
-  const { t } = useTranslation();
-
   return (
     <div className="flex h-full w-full flex-col overflow-x-hidden" style={{ backgroundColor: "var(--main-background)" }}>
-      {/* About Content Area */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[1000px] mx-auto px-6 py-8 w-full">
-          {/* Page Header */}
-          <div className="mb-8 text-center">
-            <h1
-              className="text-4xl md:text-5xl font-bold mb-4"
-              style={{
-                color: "var(--text-primary)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              {t("about.title")}
-            </h1>
-            <p
-              className="text-lg md:text-xl"
-              style={{
-                color: "var(--text-secondary)",
-              }}
-            >
-              {t("about.subtitle")}
-            </p>
-          </div>
-
-          {/* Sections */}
-          <WhatIsHAMA />
-          <EconomicViabilitySection />
-          <TeamIntro />
-        </div>
-      </div>
+      <AboutContent />
     </div>
   );
 }

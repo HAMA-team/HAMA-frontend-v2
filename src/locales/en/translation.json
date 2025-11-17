@@ -617,7 +617,16 @@
         },
         "team": {
             "title": "Team",
-            "content": "Content to be updated"
+            "members": {
+                "jiwoo": {
+                    "name": "Jiwoo Choi",
+                    "role": "Backend & AI Agent System"
+                },
+                "seongmin": {
+                    "name": "Seongmin Hwang",
+                    "role": "Frontend & Product Design"
+                }
+            }
         },
         "economic": {
             "title": "Business Model",
