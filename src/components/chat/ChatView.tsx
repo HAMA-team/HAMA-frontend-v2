@@ -54,9 +54,9 @@ export default function ChatView({
       <div className="max-w-[800px] mx-auto px-4 w-full min-w-0">
         {/* Messages List */}
         <div>
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <ChatMessage
-              key={message.id}
+              key={`${message.id}-${index}`}
               message={message}
               onRetry={
                 onRetryMessage ? () => onRetryMessage(message.id) : undefined
