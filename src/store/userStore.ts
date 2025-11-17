@@ -15,8 +15,14 @@ import { PRESET_COPILOT, migrateAutomationLevel, normalizeHITLConfig } from '@/t
  * @see docs/AutomationLevelAPIChanges.md - Frontend Migration
  */
 
+export type RiskProfileType =
+  | 'conservative'
+  | 'moderatelyConservative'
+  | 'neutral'
+  | 'aggressive';
+
 export interface InvestmentProfile {
-  type: '안정형' | '안정추구형' | '위험중립형' | '공격투자형';
+  type: RiskProfileType;
   description: string; // LLM 생성 서술형 프로필
   last_updated: string;
 }
@@ -25,6 +31,7 @@ export interface UserInfo {
   id: string;
   name: string;
   email: string;
+  age?: number;
   avatar_url?: string;
 }
 
@@ -40,10 +47,11 @@ interface UserStore {
   _hasHydrated: boolean; // Zustand persist hydration 완료 여부
 
   // Actions
-  setUserInfo: (userInfo: UserInfo) => void;
+  setUserInfo: (userInfo: UserInfo | null) => void;
   setHITLConfig: (config: HITLConfig) => void;
   setCustomModePhases: (phases: HITLPhases) => void; // Custom 모드 설정 저장
   setInvestmentProfile: (profile: InvestmentProfile) => void;
+  clearInvestmentProfile: () => void;
   setLoadingProfile: (loading: boolean) => void;
   setLoading: (loading: boolean) => void;
   setLastSyncedConfig: (config: HITLConfig) => void;
@@ -116,6 +124,11 @@ export const useUserStore = create<UserStore>()(
           investmentProfile: profile,
         }),
 
+      clearInvestmentProfile: () =>
+        set({
+          investmentProfile: null,
+        }),
+
       setLoadingProfile: (loading) =>
         set({
           isLoadingProfile: loading,
@@ -173,9 +186,11 @@ export const useUserStore = create<UserStore>()(
       },
 
       partialize: (state) => ({
-        // 저장할 state만 선택 (userInfo는 제외 - 보안)
+        // 저장할 state만 선택
         hitlConfig: state.hitlConfig,
         customModePhases: state.customModePhases, // Custom 모드 설정도 저장
+        userInfo: state.userInfo,
+        investmentProfile: state.investmentProfile,
       }),
 
       // Hydration 완료 후 기본값 병합

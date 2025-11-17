@@ -21,6 +21,7 @@ import DevDemoToggle from "@/components/common/DevDemoToggle";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import { formatRelativeOrDate, formatAbsoluteDate } from "@/lib/utils";
 import { useAppModeStore } from "@/store/appModeStore";
+import { useUserStore } from "@/store/userStore";
 import { getChatSessions, getChatHistory, deleteChatHistory } from "@/lib/api/chat";
 
 /**
@@ -44,6 +45,7 @@ export default function LNB() {
   const currentThreadId = useChatStore((s) => s.currentThreadId);
   const { t, i18n } = useTranslation();
   const { mode } = useAppModeStore();
+  const { userInfo } = useUserStore();
   const [sessions, setSessions] = React.useState<any[]>([]);
   const [loadingSessions, setLoadingSessions] = React.useState<boolean>(false);
   const [sessionsLimit, setSessionsLimit] = React.useState<number>(20);
@@ -585,20 +587,32 @@ export default function LNB() {
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--lnb-hover-bg)"}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
         >
+          {(() => {
+            const displayUser = userInfo || {
+              id: "demo-user",
+              name: t("mypage.user.demoName"),
+              email: "demo@hama.ai",
+            };
+            const initial = displayUser.name.charAt(0).toUpperCase();
+            return (
+              <>
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
             style={{ backgroundColor: "var(--lnb-text-muted)" }}
           >
-            <span className="text-sm font-semibold" style={{ color: "var(--lnb-active-text)" }}>김</span>
+            <span className="text-sm font-semibold" style={{ color: "var(--lnb-active-text)" }}>{initial}</span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate animate-fadeInText" style={{ color: "var(--lnb-text)" }}>
-              김투자
+              {displayUser.name}
             </p>
             <p className="text-xs truncate animate-fadeInText" style={{ color: "var(--lnb-text-muted)" }}>
-              프리미엄 플랜
+              {t("mypage.user.planPremium")}
             </p>
           </div>
+              </>
+            );
+          })()}
         </div>
       </div>
     </aside>

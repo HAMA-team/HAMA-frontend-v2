@@ -32,7 +32,7 @@ import APICheckPanel from "./APICheckPanel";
 export default function MyPageView() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const { userInfo } = useUserStore();
+  const { userInfo, setUserInfo, clearInvestmentProfile } = useUserStore();
   const { theme, toggleTheme } = useThemeStore();
   const { mode } = useAppModeStore();
 
@@ -44,7 +44,13 @@ export default function MyPageView() {
     id: "demo-user",
     name: t("mypage.user.demoName"),
     email: "demo@hama.ai",
+    age: undefined,
     avatar_url: undefined,
+  };
+
+  const handleResetUser = () => {
+    setUserInfo(null);
+    clearInvestmentProfile();
   };
 
   const handleLanguageChange = (lang: "ko" | "en") => {
@@ -76,12 +82,27 @@ export default function MyPageView() {
 
       {/* 섹션 1: 사용자 정보 */}
       <section>
-        <h2
-          className="text-xl font-semibold mb-4"
-          style={{ color: "var(--text-primary)" }}
-        >
-          {t("mypage.user.title")}
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2
+            className="text-xl font-semibold"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {t("mypage.user.title")}
+          </h2>
+          <button
+            type="button"
+            onClick={handleResetUser}
+            className="inline-flex items-center justify-center rounded-md border px-2 py-1 text-xs font-medium transition-colors"
+            style={{
+              backgroundColor: "transparent",
+              borderColor: "var(--border-default)",
+              color: "var(--text-secondary)",
+            }}
+            aria-label={t("mypage.user.resetToDemo")}
+          >
+            {t("mypage.user.resetToDemo")}
+          </button>
+        </div>
 
         <div
           className="p-6 rounded-xl border flex items-center gap-4"

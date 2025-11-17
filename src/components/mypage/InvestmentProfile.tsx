@@ -22,6 +22,15 @@ export default function InvestmentProfile() {
   const { t } = useTranslation();
   const { investmentProfile, isLoadingProfile } = useUserStore();
 
+  const getTypeKey = (rawType: string) => {
+    if (rawType === '안정형' || rawType === 'conservative') return 'conservative';
+    if (rawType === '안정추구형' || rawType === 'moderatelyConservative') {
+      return 'moderatelyConservative';
+    }
+    if (rawType === '공격투자형' || rawType === 'aggressive') return 'aggressive';
+    return 'neutral';
+  };
+
   // TODO: Phase 3 - API 연동
   // useEffect(() => {
   //   fetchInvestmentProfile();
@@ -84,6 +93,8 @@ export default function InvestmentProfile() {
   }
 
   // Phase 3: 실제 프로필 표시
+  const typeKey = getTypeKey(investmentProfile.type as unknown as string);
+
   return (
     <div
       className="p-6 rounded-xl border space-y-4"
@@ -119,7 +130,7 @@ export default function InvestmentProfile() {
             color: "var(--primary-500)",
           }}
         >
-          {investmentProfile.type}
+          {t(`mypage.profile.types.${typeKey}`)}
         </span>
       </div>
 
