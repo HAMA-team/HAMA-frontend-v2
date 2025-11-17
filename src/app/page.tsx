@@ -324,9 +324,11 @@ ${t("chat.receivedResponse")}
               // `hitl_interrupt` 분기는 제거하고 `hitl.request`만 유지한다.
               case "hitl_interrupt": {
                 const raw = ev?.data?.approval_request ?? ev?.data;
+                console.log("[DEBUG] HITL Interrupt Raw Data:", JSON.stringify(raw, null, 2));
                 if (raw) {
                   const norm: any = { ...raw };
                   if (norm.type === 'trade_approval') norm.type = 'trading';
+                  console.log("[DEBUG] Normalized HITL Data:", JSON.stringify(norm, null, 2));
                   try { openApprovalPanel(norm as any); } catch {}
                 }
                 break;
@@ -822,12 +824,15 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       }
 
       // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
-      await approveAction({
+      const approvalPayload = {
         thread_id: currentThreadId,
-        decision: "approved",
+        decision: "approved" as const,
         request_id: requestId,
         modifications: Object.keys(modifications).length > 0 ? modifications : undefined,
-      });
+      };
+      console.log("[DEBUG] Approval Request Payload:", JSON.stringify(approvalPayload, null, 2));
+
+      await approveAction(approvalPayload);
 
       console.log("Approve:", messageId, currentThreadId);
       closeApprovalPanel();

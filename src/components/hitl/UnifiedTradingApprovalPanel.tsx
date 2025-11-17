@@ -49,9 +49,9 @@ export default function UnifiedTradingApprovalPanel({
     return () => observer.disconnect();
   }, []);
 
-  const formatNumber = (num: number) => num.toLocaleString();
-  const formatCurrency = (num: number) => `${num.toLocaleString()} KRW`;
-  const formatPercentage = (num: number) => `${num.toFixed(1)}%`;
+  const formatNumber = (num?: number) => (num ?? 0).toLocaleString();
+  const formatCurrency = (num?: number) => `${(num ?? 0).toLocaleString()} KRW`;
+  const formatPercentage = (num?: number) => `${(num ?? 0).toFixed(1)}%`;
 
   const getRiskColor = (level?: string) => {
     switch (level) {
@@ -462,11 +462,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage((request.portfolio_before.cash_balance / request.portfolio_before.total_value) * 100)}
+                    {formatPercentage(((request.portfolio_before?.cash_balance ?? 0) / (request.portfolio_before?.total_value ?? 1)) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: (request.portfolio_after.cash_balance < request.portfolio_before.cash_balance) ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage((request.portfolio_after.cash_balance / request.portfolio_after.total_value) * 100)}
+                  <span style={{ color: ((request.portfolio_after?.cash_balance ?? 0) < (request.portfolio_before?.cash_balance ?? 0)) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage(((request.portfolio_after?.cash_balance ?? 0) / (request.portfolio_after?.total_value ?? 1)) * 100)}
                   </span>
                 </div>
               </div>
@@ -484,16 +484,16 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   {(() => {
-                    const before = request.portfolio_before.holdings.find(h => h.stock_code === request.stock_code);
-                    const after = request.portfolio_after.holdings.find(h => h.stock_code === request.stock_code);
+                    const before = request.portfolio_before?.holdings?.find(h => h.stock_code === request.stock_code);
+                    const after = request.portfolio_after?.holdings?.find(h => h.stock_code === request.stock_code);
                     return (
                       <>
                         <span style={{ color: "var(--text-primary)" }}>
-                          {formatPercentage((before?.weight || 0) * 100)}
+                          {formatPercentage((before?.weight ?? 0) * 100)}
                         </span>
                         <span style={{ color: "var(--text-secondary)" }}>→</span>
                         <span style={{ color: (after && before && after.weight > before.weight) ? "#10b981" : "#ef4444" }}>
-                          {formatPercentage((after?.weight || 0) * 100)}
+                          {formatPercentage((after?.weight ?? 0) * 100)}
                         </span>
                       </>
                     );
@@ -527,11 +527,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage(request.risk_before.portfolio_volatility * 100)}
+                    {formatPercentage((request.risk_before?.portfolio_volatility ?? 0) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.portfolio_volatility > request.risk_before.portfolio_volatility ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage(request.risk_after.portfolio_volatility * 100)}
+                  <span style={{ color: (request.risk_after?.portfolio_volatility ?? 0) > (request.risk_before?.portfolio_volatility ?? 0) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage((request.risk_after?.portfolio_volatility ?? 0) * 100)}
                   </span>
                 </div>
               </div>
@@ -549,11 +549,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {request.risk_before.sharpe_ratio.toFixed(2)}
+                    {(request.risk_before?.sharpe_ratio ?? 0).toFixed(2)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.sharpe_ratio > request.risk_before.sharpe_ratio ? "#10b981" : "#ef4444" }}>
-                    {request.risk_after.sharpe_ratio.toFixed(2)}
+                  <span style={{ color: (request.risk_after?.sharpe_ratio ?? 0) > (request.risk_before?.sharpe_ratio ?? 0) ? "#10b981" : "#ef4444" }}>
+                    {(request.risk_after?.sharpe_ratio ?? 0).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -571,11 +571,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage(request.risk_before.var_95 * 100)}
+                    {formatPercentage((request.risk_before?.var_95 ?? 0) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.var_95 < request.risk_before.var_95 ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage(request.risk_after.var_95 * 100)}
+                  <span style={{ color: (request.risk_after?.var_95 ?? 0) < (request.risk_before?.var_95 ?? 0) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage((request.risk_after?.var_95 ?? 0) * 100)}
                   </span>
                 </div>
               </div>
@@ -593,11 +593,11 @@ export default function UnifiedTradingApprovalPanel({
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
-                    {formatPercentage(request.risk_before.max_drawdown_estimate * 100)}
+                    {formatPercentage((request.risk_before?.max_drawdown_estimate ?? 0) * 100)}
                   </span>
                   <span style={{ color: "var(--text-secondary)" }}>→</span>
-                  <span style={{ color: request.risk_after.max_drawdown_estimate > request.risk_before.max_drawdown_estimate ? "#ef4444" : "#10b981" }}>
-                    {formatPercentage(request.risk_after.max_drawdown_estimate * 100)}
+                  <span style={{ color: (request.risk_after?.max_drawdown_estimate ?? 0) > (request.risk_before?.max_drawdown_estimate ?? 0) ? "#ef4444" : "#10b981" }}>
+                    {formatPercentage((request.risk_after?.max_drawdown_estimate ?? 0) * 100)}
                   </span>
                 </div>
               </div>

@@ -131,11 +131,11 @@ export default function UnifiedPortfolioApprovalPanel({
                       </div>
                       <div className="text-sm flex items-center gap-1">
                         <span style={{ color: "var(--text-secondary)" }}>
-                          {currentHolding ? `${currentHolding.current_weight.toFixed(1)}%` : "0%"}
+                          {currentHolding ? `${(currentHolding.current_weight ?? 0).toFixed(1)}%` : "0%"}
                         </span>
                         <span style={{ color: "var(--text-muted)" }}>→</span>
                         <span style={{ color: "var(--primary-500)" }}>
-                          {allocation.target_weight.toFixed(1)}%
+                          {(allocation.target_weight ?? 0).toFixed(1)}%
                         </span>
                       </div>
                     </div>
