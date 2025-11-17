@@ -703,37 +703,42 @@ export default function UnifiedTradingApprovalPanel({
             const isActive = (hasText || isEdited) && canSubmitNumbers;
 
             return (
-          <button
-            onClick={handleModify}
-            disabled={disabled || !isActive}
-            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: isActive
-                ? (isDark ? "#1f2937" : "#e0edff")
-                : "var(--container-background)",
-              color: isActive ? (isDark ? "#e5e7eb" : "#1d4ed8") : "var(--text-secondary)",
-              border: `1px solid ${isActive ? "#2563eb" : "var(--border-default)"}`,
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled && isActive) {
-                e.currentTarget.style.backgroundColor = isDark ? "#374151" : "#d0e2ff";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = isActive
-                ? (isDark ? "#1f2937" : "#e0edff")
-                : "var(--container-background)";
-            }}
-          >
-            {t("hitl.unified.modify")}
-            {isEdited && (
-              <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>
-                {editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0)
-                  ? "(수정됨)"
-                  : ""}
-              </span>
-            )}
-          </button>
+              <button
+                onClick={handleModify}
+                disabled={disabled || !isActive}
+                className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  // 비활성 상태에서도 배경/보더 대비를 조금 올려 항상 버튼처럼 보이도록 처리
+                  backgroundColor: isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)",
+                  color: isActive
+                    ? (isDark ? "#e5e7eb" : "#1d4ed8")
+                    : "var(--text-primary)",
+                  border: `1px solid ${
+                    isActive ? "#2563eb" : "var(--border-emphasis)"
+                  }`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!disabled && isActive) {
+                    e.currentTarget.style.backgroundColor = isDark ? "#374151" : "#d0e2ff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)";
+                }}
+              >
+                {t("hitl.unified.modify")}
+                {isEdited && (
+                  <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>
+                    {editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0)
+                      ? "(수정됨)"
+                      : ""}
+                  </span>
+                )}
+              </button>
             );
           })()}
 

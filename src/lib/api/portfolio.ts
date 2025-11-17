@@ -89,7 +89,7 @@ function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
       sector: h.sector ?? "", // 섹터는 chart-data API에서 보강
     }));
 
-  // 백엔드 데이터가 잘못되어 있으므로 프론트엔드에서 직접 계산
+  // 주식 평가금액 및 주식 원금 (백엔드 summary가 없을 때를 위한 보조 지표)
   const stocksValue = stocks.reduce((sum, s) => sum + s.value, 0);
   const stocksPrincipal = stocks.reduce((sum, s) => sum + s.quantity * s.averagePrice, 0);
 
@@ -97,64 +97,36 @@ function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
   const backendTotalValue = apiSummary.total_value ?? 0;
   const backendCash = apiSummary.cash ?? 0;
   const backendPrincipal = apiSummary.principal ?? 0;
+  const backendProfit = apiSummary.profit ?? 0;
+  const backendProfitRate = apiSummary.profit_rate ?? 0;
 
-  // 프론트엔드 계산 값
-  let totalValue: number;
-  let cash: number;
-  let principal: number;
-  let profit: number;
-  let profitRate: number;
+  // 1차: 백엔드 summary 값을 신뢰하고, 빠진 값만 최소한으로 보완한다.
+  const totalValue: number =
+    backendTotalValue && backendTotalValue > 0
+      ? backendTotalValue
+      : stocksValue + backendCash;
 
-  // total_value 검증 및 재계산
-  if (Math.abs(backendTotalValue - stocksValue) > stocksValue * 0.1) {
-    // 백엔드 값과 주식 평가금액 합계의 차이가 10% 이상이면 잘못된 것
-    console.warn("[Portfolio API] total_value가 비정상적입니다. 프론트엔드에서 재계산:", {
-      backend: backendTotalValue,
-      stocksValue,
-      diff: backendTotalValue - stocksValue,
-    });
+  const cash: number =
+    backendCash && backendCash >= 0
+      ? backendCash
+      : Math.max(0, totalValue - stocksValue);
 
-    // 현금을 백엔드 total_value - 주식 평가금액으로 계산
-    cash = Math.max(0, backendTotalValue - stocksValue);
-    totalValue = stocksValue + cash;
-  } else {
-    // 백엔드 값 신뢰
-    totalValue = backendTotalValue;
-    cash = backendCash;
-  }
+  const principal: number =
+    backendPrincipal && backendPrincipal > 0
+      ? backendPrincipal
+      : stocksPrincipal + cash;
 
-  // principal 검증
-  if (Math.abs(backendPrincipal - stocksPrincipal) > stocksPrincipal * 0.1) {
-    console.warn("[Portfolio API] principal이 비정상적입니다. 프론트엔드에서 재계산:", {
-      backend: backendPrincipal,
-      calculated: stocksPrincipal,
-    });
-    principal = stocksPrincipal + cash; // 원금 = 주식 매수 원금 + 현금
-  } else {
-    principal = backendPrincipal;
-  }
+  const profit: number =
+    backendProfit || backendProfit === 0
+      ? backendProfit
+      : totalValue - principal;
 
-  // profit 및 profit_rate 계산
-  profit = totalValue - principal;
-  profitRate = principal > 0 ? (profit / principal) * 100 : 0;
-
-  console.log("[Portfolio API] 최종 summary:", {
-    backend: {
-      total_value: backendTotalValue,
-      cash: backendCash,
-      principal: backendPrincipal,
-      profit: apiSummary.profit,
-      profit_rate: apiSummary.profit_rate,
-    },
-    calculated: {
-      totalValue,
-      cash,
-      principal,
-      profit,
-      profitRate,
-      stocksValue,
-    },
-  });
+  const profitRate: number =
+    backendProfitRate || backendProfitRate === 0
+      ? backendProfitRate
+      : principal > 0
+        ? (profit / principal) * 100
+        : 0;
 
   return {
     summary: {
