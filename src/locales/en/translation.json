@@ -58,6 +58,9 @@
                    "title": "AI Thinking",
                    "steps": "steps",
                    "current": "Current",
+                   "complete": "Complete",
+                   "showMore": "Show more",
+                   "showLess": "Show less",
                    "agents": {
                      "planner": "Planning",
                      "researcher": "Data Collection",
@@ -66,6 +69,19 @@
                      "risk": "Risk",
                      "trading": "Trading",
                      "unknown": "Analyzing"
+                   },
+                   "phases": {
+                     "planning": "Planning",
+                     "dataCollection": "Data Collection",
+                     "llm": "AI Reasoning",
+                     "tool": "Tool Execution",
+                     "finalization": "Finalization",
+                     "supervision": "Supervision",
+                     "routing": "Routing",
+                     "agentExecution": "Agent Execution",
+                     "hitl": "User Approval",
+                     "system": "System",
+                     "unknown": "In Progress"
                    }
                  },
                  "checkApiDocs":  "Check API documentation",
