@@ -26,6 +26,11 @@ export interface ChatAPIResponse {
 export async function sendChat(payload: SendChatPayload) {
   const { hitl_config, ...rest } = payload;
   const phases = hitl_config?.phases;
+
+  // 백엔드에는 preset 같은 프론트 전용 필드는 보내지 않고,
+  // phases 정보만 포함된 hitl_config를 전송한다.
+  const payloadConfig = phases ? { phases } : undefined;
+
   const intervention_required = Boolean(
     phases &&
       (phases.data_collection ||
@@ -36,7 +41,7 @@ export async function sendChat(payload: SendChatPayload) {
 
   const { data } = await apiClient.post<ChatAPIResponse>('/api/v1/chat/', {
     ...rest,
-    hitl_config,
+    hitl_config: payloadConfig,
     intervention_required,
   });
   return data;

@@ -30,11 +30,12 @@ export default function UnifiedTradingApprovalPanel({
   const [isEditingQuantity, setIsEditingQuantity] = useState(false);
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [editedAction, setEditedAction] = useState<"BUY" | "SELL" | "buy" | "sell">(request.action || "buy");
-  const [editedQuantity, setEditedQuantity] = useState(request.quantity || 0);
-  const [editedPrice, setEditedPrice] = useState(request.price || 0);
+  const [editedQuantity, setEditedQuantity] = useState<number | "">(request.quantity || 0);
+  const [editedPrice, setEditedPrice] = useState<number | "">(request.price || 0);
 
   const modifiableFields = request.modifiable_fields ?? ["quantity", "price", "action"];
-  const supportsUserInput = request.supports_user_input ?? false;
+  // Trading HITL에서도 기본적으로 자유 텍스트 수정 허용 (HITL-MODIFY-PATTERN.md)
+  const supportsUserInput = request.supports_user_input ?? true;
   const canEditQuantity = modifiableFields.includes("quantity");
   const canEditPrice = modifiableFields.includes("price");
   const canEditAction = modifiableFields.includes("action");
@@ -67,18 +68,18 @@ export default function UnifiedTradingApprovalPanel({
   };
 
   const getRiskBgColor = (level?: string) => {
-    switch (level) {
-      case "high":
-        return "#fef2f2";
-      case "medium":
-        return "#fef3c7";
+      switch (level) {
+        case "high":
+          return "#fef2f2";
+        case "medium":
+          return "#fef3c7";
       case "low":
         return "#f0fdf4";
-      default:
-        return "var(--lnb-background)";
-    }
-  };
-
+        default:
+          return "var(--lnb-background)";
+      }
+    };
+  
   const hasRiskInfo = request.risk_level && request.risk_warnings && request.risk_warnings.length > 0;
 
   const isSell = (request.action || "buy").toLowerCase() === "sell";
@@ -87,20 +88,23 @@ export default function UnifiedTradingApprovalPanel({
     editedPrice !== (request.price || 0) ||
     editedAction.toLowerCase() !== (request.action || "buy").toLowerCase();
 
-  // 수정된 총 금액 계산
-  const editedTotalAmount = editedQuantity * editedPrice;
+  // 수정된 총 금액 계산 (빈 문자열은 0으로 처리)
+  const editedTotalAmount = (editedQuantity || 0) * (editedPrice || 0);
 
   const handleModify = () => {
     if (onModify) {
       // 구조화된 수정사항 생성 (HITL-MODIFY-PATTERN.md)
       const modifications: { quantity?: number; price?: number; action?: string } = {};
 
-      // 변경된 값만 포함
-      if (canEditQuantity && editedQuantity !== (request.quantity || 0)) {
-        modifications.quantity = editedQuantity;
+      // 변경된 값만 포함 (빈 문자열은 0으로 변환)
+      const finalQuantity = editedQuantity || 0;
+      const finalPrice = editedPrice || 0;
+
+      if (canEditQuantity && finalQuantity !== (request.quantity || 0)) {
+        modifications.quantity = finalQuantity;
       }
-      if (canEditPrice && editedPrice !== (request.price || 0)) {
-        modifications.price = editedPrice;
+      if (canEditPrice && finalPrice !== (request.price || 0)) {
+        modifications.price = finalPrice;
       }
       if (canEditAction && editedAction.toLowerCase() !== (request.action || "buy").toLowerCase()) {
         modifications.action = editedAction.toLowerCase();
@@ -262,19 +266,21 @@ export default function UnifiedTradingApprovalPanel({
                 <input
                   type="number"
                   value={editedQuantity}
-                  onChange={(e) => setEditedQuantity(Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEditedQuantity(val === "" ? "" : Number(val));
+                  }}
                   className="w-full px-2 py-1 text-base font-bold rounded border"
                   style={{
                     backgroundColor: "var(--container-background)",
                     borderColor: "var(--border-default)",
                     color: "var(--text-primary)",
                   }}
-                  min="1"
                   step="1"
                 />
               ) : (
                 <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
-                  {formatNumber(editedQuantity)} {t("hitl.shares")}
+                  {formatNumber(editedQuantity || 0)} {t("hitl.shares")}
                 </div>
               )}
             </div>
@@ -307,19 +313,21 @@ export default function UnifiedTradingApprovalPanel({
                 <input
                   type="number"
                   value={editedPrice}
-                  onChange={(e) => setEditedPrice(Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEditedPrice(val === "" ? "" : Number(val));
+                  }}
                   className="w-full px-2 py-1 text-base font-bold rounded border"
                   style={{
                     backgroundColor: "var(--container-background)",
                     borderColor: "var(--border-default)",
                     color: "var(--text-primary)",
                   }}
-                  min="1"
                   step="100"
                 />
               ) : (
                 <div className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
-                  {formatCurrency(editedPrice)}
+                  {formatCurrency(editedPrice || 0)}
                 </div>
               )}
             </div>
@@ -688,31 +696,51 @@ export default function UnifiedTradingApprovalPanel({
           </button>
 
           {/* Modify Button */}
-          <button
-            onClick={handleModify}
-            disabled={disabled || (!adjustmentRequest.trim() && !isEdited)}
-            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: (adjustmentRequest.trim() || isEdited)
-                ? (isDark ? "#374151" : "#ffffff")
-                : "var(--container-background)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border-default)",
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled && (adjustmentRequest.trim() || isEdited)) {
-                e.currentTarget.style.backgroundColor = isDark ? "#4b5563" : "#f9fafb";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = (adjustmentRequest.trim() || isEdited)
-                ? (isDark ? "#374151" : "#ffffff")
-                : "var(--container-background)";
-            }}
-          >
-            {t("hitl.unified.modify")}
-            {isEdited && <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>({editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0) ? "수정됨" : ""})</span>}
-          </button>
+          {(() => {
+            const hasText = adjustmentRequest.trim().length > 0;
+            const canSubmitNumbers =
+              !!editedQuantity && editedQuantity > 0 && !!editedPrice && editedPrice > 0;
+            const isActive = (hasText || isEdited) && canSubmitNumbers;
+
+            return (
+              <button
+                onClick={handleModify}
+                disabled={disabled || !isActive}
+                className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  // 비활성 상태에서도 배경/보더 대비를 조금 올려 항상 버튼처럼 보이도록 처리
+                  backgroundColor: isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)",
+                  color: isActive
+                    ? (isDark ? "#e5e7eb" : "#1d4ed8")
+                    : "var(--text-primary)",
+                  border: `1px solid ${
+                    isActive ? "#2563eb" : "var(--border-emphasis)"
+                  }`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!disabled && isActive) {
+                    e.currentTarget.style.backgroundColor = isDark ? "#374151" : "#d0e2ff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)";
+                }}
+              >
+                {t("hitl.unified.modify")}
+                {isEdited && (
+                  <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>
+                    {editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0)
+                      ? "(수정됨)"
+                      : ""}
+                  </span>
+                )}
+              </button>
+            );
+          })()}
 
           {/* Approve Button */}
           <button

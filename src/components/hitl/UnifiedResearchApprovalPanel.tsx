@@ -46,8 +46,8 @@ export default function UnifiedResearchApprovalPanel({
   // 선택 상태(데모용 로컬 상태) – 백엔드 권장값이 오면 기본값으로 매핑
   const [subgraph, setSubgraph] = React.useState<"qualitative" | "quantitative" | "both">("both");
   const [depth, setDepth] = React.useState<"brief" | "detailed" | "comprehensive">(request.depth_level || "detailed");
-  const [scope, setScope] = React.useState<"narrow" | "balanced" | "broad">("balanced");
-  const [perspectives, setPerspectives] = React.useState<string[]>(["macro", "fundamental", "technical"]);
+  const [scope, setScope] = React.useState<"narrow" | "balanced" | "broad">(request.plan?.scope as any || "balanced");
+  const [perspectives, setPerspectives] = React.useState<string[]>(request.plan?.perspectives || ["macro", "fundamental", "technical"]);
 
   const modifiableFields = request.modifiable_fields ?? ["depth", "scope", "perspectives"];
   const supportsUserInput = request.supports_user_input ?? true;
@@ -55,21 +55,29 @@ export default function UnifiedResearchApprovalPanel({
   const canModifyScope = modifiableFields.includes("scope");
   const canModifyPerspectives = modifiableFields.includes("perspectives");
 
+  // 실제 변경사항 확인 - 원본값과 비교
+  const originalDepth = request.depth_level || "detailed";
+  const originalScope = request.plan?.scope || "balanced";
+  const originalPerspectives = request.plan?.perspectives || ["macro", "fundamental", "technical"];
+
+  const isModified =
+    (canModifyDepth && depth !== originalDepth) ||
+    (canModifyScope && scope !== originalScope) ||
+    (canModifyPerspectives && JSON.stringify([...perspectives].sort()) !== JSON.stringify([...originalPerspectives].sort()));
+
   const handleModify = () => {
     if (onModify) {
       // 구조화된 수정사항 생성 (HITL-MODIFY-PATTERN.md)
       const modifications: { depth?: string; scope?: string; perspectives?: string[] } = {};
 
       // 변경된 값만 포함 (modifiable_fields 기준)
-      if (canModifyDepth && depth !== request.depth_level) {
+      if (canModifyDepth && depth !== originalDepth) {
         modifications.depth = depth;
       }
-      if (canModifyScope) {
+      if (canModifyScope && scope !== originalScope) {
         modifications.scope = scope;
       }
-      // perspectives 변경 확인
-      const originalPerspectives = (request as any).perspectives || [];
-      if (canModifyPerspectives && JSON.stringify(perspectives.sort()) !== JSON.stringify(originalPerspectives.sort())) {
+      if (canModifyPerspectives && JSON.stringify([...perspectives].sort()) !== JSON.stringify([...originalPerspectives].sort())) {
         modifications.perspectives = perspectives;
       }
 
@@ -412,30 +420,46 @@ export default function UnifiedResearchApprovalPanel({
           </button>
 
           {/* Modify Button */}
-          <button
-            onClick={handleModify}
-            disabled={disabled}
-            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: adjustmentRequest.trim()
-                ? (isDark ? "#374151" : "#ffffff")
-                : "var(--container-background)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border-default)",
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled && adjustmentRequest.trim()) {
-                e.currentTarget.style.backgroundColor = isDark ? "#4b5563" : "#f9fafb";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = adjustmentRequest.trim()
-                ? (isDark ? "#374151" : "#ffffff")
-                : "var(--container-background)";
-            }}
-          >
-            {t("hitl.unified.modify")}
-          </button>
+          {(() => {
+            const hasText = adjustmentRequest.trim().length > 0;
+            const isActive = hasText || isModified;
+
+            return (
+              <button
+                onClick={handleModify}
+                disabled={disabled || !isActive}
+                className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)",
+                  color: isActive
+                    ? (isDark ? "#e5e7eb" : "#1d4ed8")
+                    : "var(--text-primary)",
+                  border: `1px solid ${
+                    isActive ? "#2563eb" : "var(--border-emphasis)"
+                  }`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!disabled && isActive) {
+                    e.currentTarget.style.backgroundColor = isDark ? "#374151" : "#d0e2ff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)";
+                }}
+              >
+                {t("hitl.unified.modify")}
+                {isModified && (
+                  <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>
+                    ({t("common.modified") || "수정됨"})
+                  </span>
+                )}
+              </button>
+            );
+          })()}
 
           {/* Approve Button */}
           <button

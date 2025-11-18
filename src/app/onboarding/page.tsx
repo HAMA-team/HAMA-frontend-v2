@@ -182,6 +182,13 @@ export default function OnboardingPage() {
       type: computedRiskProfileType,
       description,
       last_updated: now,
+      context: {
+        name: trimmedName,
+        age: computedAge,
+        purpose: form.purpose.trim(),
+        styleKey: form.style || "neutral",
+        allocation: form.allocation || 1,
+      },
     });
 
     router.push("/settings");

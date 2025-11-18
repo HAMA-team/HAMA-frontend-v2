@@ -85,6 +85,34 @@ export default function InvestmentProfile() {
 
   // Phase 3: 실제 프로필 표시
   const typeKey = getTypeKey(investmentProfile.type as unknown as string);
+  const context = investmentProfile.context;
+
+  const description = React.useMemo(() => {
+    if (!context) {
+      return investmentProfile.description;
+    }
+
+    const styleKey = context.styleKey || "neutral";
+    const allocation = context.allocation || 1;
+    const localizedTypeLabel = t(`mypage.profile.types.${typeKey}`);
+    const styleLabel = t(
+      `mypage.onboarding.style.options.${styleKey}.title`,
+    );
+    const allocationLabel = t(
+      `mypage.onboarding.allocation.options.${allocation}.label`,
+    );
+
+    return t("mypage.onboarding.summary.description", {
+      name: context.name || t("mypage.user.demoName"),
+      age: context.age,
+      purpose:
+        context.purpose?.trim() ||
+        t("mypage.onboarding.summary.defaultPurpose"),
+      style: styleLabel,
+      allocation: allocationLabel,
+      type: localizedTypeLabel,
+    });
+  }, [context, investmentProfile.description, t, typeKey]);
 
   return (
     <div
@@ -133,7 +161,7 @@ export default function InvestmentProfile() {
           color: "var(--text-primary)",
         }}
       >
-        {investmentProfile.description}
+        {description}
       </div>
 
       {/* 로딩 상태 */}

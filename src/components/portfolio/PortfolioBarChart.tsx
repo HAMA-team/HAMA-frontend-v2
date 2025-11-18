@@ -76,13 +76,13 @@ export default function PortfolioBarChart({ stocks = [] }: PortfolioBarChartProp
               color: data.returnRate >= 0 ? "var(--chart-profit)" : "var(--chart-loss)",
             }}
           >
-            수익률: {formatPercentage(data.returnRate)}
+            {t("portfolio.charts.labels.returnRate")}: {formatPercentage(data.returnRate)}
           </p>
           <p className="text-xs mb-0.5" style={{ color: "var(--text-secondary)" }}>
-            수익금액: {formatCurrency(data.return)}
+            {t("portfolio.charts.labels.returnAmount")}: {formatCurrency(data.return)}
           </p>
           <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-            평가금액: {formatCurrency(data.value)}
+            {t("portfolio.charts.labels.value")}: {formatCurrency(data.value)}
           </p>
         </div>
       );

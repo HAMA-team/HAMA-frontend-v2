@@ -35,6 +35,7 @@ export default function PortfolioSummary({ summary }: PortfolioSummaryProps) {
   };
 
   const isPositive = summary.totalReturnRate >= 0;
+  const stockValue = summary.totalValue - summary.cash;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -57,6 +58,14 @@ export default function PortfolioSummary({ summary }: PortfolioSummaryProps) {
           style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}
         >
           {formatCurrency(summary.totalValue)}
+        </p>
+        <p
+          className="mt-1 text-sm"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          {t("portfolio.summary.valueBreakdown", {
+            stockValue: formatCurrency(stockValue),
+          })}
         </p>
       </div>
 
