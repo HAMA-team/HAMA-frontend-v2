@@ -382,14 +382,20 @@
                                                      "colorMode":  "By Stock",
                                                      "returnMode":  "By Return"
                                                  },
-                                       "pie":  {
+                                        "pie":  {
                                                    "title":  "Allocation by Sector",
                                                    "description":  "Shows holdings grouped by sector"
                                                },
                                        "bar":  {
                                                    "title":  "Return by Stock",
                                                    "description":  "Shows stocks ordered by return rate"
-                                               }
+                                               },
+                                        "labels": {
+                                                    "value": "Value",
+                                                    "weight": "Weight",
+                                                    "returnRate": "Return %",
+                                                    "returnAmount": "P/L"
+                                                  }
                                    }
                     ,
                         "sectors": {

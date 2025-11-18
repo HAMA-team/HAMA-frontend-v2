@@ -77,10 +77,10 @@ export default function PortfolioPieChart({ stocks = [] }: PortfolioPieChartProp
             {data.name}
           </p>
           <p className="text-xs mb-0.5" style={{ color: "var(--text-secondary)" }}>
-            평가금액: {formatCurrency(data.value)}
+            {t("portfolio.charts.labels.value")}: {formatCurrency(data.value)}
           </p>
           <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-            비중: {data.weight.toFixed(2)}%
+            {t("portfolio.charts.labels.weight")}: {data.weight.toFixed(2)}%
           </p>
         </div>
       );

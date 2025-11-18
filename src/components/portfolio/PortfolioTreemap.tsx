@@ -80,10 +80,10 @@ export default function PortfolioTreemap({ stocks = [] }: PortfolioTreemapProps)
             {data.name}
           </p>
           <p className="text-xs mb-0.5" style={{ color: "var(--text-secondary)" }}>
-            평가금액: {formatCurrency(data.size)}
+            {t("portfolio.charts.labels.value")}: {formatCurrency(data.size)}
           </p>
           <p className="text-xs mb-0.5" style={{ color: "var(--text-secondary)" }}>
-            비중: {data.weight.toFixed(2)}%
+            {t("portfolio.charts.labels.weight")}: {data.weight.toFixed(2)}%
           </p>
           <p
             className="text-xs font-semibold"
@@ -91,7 +91,7 @@ export default function PortfolioTreemap({ stocks = [] }: PortfolioTreemapProps)
               color: data.returnRate >= 0 ? "var(--chart-profit)" : "var(--chart-loss)",
             }}
           >
-            수익률: {formatPercentage(data.returnRate)}
+            {t("portfolio.charts.labels.returnRate")}: {formatPercentage(data.returnRate)}
           </p>
         </div>
       );
