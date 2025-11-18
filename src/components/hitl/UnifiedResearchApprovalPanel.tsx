@@ -46,8 +46,8 @@ export default function UnifiedResearchApprovalPanel({
   // 선택 상태(데모용 로컬 상태) – 백엔드 권장값이 오면 기본값으로 매핑
   const [subgraph, setSubgraph] = React.useState<"qualitative" | "quantitative" | "both">("both");
   const [depth, setDepth] = React.useState<"brief" | "detailed" | "comprehensive">(request.depth_level || "detailed");
-  const [scope, setScope] = React.useState<"narrow" | "balanced" | "broad">("balanced");
-  const [perspectives, setPerspectives] = React.useState<string[]>(["macro", "fundamental", "technical"]);
+  const [scope, setScope] = React.useState<"narrow" | "balanced" | "broad">(request.plan?.scope as any || "balanced");
+  const [perspectives, setPerspectives] = React.useState<string[]>(request.plan?.perspectives || ["macro", "fundamental", "technical"]);
 
   const modifiableFields = request.modifiable_fields ?? ["depth", "scope", "perspectives"];
   const supportsUserInput = request.supports_user_input ?? true;
@@ -55,12 +55,15 @@ export default function UnifiedResearchApprovalPanel({
   const canModifyScope = modifiableFields.includes("scope");
   const canModifyPerspectives = modifiableFields.includes("perspectives");
 
-  // 실제 변경사항 확인
-  const originalPerspectives = (request as any).perspectives || [];
+  // 실제 변경사항 확인 - 원본값과 비교
+  const originalDepth = request.depth_level || "detailed";
+  const originalScope = request.plan?.scope || "balanced";
+  const originalPerspectives = request.plan?.perspectives || ["macro", "fundamental", "technical"];
+
   const isModified =
-    (canModifyDepth && depth !== request.depth_level) ||
-    (canModifyScope && scope !== "balanced") || // scope는 기본값 "balanced"와 비교
-    (canModifyPerspectives && JSON.stringify(perspectives.sort()) !== JSON.stringify(originalPerspectives.sort()));
+    (canModifyDepth && depth !== originalDepth) ||
+    (canModifyScope && scope !== originalScope) ||
+    (canModifyPerspectives && JSON.stringify([...perspectives].sort()) !== JSON.stringify([...originalPerspectives].sort()));
 
   const handleModify = () => {
     if (onModify) {
@@ -68,15 +71,13 @@ export default function UnifiedResearchApprovalPanel({
       const modifications: { depth?: string; scope?: string; perspectives?: string[] } = {};
 
       // 변경된 값만 포함 (modifiable_fields 기준)
-      if (canModifyDepth && depth !== request.depth_level) {
+      if (canModifyDepth && depth !== originalDepth) {
         modifications.depth = depth;
       }
-      if (canModifyScope) {
+      if (canModifyScope && scope !== originalScope) {
         modifications.scope = scope;
       }
-      // perspectives 변경 확인
-      const originalPerspectives = (request as any).perspectives || [];
-      if (canModifyPerspectives && JSON.stringify(perspectives.sort()) !== JSON.stringify(originalPerspectives.sort())) {
+      if (canModifyPerspectives && JSON.stringify([...perspectives].sort()) !== JSON.stringify([...originalPerspectives].sort())) {
         modifications.perspectives = perspectives;
       }
 
