@@ -40,7 +40,6 @@ interface ThinkingSectionProps {
 
 interface StepGroup {
   phase: string;
-  agent: string;
   steps: ThinkingStep[];
   startIndex: number;
   endIndex: number;
@@ -152,6 +151,63 @@ const getPhaseNameKey = (phase: string): string => {
 };
 
 /**
+ * Description에서 Phase 추론 (임시 방편)
+ *
+ * TODO: 백엔드에서 reasoning_event.phase를 올바르게 설정하면 이 함수 제거
+ *
+ * @see docs/reasoningEventStreamGuide.md - Phase 정의
+ */
+function inferPhaseFromDescription(description: string): string {
+  const desc = description.toLowerCase();
+
+  // 백엔드 실제 패턴 우선 매칭 (ThinkingStep3.png 분석 기반)
+  // Supervision 패턴
+  if (desc.includes("supervise") || desc.includes("supervisor") || desc.includes("master")) return "supervision";
+
+  // Tool 실행 패턴 (call, import, export, API 호출 등)
+  if (desc.includes("call end") || desc.includes("call start")) return "tool";
+  if (desc.includes("/import") || desc.includes("/export")) return "tool";
+  if (desc.includes("insertgraph") || desc.includes("insert_graph")) return "tool";
+  if (desc.includes("api") || desc.includes("fetch_") || desc.includes("get_")) return "tool";
+
+  // Data Collection 패턴
+  if (desc.includes("data_worker") || desc.includes("collector") || desc.includes("database")) return "data_collection";
+  if (desc.includes("loading") || desc.includes("fetching") || desc.includes("collecting")) return "data_collection";
+  if (desc.includes("scraping") || desc.includes("crawling")) return "data_collection";
+
+  // LLM 추론 패턴
+  if (desc.includes("llm") || desc.includes("reasoning") || desc.includes("thinking")) return "llm";
+  if (desc.includes("generating") || desc.includes("analyzing")) return "llm";
+  if (desc.includes("completion") || desc.includes("chat")) return "llm";
+
+  // Planning 패턴
+  if (desc.includes("planner") || desc.includes("planning")) return "planning";
+  if (desc.includes("strategy") || desc.includes("route")) return "planning";
+
+  // 명시적 Phase 키워드 매칭 (한글)
+  if (desc.includes("계획")) return "planning";
+  if (desc.includes("데이터 수집")) return "data_collection";
+  if (desc.includes("추론")) return "llm";
+  if (desc.includes("도구 실행")) return "tool";
+  if (desc.includes("조율")) return "supervision";
+  if (desc.includes("라우팅")) return "routing";
+  if (desc.includes("마무리")) return "finalization";
+  if (desc.includes("승인") || desc.includes("hitl") || desc.includes("approval")) return "hitl";
+
+  // Routing 패턴
+  if (desc.includes("routing") || desc.includes("router")) return "routing";
+
+  // Finalization 패턴 (구체적인 키워드만 사용, complete/done은 너무 광범위)
+  if (desc.includes("finalization") || desc.includes("finalizing")) return "finalization";
+  if (desc.includes("summary") || desc.includes("summarizing") || desc.includes("결론")) return "finalization";
+  if (desc.includes("wrapping up") || desc.includes("finishing")) return "finalization";
+  if (desc.includes("final response") || desc.includes("최종 응답")) return "finalization";
+
+  // Fallback
+  return "agent_execution";
+}
+
+/**
  * Steps를 Phase/Agent별로 그룹화
  */
 function groupStepsByPhase(steps: ThinkingStep[]): StepGroup[] {
@@ -159,17 +215,16 @@ function groupStepsByPhase(steps: ThinkingStep[]): StepGroup[] {
   let currentGroup: StepGroup | null = null;
 
   steps.forEach((step, index) => {
-    const phase = step.reasoning_event?.phase || "agent_execution";
-    const agent = step.agent;
+    // TODO: 백엔드에서 reasoning_event.phase를 올바르게 설정하면 inferPhaseFromDescription 제거
+    const phase = step.reasoning_event?.phase || inferPhaseFromDescription(step.description);
 
-    // 새로운 phase/agent 그룹 시작 조건
-    if (!currentGroup || currentGroup.phase !== phase || currentGroup.agent !== agent) {
+    // 새로운 phase 그룹 시작 조건 (agent는 무시, phase만으로 그룹화)
+    if (!currentGroup || currentGroup.phase !== phase) {
       if (currentGroup) {
         groups.push(currentGroup);
       }
       currentGroup = {
         phase,
-        agent,
         steps: [step],
         startIndex: index,
         endIndex: index,
