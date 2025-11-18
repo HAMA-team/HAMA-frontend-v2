@@ -55,6 +55,13 @@ export default function UnifiedResearchApprovalPanel({
   const canModifyScope = modifiableFields.includes("scope");
   const canModifyPerspectives = modifiableFields.includes("perspectives");
 
+  // 실제 변경사항 확인
+  const originalPerspectives = (request as any).perspectives || [];
+  const isModified =
+    (canModifyDepth && depth !== request.depth_level) ||
+    (canModifyScope && scope !== "balanced") || // scope는 기본값 "balanced"와 비교
+    (canModifyPerspectives && JSON.stringify(perspectives.sort()) !== JSON.stringify(originalPerspectives.sort()));
+
   const handleModify = () => {
     if (onModify) {
       // 구조화된 수정사항 생성 (HITL-MODIFY-PATTERN.md)
@@ -412,30 +419,46 @@ export default function UnifiedResearchApprovalPanel({
           </button>
 
           {/* Modify Button */}
-          <button
-            onClick={handleModify}
-            disabled={disabled}
-            className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: adjustmentRequest.trim()
-                ? (isDark ? "#374151" : "#ffffff")
-                : "var(--container-background)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border-default)",
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled && adjustmentRequest.trim()) {
-                e.currentTarget.style.backgroundColor = isDark ? "#4b5563" : "#f9fafb";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = adjustmentRequest.trim()
-                ? (isDark ? "#374151" : "#ffffff")
-                : "var(--container-background)";
-            }}
-          >
-            {t("hitl.unified.modify")}
-          </button>
+          {(() => {
+            const hasText = adjustmentRequest.trim().length > 0;
+            const isActive = hasText || isModified;
+
+            return (
+              <button
+                onClick={handleModify}
+                disabled={disabled || !isActive}
+                className="flex-1 px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)",
+                  color: isActive
+                    ? (isDark ? "#e5e7eb" : "#1d4ed8")
+                    : "var(--text-primary)",
+                  border: `1px solid ${
+                    isActive ? "#2563eb" : "var(--border-emphasis)"
+                  }`,
+                }}
+                onMouseEnter={(e) => {
+                  if (!disabled && isActive) {
+                    e.currentTarget.style.backgroundColor = isDark ? "#374151" : "#d0e2ff";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = isActive
+                    ? (isDark ? "#1f2937" : "#e0edff")
+                    : "var(--surface-muted)";
+                }}
+              >
+                {t("hitl.unified.modify")}
+                {isModified && (
+                  <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>
+                    ({t("common.modified") || "수정됨"})
+                  </span>
+                )}
+              </button>
+            );
+          })()}
 
           {/* Approve Button */}
           <button
