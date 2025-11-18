@@ -848,6 +848,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       // 승인 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
       await refreshChatHistory(currentThreadId);
 
+      // 승인 완료 후 isLoading을 false로 설정하여 ChatInput 다시 활성화
+      setLoading(false);
+
     } catch (error) {
       console.error("Approval error:", error);
       closeApprovalPanel(); // HITL 패널 먼저 닫기
@@ -860,6 +863,8 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `승인 실패: ${serverMsg}`
       });
+      // 에러 발생 시에도 isLoading을 false로 설정
+      setLoading(false);
     } finally {
       try { setApprovalBusy(false); } catch {}
     }
@@ -894,6 +899,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       // 거부 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
       await refreshChatHistory(currentThreadId);
 
+      // 거부 완료 후 isLoading을 false로 설정하여 ChatInput 다시 활성화
+      setLoading(false);
+
     } catch (error) {
       console.error("Rejection error:", error);
       // 백엔드 에러 메시지 출력
@@ -906,6 +914,8 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `거부 실패: ${serverMsg}`
       });
+      // 에러 발생 시에도 isLoading을 false로 설정
+      setLoading(false);
     } finally {
       try { setApprovalBusy(false); } catch {}
     }
@@ -948,6 +958,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       // 수정 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
       await refreshChatHistory(currentThreadId);
 
+      // 수정 완료 후 isLoading을 false로 설정하여 ChatInput 다시 활성화
+      setLoading(false);
+
     } catch (error) {
       console.error("Modification error:", error);
       closeApprovalPanel();
@@ -959,6 +972,8 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `수정 실패: ${serverMsg}`
       });
+      // 에러 발생 시에도 isLoading을 false로 설정
+      setLoading(false);
     } finally {
       try { setApprovalBusy(false); } catch {}
     }
