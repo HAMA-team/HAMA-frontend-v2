@@ -1,5 +1,6 @@
 import apiClient from "@/lib/api";
 import { Portfolio, Stock } from "@/lib/types/portfolio";
+import { normalizeSector } from "@/lib/sector";
 
 // API Types (subset from OpenAPI)
 interface PortfolioOverviewAPI {
@@ -86,7 +87,7 @@ function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
       return: h.profit ?? h.pnl ?? 0,
       returnRate: h.profit_rate ?? h.return_rate ?? 0,
       weight: h.weight ?? 0,
-      sector: h.sector ?? "", // 섹터는 chart-data API에서 보강
+      sector: normalizeSector(h.sector, h.stock_name ?? h.name ?? h.ticker_name ?? h.display_name ?? ""),
     }));
 
   // 주식 평가금액 및 주식 원금 (백엔드 summary가 없을 때를 위한 보조 지표)
@@ -109,19 +110,16 @@ function mapOverviewToPortfolio(api: PortfolioOverviewAPI): Portfolio {
       ? backendCash
       : Math.max(0, totalValue - stocksValue);
 
-  // 전체 원금 = 주식 매수 원금 + 현재 보유 현금
-  const principal: number = stocksPrincipal + cash;
-
-  const profit: number = totalValue - principal;
-
-  const profitRate: number =
-    principal > 0 ? (profit / principal) * 100 : 0;
+  // 총 수익/수익률은 "주식 원금 대비 주식 평가금" 기준으로 계산
+  const stockProfit: number = stocksValue - stocksPrincipal;
+  const stockProfitRate: number =
+    stocksPrincipal > 0 ? (stockProfit / stocksPrincipal) * 100 : 0;
 
   return {
     summary: {
       totalValue,
-      totalReturn: profit,
-      totalReturnRate: profitRate,
+      totalReturn: stockProfit,
+      totalReturnRate: stockProfitRate,
       stockCount: stocks.length, // 현금 제외한 실제 종목 수
       cash,
     },

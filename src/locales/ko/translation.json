@@ -100,13 +100,14 @@
   },
   "portfolio": {
     "title": "포트폴리오",
-    "summary": {
-      "totalValue": "총 평가금액",
-      "totalReturn": "총 수익률",
-      "holdings": "보유 종목 수",
-      "cash": "현금 보유액",
-      "stockCount": "개"
-    },
+      "summary": {
+        "totalValue": "총 평가금액",
+        "totalReturn": "총 수익률",
+        "holdings": "보유 종목 수",
+        "cash": "현금 보유액",
+        "stockCount": "개",
+        "valueBreakdown": "주식 평가금액 {{stockValue}}"
+      },
     "holdings": {
       "title": "보유 종목",
       "quantity": "보유 수량",
@@ -121,23 +122,33 @@
       "pie": "원형",
       "bar": "막대"
     },
-    "charts": {
-      "treemap": {
-        "title": "종목별 비중",
-        "description": "보유 종목의 평가금액을 면적으로 표시합니다",
-        "colorMode": "종목별",
-        "returnMode": "수익률별"
+      "charts": {
+        "treemap": {
+          "title": "종목별 비중",
+          "description": "보유 종목의 평가금액을 면적으로 표시합니다",
+          "colorMode": "종목별",
+          "returnMode": "수익률별"
+        },
+        "pie": {
+          "title": "섹터별 비중",
+          "description": "보유 종목을 섹터별로 그룹화하여 표시합니다"
+        },
+        "bar": {
+          "title": "종목별 수익률",
+          "description": "수익률이 높은 종목부터 순서대로 표시합니다"
+        }
       },
-      "pie": {
-        "title": "섹터별 비중",
-        "description": "보유 종목을 섹터별로 그룹화하여 표시합니다"
-      },
-      "bar": {
-        "title": "종목별 수익률",
-        "description": "수익률이 높은 종목부터 순서대로 표시합니다"
+      "sectors": {
+        "semiconductor": "반도체",
+        "battery": "배터리",
+        "it": "IT",
+        "bio": "바이오",
+        "chemicals": "화학",
+        "foodBeverage": "식품/음료",
+        "entertainment": "엔터테인먼트",
+        "other": "기타"
       }
-    }
-  },
+    },
   "artifacts": {
     "title": "저장된 분석",
     "listTitle": "아티팩트",

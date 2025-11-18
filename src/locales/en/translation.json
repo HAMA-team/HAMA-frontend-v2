@@ -354,12 +354,13 @@
     "portfolio":  {
                       "title":  "Portfolio",
                       "summary":  {
-                                      "totalValue":  "Total Value",
-                                      "totalReturn":  "Total Return",
-                                      "holdings":  "Holdings",
-                                      "cash":  "Cash",
-                                      "stockCount":  ""
-                                  },
+                                        "totalValue":  "Total Value",
+                                        "totalReturn":  "Total Return",
+                                        "holdings":  "Holdings",
+                                        "cash":  "Cash",
+                                        "stockCount":  "",
+                                        "valueBreakdown": "Stock Value {{stockValue}}"
+                                    },
                       "holdings":  {
                                        "title":  "Holdings",
                                        "quantity":  "Quantity",
@@ -381,16 +382,27 @@
                                                      "colorMode":  "By Stock",
                                                      "returnMode":  "By Return"
                                                  },
-                                     "pie":  {
-                                                 "title":  "Allocation by Sector",
-                                                 "description":  "Shows holdings grouped by sector"
-                                             },
-                                     "bar":  {
-                                                 "title":  "Return by Stock",
-                                                 "description":  "Shows stocks ordered by return rate"
-                                             }
-                                 }
-                  },
+                                       "pie":  {
+                                                   "title":  "Allocation by Sector",
+                                                   "description":  "Shows holdings grouped by sector"
+                                               },
+                                       "bar":  {
+                                                   "title":  "Return by Stock",
+                                                   "description":  "Shows stocks ordered by return rate"
+                                               }
+                                   }
+                    ,
+                        "sectors": {
+                          "semiconductor": "Semiconductors",
+                          "battery": "Batteries",
+                          "it": "IT",
+                          "bio": "Biotech",
+                          "chemicals": "Chemicals",
+                          "foodBeverage": "Food & Beverage",
+                          "entertainment": "Entertainment",
+                          "other": "Others"
+                        }
+                    },
     "artifacts":  {
                       "title":  "Artifacts",
                       "listTitle":  "Artifacts",

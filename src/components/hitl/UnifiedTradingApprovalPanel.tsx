@@ -68,18 +68,18 @@ export default function UnifiedTradingApprovalPanel({
   };
 
   const getRiskBgColor = (level?: string) => {
-    switch (level) {
-      case "high":
-        return "#fef2f2";
-      case "medium":
-        return "#fef3c7";
+      switch (level) {
+        case "high":
+          return "#fef2f2";
+        case "medium":
+          return "#fef3c7";
       case "low":
         return "#f0fdf4";
-      default:
-        return "var(--lnb-background)";
-    }
-  };
-
+        default:
+          return "var(--lnb-background)";
+      }
+    };
+  
   const hasRiskInfo = request.risk_level && request.risk_warnings && request.risk_warnings.length > 0;
 
   const isSell = (request.action || "buy").toLowerCase() === "sell";

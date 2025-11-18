@@ -28,29 +28,27 @@ export default function PortfolioPieChart({ stocks = [] }: PortfolioPieChartProp
 
   // 섹터별 그룹화: 같은 섹터의 종목들을 합산
   const sectorMap = new Map<string, { value: number; weight: number }>();
-  const totalValue = stocks.reduce((sum, stock) => sum + stock.value, 0);
 
   stocks.forEach((stock) => {
-    // 섹터가 없으면 "기타"로 분류
-    const sectorName = stock.sector && stock.sector.trim() !== "" ? stock.sector : "기타";
-
-    const existing = sectorMap.get(sectorName) || { value: 0, weight: 0 };
+    const sectorKey = stock.sector && stock.sector.trim() !== "" ? stock.sector : "other";
+    const existing = sectorMap.get(sectorKey) || { value: 0, weight: 0 };
     existing.value += stock.value;
     existing.weight += stock.weight;
-    sectorMap.set(sectorName, existing);
+    sectorMap.set(sectorKey, existing);
   });
 
   // Map을 배열로 변환하여 차트 데이터 생성
-  const dataArray = Array.from(sectorMap.entries()).map(([name, { value, weight }]) => ({
-    name,
+  const dataArray = Array.from(sectorMap.entries()).map(([key, { value, weight }]) => ({
+    key,
+    name: t(`portfolio.sectors.${key}`, key),
     value,
     weight,
   }));
 
   // 정렬: 큰 것부터 (기타는 맨 마지막)
   dataArray.sort((a, b) => {
-    if (a.name === "기타") return 1;
-    if (b.name === "기타") return -1;
+    if (a.key === "other") return 1;
+    if (b.key === "other") return -1;
     return b.value - a.value; // 큰 것부터
   });
 

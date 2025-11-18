@@ -8,6 +8,7 @@ import { Portfolio } from "@/lib/types/portfolio";
 import { useTranslation } from "react-i18next";
 import { useAppModeStore } from "@/store/appModeStore";
 import { mockPortfolio } from "@/lib/mock/portfolioData";
+import { normalizeSector } from "@/lib/sector";
 
 // Dynamic import로 hydration 에러 해결 (i18n 사용)
 const ChatInput = dynamic(() => import("@/components/layout/ChatInput"), {
@@ -54,7 +55,8 @@ export default function PortfolioPage() {
               const sectorByCode = new Map<string, string>();
               chartData.stocks.forEach((s) => {
                 if (s.stock_code) {
-                  sectorByCode.set(s.stock_code, s.sector);
+                  const sectorKey = normalizeSector(s.sector, s.stock_name);
+                  sectorByCode.set(s.stock_code, sectorKey);
                 }
               });
 

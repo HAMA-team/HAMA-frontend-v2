@@ -73,8 +73,6 @@ export const MOCK_UNIFIED_TRADING_HIGH_RISK = {
   risk_level: "high" as const,
   risk_warnings: [
     "This trade will increase single stock weight to 42%, significantly above the recommended 30% threshold for individual positions.",
-    "Technology sector allocation will reach 65% of total portfolio, creating concentrated sector risk.",
-    "Cash ratio will drop to 5%, creating liquidity risk for emergency needs.",
   ],
 };
 
