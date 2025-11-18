@@ -824,22 +824,12 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       console.log("🔑 Approving with thread_id:", currentThreadId);
       console.log("📋 Approval panel data:", approvalPanel.data);
 
-      // HITL 패널 데이터에서 거래 정보 추출 (백엔드에서 사용할 수 있도록 전달)
-      const modifications: Record<string, any> = {};
+      // HITL-MODIFY-PATTERN.md:
+      // - Approved: decision="approved", modifications 생략
+      // - Modified: handleModify 경로에서만 modifications / user_input 전송
       let requestId: string | undefined;
-      if (approvalPanel.data) {
-        const data = approvalPanel.data as any;
-        if (data.request_id) requestId = String(data.request_id);
-        // Trading Agent의 경우 종목 코드, 수량 등 정보 포함
-        if (data.type === "trading" || data.stock_code) {
-          modifications.stock_code = data.stock_code;
-          modifications.stock_name = data.stock_name;
-          modifications.quantity = data.quantity;
-          modifications.price = data.price;
-          modifications.action = data.action;
-          modifications.total_amount = data.total_amount;
-        }
-        // 다른 Agent type의 경우도 필요한 데이터 포함 가능
+      if (approvalPanel.data && (approvalPanel.data as any).request_id) {
+        requestId = String((approvalPanel.data as any).request_id);
       }
 
       // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
@@ -847,7 +837,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         thread_id: currentThreadId,
         decision: "approved" as const,
         request_id: requestId,
-        modifications: Object.keys(modifications).length > 0 ? modifications : undefined,
       };
       console.log("[DEBUG] Approval Request Payload:", JSON.stringify(approvalPayload, null, 2));
 
