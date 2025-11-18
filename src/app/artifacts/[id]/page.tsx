@@ -8,7 +8,7 @@ import { useArtifactStore } from '@/store/artifactStore';
 import { formatDate } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ArrowLeft, Download, Share2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, Trash2 } from 'lucide-react';
 import { useDialogStore } from '@/store/dialogStore';
 
 // Dynamic import로 ChatInput 불러와 i18n hydration 에러 방지
@@ -102,14 +102,6 @@ export default function ArtifactDetailPage() {
     URL.revokeObjectURL(url);
   };
 
-  const handleShare = () => {
-    // Phase 3: Implement share functionality
-    openAlert({
-      title: t('artifacts.share'),
-      message: t('artifacts.shareComingSoon'),
-    });
-  };
-
   const handleDelete = () => {
     openConfirm({
       title: t('common.delete'),
@@ -186,14 +178,6 @@ export default function ArtifactDetailPage() {
                     title={t("artifacts.download")}
                   >
                     <Download className="w-5 h-5" strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
-                  </button>
-                  <button
-                    onClick={handleShare}
-                    className="p-2 rounded-lg hover:bg-opacity-80 transition-colors"
-                    style={{ backgroundColor: 'var(--container-background)' }}
-                    title={t("artifacts.share")}
-                  >
-                    <Share2 className="w-5 h-5" strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
                   </button>
                   <button
                     onClick={handleDelete}
