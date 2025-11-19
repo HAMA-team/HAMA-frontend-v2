@@ -824,22 +824,12 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       console.log("🔑 Approving with thread_id:", currentThreadId);
       console.log("📋 Approval panel data:", approvalPanel.data);
 
-      // HITL 패널 데이터에서 거래 정보 추출 (백엔드에서 사용할 수 있도록 전달)
-      const modifications: Record<string, any> = {};
+      // HITL-MODIFY-PATTERN.md:
+      // - Approved: decision="approved", modifications 생략
+      // - Modified: handleModify 경로에서만 modifications / user_input 전송
       let requestId: string | undefined;
-      if (approvalPanel.data) {
-        const data = approvalPanel.data as any;
-        if (data.request_id) requestId = String(data.request_id);
-        // Trading Agent의 경우 종목 코드, 수량 등 정보 포함
-        if (data.type === "trading" || data.stock_code) {
-          modifications.stock_code = data.stock_code;
-          modifications.stock_name = data.stock_name;
-          modifications.quantity = data.quantity;
-          modifications.price = data.price;
-          modifications.action = data.action;
-          modifications.total_amount = data.total_amount;
-        }
-        // 다른 Agent type의 경우도 필요한 데이터 포함 가능
+      if (approvalPanel.data && (approvalPanel.data as any).request_id) {
+        requestId = String((approvalPanel.data as any).request_id);
       }
 
       // Approval API 호출 (automation_level 제거됨 - hitl_config는 GraphState에 저장됨)
@@ -847,7 +837,6 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         thread_id: currentThreadId,
         decision: "approved" as const,
         request_id: requestId,
-        modifications: Object.keys(modifications).length > 0 ? modifications : undefined,
       };
       console.log("[DEBUG] Approval Request Payload:", JSON.stringify(approvalPayload, null, 2));
 
@@ -858,6 +847,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
 
       // 승인 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
       await refreshChatHistory(currentThreadId);
+
+      // 승인 완료 후 isLoading을 false로 설정하여 ChatInput 다시 활성화
+      setLoading(false);
 
     } catch (error) {
       console.error("Approval error:", error);
@@ -871,6 +863,8 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `승인 실패: ${serverMsg}`
       });
+      // 에러 발생 시에도 isLoading을 false로 설정
+      setLoading(false);
     } finally {
       try { setApprovalBusy(false); } catch {}
     }
@@ -905,6 +899,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       // 거부 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
       await refreshChatHistory(currentThreadId);
 
+      // 거부 완료 후 isLoading을 false로 설정하여 ChatInput 다시 활성화
+      setLoading(false);
+
     } catch (error) {
       console.error("Rejection error:", error);
       // 백엔드 에러 메시지 출력
@@ -917,6 +914,8 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `거부 실패: ${serverMsg}`
       });
+      // 에러 발생 시에도 isLoading을 false로 설정
+      setLoading(false);
     } finally {
       try { setApprovalBusy(false); } catch {}
     }
@@ -959,6 +958,9 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
       // 수정 후 Chat History 새로고침하여 백엔드가 저장한 메시지들 가져오기
       await refreshChatHistory(currentThreadId);
 
+      // 수정 완료 후 isLoading을 false로 설정하여 ChatInput 다시 활성화
+      setLoading(false);
+
     } catch (error) {
       console.error("Modification error:", error);
       closeApprovalPanel();
@@ -970,6 +972,8 @@ ${data.risk_warning ? `\n⚠️ **${t("hitl.trading.riskWarning") || "리스크 
         title: t('common.error'),
         message: `수정 실패: ${serverMsg}`
       });
+      // 에러 발생 시에도 isLoading을 false로 설정
+      setLoading(false);
     } finally {
       try { setApprovalBusy(false); } catch {}
     }
