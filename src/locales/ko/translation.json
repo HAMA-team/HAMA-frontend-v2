@@ -168,6 +168,8 @@
         "chemicals": "화학",
         "foodBeverage": "식품/음료",
         "entertainment": "엔터테인먼트",
+        "finance": "금융",
+        "energy": "에너지",
         "other": "기타"
       }
     },

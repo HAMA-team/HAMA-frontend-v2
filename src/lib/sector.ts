@@ -6,16 +6,20 @@ export type SectorKey =
   | "chemicals"
   | "foodBeverage"
   | "entertainment"
+  | "finance"
+  | "energy"
   | "other";
 
 const SECTOR_SYNONYMS: Record<SectorKey, string[]> = {
   semiconductor: ["반도체", "semiconductor", "semiconductors"],
   battery: ["배터리", "battery", "batteries"],
-  it: ["it", "정보기술"],
+  it: ["it", "정보기술", "통신", "telecommunication"],
   bio: ["바이오", "bio", "biotech", "biotechnology"],
   chemicals: ["화학", "chemicals", "chemical"],
   foodBeverage: ["식품", "음료", "식품/음료", "food", "beverage", "food & beverage"],
   entertainment: ["엔터", "엔터테인먼트", "entertainment", "media"],
+  finance: ["금융", "보험", "finance", "insurance", "financial"],
+  energy: ["에너지", "전력", "유틸리티", "energy", "utilities", "power"],
   other: [],
 };
 
@@ -41,6 +45,19 @@ const STOCK_SECTOR_BY_NAME: Record<string, SectorKey> = {
   // Entertainment
   "JYP Ent.": "entertainment",
   "JYP Entertainment": "entertainment",
+
+  // IT / Telecommunication
+  "SK텔레콤": "it",
+  "SK Telecom": "it",
+
+  // Finance / Insurance
+  "삼성생명": "finance",
+  "Samsung Life Insurance": "finance",
+
+  // Energy / Utilities
+  "한국전력": "energy",
+  "Korea Electric Power": "energy",
+  "KEPCO": "energy",
 };
 
 export function normalizeSector(rawSector?: string | null, name?: string | null): SectorKey {

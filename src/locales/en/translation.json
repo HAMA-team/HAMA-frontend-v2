@@ -422,6 +422,8 @@
                           "chemicals": "Chemicals",
                           "foodBeverage": "Food & Beverage",
                           "entertainment": "Entertainment",
+                          "finance": "Finance",
+                          "energy": "Energy",
                           "other": "Others"
                         }
                     },
