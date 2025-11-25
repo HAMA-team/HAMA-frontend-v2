@@ -15,7 +15,10 @@
     "stocks": "주식",
     "cash": "현금",
     "shares": "주",
-    "won": "원"
+    "won": "원",
+    "highRisk": "높은 리스크",
+    "mediumRisk": "중간 리스크",
+    "lowRisk": "낮은 리스크"
   },
   "nav": {
     "chat": "채팅",

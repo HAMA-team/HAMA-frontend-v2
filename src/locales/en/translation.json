@@ -15,7 +15,10 @@
                    "stocks": "Stocks",
                    "cash": "Cash",
                    "shares": "shares",
-                   "won": "KRW"
+                   "won": "KRW",
+                   "highRisk": "High Risk",
+                   "mediumRisk": "Medium Risk",
+                   "lowRisk": "Low Risk"
                },
     "nav":  {
                 "chat":  "Chat",
@@ -365,6 +368,15 @@
         "stocks": {
           "samsungElectronics": "Samsung Electronics"
         }
+      },
+      "simulator": {
+        "portfolioChanges": "Portfolio Changes",
+        "riskChanges": "Risk Changes",
+        "cashBalance": "Cash",
+        "weight": "Weight",
+        "volatility": "Volatility",
+        "maxDrawdown": "Max Drawdown",
+        "recalculation": "The server will recalculate with modified values and provide updated before/after data."
       }
     },
     "portfolio":  {
