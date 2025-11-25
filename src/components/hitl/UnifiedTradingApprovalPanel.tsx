@@ -173,7 +173,13 @@ export default function UnifiedTradingApprovalPanel({
                 : getRiskColor(request.risk_level),
             }}
           >
-            {request.risk_level.toUpperCase()} RISK
+            {t(
+              request.risk_level === "high"
+                ? "common.highRisk"
+                : request.risk_level === "medium"
+                ? "common.mediumRisk"
+                : "common.lowRisk"
+            )}
           </span>
         )}
       </div>
@@ -454,7 +460,7 @@ export default function UnifiedTradingApprovalPanel({
               className="text-lg font-semibold mb-3"
               style={{ color: "var(--text-primary)" }}
             >
-              📊 {t("hitl.simulator.portfolioChanges") || "포트폴리오 변화"}
+              📊 {t("hitl.simulator.portfolioChanges")}
             </h3>
             <div className="grid grid-cols-2 gap-3 mb-3">
               {/* 현금 비중 변화 */}
@@ -466,7 +472,7 @@ export default function UnifiedTradingApprovalPanel({
                 }}
               >
                 <div className="text-xs mb-1" style={{ color: "var(--text-secondary)" }}>
-                  {t("hitl.simulator.cashBalance") || "현금"}
+                  {t("hitl.simulator.cashBalance")}
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
@@ -488,7 +494,7 @@ export default function UnifiedTradingApprovalPanel({
                 }}
               >
                 <div className="text-xs mb-1" style={{ color: "var(--text-secondary)" }}>
-                  {request.stock_name} {t("hitl.simulator.weight") || "비중"}
+                  {request.stock_name} {t("hitl.simulator.weight")}
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   {(() => {
@@ -519,7 +525,7 @@ export default function UnifiedTradingApprovalPanel({
               className="text-lg font-semibold mb-3"
               style={{ color: "var(--text-primary)" }}
             >
-              📈 {t("hitl.simulator.riskChanges") || "리스크 변화"}
+              📈 {t("hitl.simulator.riskChanges")}
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {/* 변동성 */}
@@ -531,7 +537,7 @@ export default function UnifiedTradingApprovalPanel({
                 }}
               >
                 <div className="text-xs mb-1" style={{ color: "var(--text-secondary)" }}>
-                  {t("hitl.simulator.volatility") || "변동성"}
+                  {t("hitl.simulator.volatility")}
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
@@ -597,7 +603,7 @@ export default function UnifiedTradingApprovalPanel({
                 }}
               >
                 <div className="text-xs mb-1" style={{ color: "var(--text-secondary)" }}>
-                  {t("hitl.simulator.maxDrawdown") || "최대 낙폭"}
+                  {t("hitl.simulator.maxDrawdown")}
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold">
                   <span style={{ color: "var(--text-primary)" }}>
@@ -621,7 +627,7 @@ export default function UnifiedTradingApprovalPanel({
                 }}
               >
                 <p className="text-sm" style={{ color: isDark ? "#93c5fd" : "#1e40af" }}>
-                  ℹ️ {t("hitl.simulator.recalculation") || "수정 후 서버에서 재계산하여 새로운 전/후 비교 데이터를 제공합니다."}
+                  ℹ️ {t("hitl.simulator.recalculation")}
                 </p>
               </div>
             )}
@@ -734,7 +740,7 @@ export default function UnifiedTradingApprovalPanel({
                 {isEdited && (
                   <span style={{ marginLeft: "4px", fontSize: "0.75rem" }}>
                     {editedQuantity !== (request.quantity || 0) || editedPrice !== (request.price || 0)
-                      ? "(수정됨)"
+                      ? `(${t("common.modified")})`
                       : ""}
                   </span>
                 )}
